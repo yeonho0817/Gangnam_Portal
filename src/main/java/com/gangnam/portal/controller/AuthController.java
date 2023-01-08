@@ -1,7 +1,7 @@
 package com.gangnam.portal.controller;
 
 import com.gangnam.portal.dto.Response.ResponseData;
-import com.gangnam.portal.service.EmployeeService;
+import com.gangnam.portal.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("")
 @RequiredArgsConstructor
 public class AuthController {
-    private final EmployeeService employeeService;
+    private final AuthService authService;
 
     //구글 - 로그인 API 주소 넘기는 것
     @GetMapping("/google/login")
     public ResponseEntity login() {
-        ResponseData responseData = employeeService.login();
+        ResponseData responseData = authService.login();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -26,7 +26,7 @@ public class AuthController {
     // 구글 로그인 리다이렉트 -> 로그인 성공 시 서버 JWT 토큰 넘겨줌
     @GetMapping("/auth/google/callback")
     public ResponseEntity googleRedirectInfo(@RequestParam(value = "code") String authCode) {
-        ResponseData responseData = employeeService.googleRedirectInfo(authCode);
+        ResponseData responseData = authService.googleRedirectInfo(authCode);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
