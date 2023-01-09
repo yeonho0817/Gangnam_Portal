@@ -9,22 +9,7 @@ public class EmployeeDTO {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public static class LoginDTO {
-        private String email;
-        private String password;
-    }
-
-    @Data
-    @RequiredArgsConstructor
-    @AllArgsConstructor
-    public class FindPasswordDTO {
-        private String email;
-    }
-
-    @Data
-    @RequiredArgsConstructor
-    @AllArgsConstructor
-    public class UpdateInfoDTO {
+    public static class UpdateInfoDTO {
         private String password;
         private String phone;
         private String address;
@@ -33,13 +18,32 @@ public class EmployeeDTO {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public class ReadHumanResource {
+    public static class EmployeeInfo {
         private Long employeeId;
-        private String name;
+        private Long employeeNo;
+        private String name_kr;
+        private String name_en;
         private String ranks;
         private String department;
         private String team;
         private String email;
         private String phone;
     }
+
+    @Data
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class LoginResponseDTO {
+        private String accessToken;
+        private String refreshToken;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class FindEmployeeInfoDTO {
+        private String email;
+        private String roles;
+    }
+
 }

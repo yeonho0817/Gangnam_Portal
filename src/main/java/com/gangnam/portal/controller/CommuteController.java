@@ -37,16 +37,18 @@ public class CommuteController {
     
     // 월별 출퇴근 조회
     @GetMapping("")
-    public ResponseEntity commuteMy(@RequestParam(/*defaultValue = new Date()*/) Integer year,
-                                    @RequestParam Integer month) {
+
+    public ResponseEntity commuteMy(@RequestParam String year,
+                                    @RequestParam String month) {
 
         return null;
     }
 
     // 월별 출퇴근 조회
     @GetMapping("/all")
-    public ResponseEntity commuteAll(@RequestParam(/*defaultValue = new Date()*/) Integer year,
-                                    @RequestParam Integer month) {
+    public ResponseEntity commuteAll(@RequestParam String year,
+                                    @RequestParam String month) {
+
 
         return null;
     }

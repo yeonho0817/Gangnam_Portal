@@ -2,92 +2,69 @@ package com.gangnam.portal.config;
 
 import com.gangnam.portal.util.jwt.JwtAccessDeniedHandler;
 import com.gangnam.portal.util.jwt.JwtAuthenticationEntryPoint;
-import com.gangnam.portal.util.jwt.JwtAuthenticationFilter;
-import com.gangnam.portal.util.jwt.userDetails.CustomUserDetailService;
+import com.gangnam.portal.util.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig {
+    private final JwtFilter jwtFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtEntryPoint;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailService customUserDetailService;
-
-    @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManagerBean();
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    public void configure(WebSecurity webSecurity)
-//    {
-//        webSecurity.ignoring()
-//                .antMatchers("/swagger/**", "/swagger-ui.html","/swagger-resources/**", "/webjars/**", "/v2/api-docs");
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer(){
+//        return (web) -> web.ignoring()
+//                .antMatchers("/favicon.ico");
 //    }
-
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
                 .csrf().disable()
+
+                /**401, 403 Exception 핸들링 */
                 .exceptionHandling()
-                .authenticationEntryPoint(jwtEntryPoint)
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
+                /**세션 사용하지 않음*/
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
+                /** HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정*/
                 .and()
                 .authorizeRequests()
+                .antMatchers("/logout", "/reissue").permitAll()
 
+                // 구글 로그인
+                .antMatchers("/google/login", "/auth/google/callback").permitAll()
+                
+                //권한 부여
+//                .antMatchers("/hr/password").hasRole("ADMIN")
 
-                // 쉽게할려고
-//                .antMatchers("/**").permitAll()
-
-
-
-                // 설정 풀어야됨
-                .antMatchers("/login", "/hr/password").permitAll()
-                .antMatchers("/ws/info","/ws/**").permitAll()
+                // 나머지는 다 인증 필요
                 .anyRequest().authenticated()
 
+                /**JwtSecurityConfig 적용 */
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
-                .and()
-                .logout().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .invalidateHttpSession(true);
+                .build();
     }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
-    }
-
 }

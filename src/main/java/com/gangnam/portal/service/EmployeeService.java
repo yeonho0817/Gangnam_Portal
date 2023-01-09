@@ -1,39 +1,49 @@
 package com.gangnam.portal.service;
 
-import com.gangnam.portal.domain.Employee;
-import com.gangnam.portal.dto.EmployeeDTO;
-import com.gangnam.portal.dto.Response.ResponseData;
-import com.gangnam.portal.dto.Response.Status;
-import com.gangnam.portal.repository.EmployeeRepository;
-import com.gangnam.portal.util.jwt.JwtTokenUtil;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeeService {
-    private final EmployeeRepository employeeRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final EmployeeEmailCustomRepository employeeEmailCustomRepository;
 
-    //로그인
-    public ResponseData login(EmployeeDTO.LoginDTO loginDTO) {
-        Optional<Employee> findEmployee = employeeRepository.findByEmail(loginDTO.getEmail());
-
-        // 불일치 시
-        if (findEmployee.isEmpty()) return new ResponseData(Status.EMAIL_NOT_FOUND);
-        if (! passwordEncoder.matches(loginDTO.getPassword(), findEmployee.get().getPassword())) return new ResponseData(Status.PASSWORD_NOT_FOUND);
-        
-        // 일치 시
-        String accessToken = jwtTokenUtil.generateAccessToken(findEmployee.get().getId(), findEmployee.get().getEmail());
-        String refreshToken = jwtTokenUtil.generateRefreshToken(findEmployee.get().getId(), findEmployee.get().getEmail());
-        
-
-        return null;
-    }
+//    private final GoogleLoginInfo googleLoginInfo;
+//    private final JwtTokenProvider jwtTokenProvider;
+//
+//    //구글 - 로그인 API 주소 넘기는 것
+//    public ResponseData login() {
+//        ResponseEntity<Object> responseEntity = googleLoginInfo.googleLoginUri();
+//
+//        if (responseEntity == null) {
+//            return new ResponseData(Status.PROVIDER_REJECTED);
+//        } else {
+//            return new ResponseData(Status.PROVIDER_ACCEPTED, responseEntity);
+//        }
+//    }
+//
+//    // 구글 로그인 -> 성공시 대시보드 (월별 출근 현황, 사진, 소속, 부서)
+//    public ResponseData googleRedirectInfo(String authCode) {
+//        // 구글 이메일 받아오기
+//        String employeeEmail = googleLoginInfo.googleRedirectInfo(authCode).getEmail();
+//
+//        // Employee_Email 테이블에서 email이 존재하는지 검사
+//        Optional<EmployeeEmail> isExists = employeeEmailCustomRepository.isExists(employeeEmail);
+//
+//        if (isExists.isEmpty()) {
+//            return new ResponseData(Status.LOGIN_FAILED);
+//        } else {
+//            // jwt 토큰 생성
+//            String accessToken = jwtTokenProvider.generateAccessToken(isExists.get().getEmail(), isExists.get().getEmployee().getNameKr());
+//            String refreshToken = jwtTokenProvider.generateRefreshToken(isExists.get().getEmail(), isExists.get().getEmployee().getNameKr());
+//
+//            return new ResponseData(Status.LOGIN_SUCCESS, new EmployeeDTO.LoginResponseDTO(accessToken, refreshToken));
+//        }
+//
+//    }
 
     // 로그아웃
     public void logout() {

@@ -32,5 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+<<<<<<< HEAD
 
 src/main/resources/application.yml
+=======
+src/main/resources/application.yml
+>>>>>>> ff0b5d2cb08172629550ed6bd20320fb7aef30ee

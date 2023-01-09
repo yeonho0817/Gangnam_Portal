@@ -22,37 +22,32 @@ public class Employee {
     @Column(name = "employee_no")
     private Long employeeNo;
 
-    // 부서번호
-    @ManyToOne
+
+    // 소속 번호
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "affiliation_id", nullable = false)
+    private Affiliation affiliation;
+
+    // 부서 번호
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    // 팀 번호
-    @ManyToOne
-    @JoinColumn(name = "team_id", nullable = false)
-    private Team team;
-
     // 직급 번호
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ranks_id", nullable = false)
     private Ranks ranks;
 
     // 권한 번호
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "authority_id", nullable = false)
     private Authority authority;
-
-    @Column(name = "email", nullable = false, columnDefinition = "VARCHAR(320)")
-    private String email;
-
-    @Column(name = "password", nullable = false, columnDefinition = "VARCHAR(250)")
-    private String password;
 
     @Column(name = "name_kr", nullable = false, columnDefinition = "VARCHAR(20)")
     private String nameKr;
 
     @Column(name = "name_en", nullable = false, columnDefinition = "VARCHAR(50)")
-    private String name_en;
+    private String nameEn;
 
     @Column(name = "gender", nullable = false, columnDefinition = "TINYINT(1)")
     private Integer gender;
@@ -79,8 +74,10 @@ public class Employee {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date joinDate;
 
-
     @OneToMany(mappedBy = "employee")
     private List<Commute> commuteList;
+
+    @OneToMany(mappedBy = "employee")
+    private List<EmployeeEmail> employeeEmailList;
 
 }

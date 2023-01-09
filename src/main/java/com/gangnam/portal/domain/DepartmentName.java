@@ -5,10 +5,12 @@ import lombok.Getter;
 @Getter
 public enum DepartmentName {
     개발(1, "개발"),
+    퍼블리셔(1, "퍼블리셔"),
     QA(2, "QA"),
-    경영지원(3, "경영지원"),
-    디자인(4, "디자인"),
-    마케팅(5, "마케팅")
+    재무(3, "재무"),
+    인사총무(3, "인사총무"),
+    UI(4, "UI/UX"),
+    BX(5, "BX")
     ;
 
     private int code;

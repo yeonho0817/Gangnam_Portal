@@ -8,24 +8,22 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "department")
+@Table(name = "affiliation")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Department {
+public class Affiliation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 부서 번호
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "affiliation_id", nullable = false)
-    private Affiliation affiliation;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(100)")
-    private DepartmentName departmentName;
+    @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(50)")
+    private AffiliationName name;
 
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "affiliation")
     private List<Employee> employeeList;
+
+    @OneToMany(mappedBy = "affiliation")
+    private List<Department> departmentList;
 }
