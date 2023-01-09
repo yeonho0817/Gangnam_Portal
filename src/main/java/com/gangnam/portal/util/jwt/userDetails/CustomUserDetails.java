@@ -1,7 +1,7 @@
 package com.gangnam.portal.util.jwt.userDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gangnam.portal.domain.Employee;
+import com.gangnam.portal.domain.EmployeeEmail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,22 +22,24 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
 
     private String username;
-    private String password;
-    @Builder.Default
-    private static List<String> roles = new ArrayList<>();
+    private List<String> roles;
 
-    public static UserDetails of(Employee employee) {
-        roles.add(employee.getAuthority().getName().name());
+    public static CustomUserDetails of(EmployeeEmail employeeEmail) {
+        List<String> roles = new ArrayList<>();
+        roles.add(employeeEmail.getEmployee().getAuthority().getName().toString());
+        System.out.println(employeeEmail.getEmployee().getAuthority().getName().toString());
 
         return CustomUserDetails.builder()
-                .username(employee.getEmail())
-                .password(employee.getPassword())
-
+                .username(employeeEmail.getEmail())
+                .roles(roles)
                 .build();
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     @Override
-    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
@@ -46,12 +48,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return username;
-    }
-
-    @Override
-    public String getUsername() {
-        return password;
+        return null;
     }
 
     @Override

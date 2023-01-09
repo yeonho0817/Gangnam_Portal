@@ -45,13 +45,6 @@ public class EmployeeController {
                 .body(token);
     }
 
-    // 로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity logout() {
-
-        return null;
-    }
-
     // 회원 조회
     @GetMapping("/hr/info")
     public ResponseEntity findEmployeeInfo(@PathVariable("id") Long id) {

@@ -1,33 +1,26 @@
 package com.gangnam.portal.util.jwt.userDetails;
 
 
-import com.gangnam.portal.domain.Employee;
-import com.gangnam.portal.repository.EmployeeRepository;
+import com.gangnam.portal.domain.EmployeeEmail;
+import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
 
-@Service
+@Service("customUserDetailServices")
 @RequiredArgsConstructor
-@Transactional
 public class CustomUserDetailService implements UserDetailsService {
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeEmailCustomRepository employeeEmailCustomRepository;
 
     @Override
-//    @Cacheable(value = CacheKey.USER, key = "#userId", unless = "#result == null")
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-//        Optional<Member> findMember = memberRepository.findByUserId(userId);
-
-        Employee findMember = employeeRepository.findByEmail(userId)
+    public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        EmployeeEmail findEmployeeEmail = employeeEmailCustomRepository.isExists(email)
                 .orElseThrow(() -> new NoSuchElementException("없는 회원입니다."));
 
-        return CustomUserDetails.of(findMember);
-
+        return CustomUserDetails.of(findEmployeeEmail);
     }
 }

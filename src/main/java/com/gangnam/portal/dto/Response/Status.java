@@ -8,13 +8,16 @@ public enum Status {
     LOGIN_SUCCESS(200, HttpStatus.OK, "로그인을 성공했습니다."),
     LOGIN_FAILED(404, HttpStatus.NOT_FOUND, "로그인을 실패했습니다."),
 
+    LOGOUT_SUCCESS(200, HttpStatus.OK, "로그아웃했습니다."),
+
+    NOT_FOUND_EMAIL(404, HttpStatus.NOT_FOUND, "해당 이메일을 찾지 못했습니다."),
+
     PROVIDER_ACCEPTED(406, HttpStatus.NOT_ACCEPTABLE, "해당 로그인은 정상적인 접속입니다."),
     PROVIDER_REJECTED(406, HttpStatus.NOT_ACCEPTABLE, "해당 로그인은 정상적인 접속이 아닙니다."),
 
     TOKEN_EMPTY(404, HttpStatus.NOT_FOUND, "Token이 없습니다. 다시 보내주세요!"),
-    ACCESS_TOKEN_EXPIRED(401, HttpStatus.UNAUTHORIZED, "AccessToken이 만료되었습니다. RefreshToken을 보내주세요!"),
-    ACCESS_TOKEN_SIGNATURE_ERROR(406, HttpStatus.NOT_ACCEPTABLE, "Token의 Signature가 잘못됐습니다."),
-    REFRESH_TOKEN_EXPIRED(401, HttpStatus.UNAUTHORIZED, "RefreshToken이 만료되었습니다. 다시 로그인해주세요!"),
+    TOKEN_EXPIRED(401, HttpStatus.UNAUTHORIZED, "해당 Token이 만료되었습니다."),
+    TOKEN_SIGNATURE_ERROR(406, HttpStatus.NOT_ACCEPTABLE, "Token의 Signature가 잘못됐습니다."),
     TOKEN_DENIED(401, HttpStatus.UNAUTHORIZED, "해당 사용자는 접속할 권한이 없습니다."),
 
     EMAIL_NOT_FOUND(404, HttpStatus.NOT_FOUND, "입력하신 이메일을 찾지 못했습니다."),

@@ -41,7 +41,24 @@ public class AuthController {
 
     // 토큰 만료 시, refreshToken 받아서 갱신 or 권한 거부
     @GetMapping("/reissue")
-    public ResponseEntity reissueRefreshToken(@RequestHeader("Authorization") String refreshToken) {
-        return null;
+    public ResponseEntity reissueToken(@RequestHeader("Authorization") String accessToken,
+                                       @RequestHeader("RefreshToken") String refreshToken) {
+        ResponseData responseData = authService.reissueToken(accessToken, refreshToken);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
     }
+
+    // logout
+    @GetMapping("/logout")
+    public ResponseEntity logout(@RequestHeader("Authorization") String accessToken,
+                                 @RequestHeader("RefreshToken") String refreshToken) {
+        ResponseData responseData = authService.logout(accessToken, refreshToken);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
+    }
+
 }

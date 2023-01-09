@@ -22,10 +22,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         if (exception == Status.TOKEN_EMPTY) {
             setResponse(response, Status.TOKEN_EMPTY);
-        } else if (exception == Status.ACCESS_TOKEN_EXPIRED) {
-            setResponse(response,Status.ACCESS_TOKEN_EXPIRED);
-        } else if (exception == Status.ACCESS_TOKEN_SIGNATURE_ERROR) {
-            setResponse(response, Status.ACCESS_TOKEN_SIGNATURE_ERROR);
+        } else if (exception == Status.TOKEN_EXPIRED) {
+            setResponse(response,Status.TOKEN_EXPIRED);
+        } else if (exception == Status.TOKEN_SIGNATURE_ERROR) {
+            setResponse(response, Status.TOKEN_SIGNATURE_ERROR);
         }
     }
 
