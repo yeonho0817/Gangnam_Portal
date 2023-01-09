@@ -1,8 +1,12 @@
-package com.gangnam.portal.util.googleApi;
+package com.gangnam.portal.util.loginApi.googleApi;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gangnam.portal.util.loginApi.LoginInfo;
+import com.gangnam.portal.util.loginApi.UserInfoDto;
+import com.gangnam.portal.util.loginApi.LoginRequest;
+import com.gangnam.portal.util.loginApi.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -14,11 +18,12 @@ import java.net.URISyntaxException;
 
 @RequiredArgsConstructor
 @Component
-public class GoogleLoginInfo {
-    private final ConfigUtils configUtils;
+public class GoogleLoginInfo implements LoginInfo {
+    private final GoogleConfigUtils googleConfigUtils;
 
-    public ResponseEntity<Object> googleLoginUri() {
-        String authUrl = configUtils.googleInitUrl();
+    @Override
+    public ResponseEntity<Object> loginUri() {
+        String authUrl = googleConfigUtils.initUrl();
 
         URI redirectUri = null;
         try {
@@ -35,14 +40,15 @@ public class GoogleLoginInfo {
         return null;
     }
 
-    public GoogleLoginDto googleRedirectInfo(String authCode) {
+    @Override
+    public UserInfoDto redirectInfo(String authCode) {
         // HTTP 통신을 위해 RestTemplate 활용
         RestTemplate restTemplate = new RestTemplate();
-        GoogleLoginRequest requestParams = GoogleLoginRequest.builder()
-                .clientId(configUtils.getGoogleClientId())
-                .clientSecret(configUtils.getGoogleSecret())
+        LoginRequest requestParams = LoginRequest.builder()
+                .clientId(googleConfigUtils.getClientId())
+                .clientSecret(googleConfigUtils.getSecret())
                 .code(authCode)
-                .redirectUri(configUtils.getGoogleRedirectUri())
+                .redirectUri(googleConfigUtils.getRedirectUri())
                 .grantType("authorization_code")
                 .build();
 
@@ -50,25 +56,25 @@ public class GoogleLoginInfo {
             // Http Header 설정
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<GoogleLoginRequest> httpRequestEntity = new HttpEntity<>(requestParams, headers);
-            ResponseEntity<String> apiResponseJson = restTemplate.postForEntity(configUtils.getGoogleAuthUrl() + "/token", httpRequestEntity, String.class);
+            HttpEntity<LoginRequest> httpRequestEntity = new HttpEntity<>(requestParams, headers);
+            ResponseEntity<String> apiResponseJson = restTemplate.postForEntity(googleConfigUtils.getTokenUri(), httpRequestEntity, String.class);
 
             // ObjectMapper를 통해 String to Object로 변환
             ObjectMapper objectMapper = new ObjectMapper();
 //            objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // NULL이 아닌 값만 응답받기(NULL인 경우는 생략)
-            GoogleLoginResponse googleLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<GoogleLoginResponse>() {});
+            LoginResponse loginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<LoginResponse>() {});
 
             // 사용자의 정보는 JWT Token으로 저장되어 있고, Id_Token에 값을 저장한다.
-            String jwtToken = googleLoginResponse.getIdToken();
+            String jwtToken = loginResponse.getIdToken();
 
             // JWT Token을 전달해 JWT 저장된 사용자 정보 확인
-            String requestUrl = UriComponentsBuilder.fromHttpUrl(configUtils.getGoogleAuthUrl() + "/tokeninfo").queryParam("id_token", jwtToken).toUriString();
+            String requestUrl = UriComponentsBuilder.fromHttpUrl(googleConfigUtils.getUserInfoUri()).queryParam("id_token", jwtToken).toUriString();
 
             String resultJson = restTemplate.getForObject(requestUrl, String.class);
 
             if(resultJson != null) {
-                GoogleLoginDto userInfoDto = objectMapper.readValue(resultJson, new TypeReference<GoogleLoginDto>() {});
+                UserInfoDto userInfoDto = objectMapper.readValue(resultJson, new TypeReference<UserInfoDto>() {});
 
                 return userInfoDto;
             }

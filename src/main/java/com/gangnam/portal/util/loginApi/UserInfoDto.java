@@ -1,12 +1,11 @@
-package com.gangnam.portal.util.googleApi;
+package com.gangnam.portal.util.loginApi;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class GoogleLoginDto {
-
+public class UserInfoDto {
     private String iss;
     private String azp;
     private String aud;

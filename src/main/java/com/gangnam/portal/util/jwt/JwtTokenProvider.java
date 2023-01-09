@@ -32,6 +32,9 @@ public class JwtTokenProvider {
     public String getEmail(String token) {
         return extractAllClaims(token).get("email", String.class);
     }
+    public String getProvider(String token) {
+        return extractAllClaims(token).get("provider", String.class);
+    }
 
     public Date getExpiration(String token) {
         return extractAllClaims(token).getExpiration();
@@ -42,10 +45,10 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(String email, String nameKr) {
+    public String generateAccessToken(String email, String provider) {
         Claims claims = Jwts.claims();
         claims.put("email", email);
-        claims.put("nameKr", nameKr);
+        claims.put("provider", provider);
         claims.put("role", "ROLE_USER");
 
         String token = Jwts.builder()

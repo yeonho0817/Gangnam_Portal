@@ -42,9 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
             getAuthentication(request, accessToken);
 
             String email = jwtTokenProvider.getEmail(accessToken);
+            String provider = jwtTokenProvider.getProvider(accessToken);
 
             if (email != null) {
-                UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
+                UserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
 
                 processSecurity(request, userDetails);
             }

@@ -1,11 +1,11 @@
-package com.gangnam.portal.util.googleApi;
+package com.gangnam.portal.util.loginApi;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class GoogleLoginRequest {
+public class LoginRequest {
 
     private String clientId;    // 애플리케이션의 클라이언트 ID
     private String redirectUri; // Google 로그인 후 redirect 위치
