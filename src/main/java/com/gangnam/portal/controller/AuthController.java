@@ -1,5 +1,6 @@
 package com.gangnam.portal.controller;
 
+import com.gangnam.portal.domain.Provider;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class AuthController {
     //구글 - 로그인 API 주소 넘기는 것
     @GetMapping("/google/login")
     public ResponseEntity loginOfGoogle() {
-        ResponseData responseData = authService.loginOfGoogle();
+        ResponseData responseData = authService.login(Provider.google);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -26,27 +27,27 @@ public class AuthController {
     // 구글 로그인 리다이렉트 -> 로그인 성공 시 서버 JWT 토큰 넘겨줌
     @GetMapping("/auth/google/callback")
     public ResponseEntity redirectInfoOfGoogle(@RequestParam(value = "code") String authCode) {
-        ResponseData responseData = authService.redirectInfoOfGoogle(authCode);
+        ResponseData responseData = authService.redirectLogin(authCode, Provider.google);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(responseData);
     }
 
-    // 네이버
-    @GetMapping("/naver/login")
-    public ResponseEntity loginOfNaver() {
-        ResponseData responseData = authService.loginOfNaver();
+    // 카카오
+    @GetMapping("/kakao/login")
+    public ResponseEntity loginOfKakao() {
+        ResponseData responseData = authService.login(Provider.kakao);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(responseData);
     }
 
-    // 네이버 라다이렉트
-    @GetMapping("/auth/naver/callback")
-    public ResponseEntity redirectInfoOfNaver(@RequestParam(value = "code") String authCode) {
-        ResponseData responseData = authService.redirectInfoOfNaver(authCode);
+    // 카카오 라다이렉트
+    @GetMapping("/auth/kakao/callback")
+    public ResponseEntity redirectInfoOfKakao(@RequestParam(value = "code") String authCode) {
+        ResponseData responseData = authService.redirectLogin(authCode, Provider.kakao);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

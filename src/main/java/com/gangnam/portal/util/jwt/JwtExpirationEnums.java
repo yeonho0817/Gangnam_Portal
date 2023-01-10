@@ -13,6 +13,8 @@ public enum JwtExpirationEnums {
     TEST_ACCESS_TOKEN_EXPIRATION_TIME("JWT 만료 시간 / 30초", 1000L * 30),
     TEST_REFRESH_TOKEN_EXPIRATION_TIME("Refresh 토큰 만료 시간 / 30초", 1000L * 30),
 
+    LONG_ACCESS_TOKEN_EXPIRATION_TIME("JWT 만료 시간 / 7일", 1000L * 60 * 60 * 24 * 7),
+
     ;
 
     private String description;

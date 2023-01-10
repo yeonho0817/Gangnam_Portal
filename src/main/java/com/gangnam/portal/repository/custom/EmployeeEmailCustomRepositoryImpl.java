@@ -14,6 +14,8 @@ public class EmployeeEmailCustomRepositoryImpl implements EmployeeEmailCustomRep
 
     @Override
     public Optional<EmployeeEmail> isExists(String email, String provider) {
+        Provider enumProvider = Enum.valueOf(Provider.class, provider);
+
         QEmployeeEmail qEmployeeEmail = QEmployeeEmail.employeeEmail;
         QEmployee qEmployee = QEmployee.employee;
         QAuthority qAuthority = QAuthority.authority;
@@ -26,7 +28,7 @@ public class EmployeeEmailCustomRepositoryImpl implements EmployeeEmailCustomRep
                 .leftJoin(qEmployee.authority, qAuthority).fetchJoin()
 
                 .where(qEmployeeEmail.email.eq(email)
-                        .and(qEmployeeEmail.provider.eq(Provider.valueOf(provider)))
+                        .and(qEmployeeEmail.provider.eq(enumProvider))
                 )
                 .fetchOne();
 

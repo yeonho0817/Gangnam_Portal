@@ -18,16 +18,21 @@ public class EmployeeDTO {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public static class EmployeeInfo {
+    public static class EmployeeInfoDTO {
         private Long employeeId;
         private Long employeeNo;
         private String name_kr;
         private String name_en;
+        private String birthday;
         private String ranks;
+        private String affiliation;
         private String department;
-        private String team;
         private String email;
+        private String profileImg;
+        private String gender;
         private String phone;
+        private String address;
+        private String joinDate;
     }
 
     @Data

@@ -1,4 +1,4 @@
-package com.gangnam.portal.util.loginApi;
+package com.gangnam.portal.util.loginApi.googleApi;
 
 import lombok.Builder;
 import lombok.Data;

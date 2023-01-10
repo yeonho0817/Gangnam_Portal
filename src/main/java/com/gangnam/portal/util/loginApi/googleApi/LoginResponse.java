@@ -1,4 +1,4 @@
-package com.gangnam.portal.util.loginApi;
+package com.gangnam.portal.util.loginApi.googleApi;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,4 +12,5 @@ public class LoginResponse {
     private String scope;
     private String tokenType;   // 반환된 토큰 유형(Bearer 고정)
     private String idToken;
+    private String grantType;
 }

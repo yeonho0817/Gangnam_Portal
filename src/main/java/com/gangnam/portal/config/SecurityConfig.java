@@ -56,6 +56,7 @@ public class SecurityConfig {
 
                 // 구글 로그인
                 .antMatchers("/google/login", "/auth/google/callback").permitAll()
+                .antMatchers("/kakao/login", "/auth/kakao/callback").permitAll()
                 
                 //권한 부여
 //                .antMatchers("/hr/password").hasRole("ADMIN")

@@ -1,6 +1,5 @@
 package com.gangnam.portal.util.loginApi.googleApi;
 
-import com.gangnam.portal.util.loginApi.ConfigUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -9,21 +8,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class GoogleConfigUtils extends ConfigUtils {
+public class GoogleConfigUtils {
     @Value("${spring.security.oauth2.client.registration.google.authUri}")
-    private String googleAuthUri;
+    private String googleAuthUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.loginUri}")
-    private String googleLoginUri;
-
-    @Value("${spring.security.oauth2.client.registration.google.tokenUri}")
-    private String googleTokenUri;
-
-    @Value("${spring.security.oauth2.client.registration.google.userInfoUri}")
-    private String googleUserInfoUri;
+    private String googleLoginUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.redirectUri}")
-    private String googleRedirectUri;
+    private String googleRedirectUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.clientId}")
     private String googleClientId;
@@ -32,26 +25,13 @@ public class GoogleConfigUtils extends ConfigUtils {
     private String googleSecret;
 
     @Value("${spring.security.oauth2.client.registration.google.scope}")
-    private String googleScopes;
+    private String scopes;
 
-    public GoogleConfigUtils() {
-        provider = "google";
-
-        authUri = googleAuthUri;
-        loginUri = googleLoginUri;
-        tokenUri = googleTokenUri;
-        userInfoUri = googleUserInfoUri;
-        redirectUri = googleRedirectUri;
-        clientId = googleClientId;
-        secret = googleSecret;
-        scopes = googleScopes;
-    }
-
-    @Override
-    public String initUrl() {
+    // Google 로그인 URL 생성 로직
+    public String googleInitUrl() {
         Map<String, Object> params = new HashMap<>();
-        params.put("client_id", getClientId());
-        params.put("redirect_uri", getRedirectUri());
+        params.put("client_id", getGoogleClientId());
+        params.put("redirect_uri", getGoogleRedirectUri());
         params.put("response_type", "code");
         params.put("scope", getScopeUrl());
 
@@ -59,9 +39,36 @@ public class GoogleConfigUtils extends ConfigUtils {
                 .map(param -> param.getKey() + "=" + param.getValue())
                 .collect(Collectors.joining("&"));
 
-        return loginUri
+        return getGoogleLoginUrl()
+                + "/o/oauth2/v2/auth"
                 + "?"
                 + paramStr;
     }
 
+    public String getGoogleAuthUrl() {
+        return googleAuthUrl;
+    }
+
+    public String getGoogleLoginUrl() {
+        return googleLoginUrl;
+    }
+
+    public String getGoogleClientId() {
+        return googleClientId;
+    }
+
+    public String getGoogleRedirectUri() {
+        return googleRedirectUrl;
+    }
+
+    public String getGoogleSecret() {
+        return googleSecret;
+    }
+
+    // scope의 값을 보내기 위해 띄어쓰기 값을 UTF-8로 변환하는 로직 포함
+    public String getScopeUrl() {
+//        return scopes.stream().collect(Collectors.joining(","))
+//                .replaceAll(",", "%20");
+        return scopes.replaceAll(",", "%20");
+    }
 }
