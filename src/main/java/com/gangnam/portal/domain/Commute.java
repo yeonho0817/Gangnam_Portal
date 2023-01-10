@@ -2,6 +2,7 @@ package com.gangnam.portal.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Commute {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

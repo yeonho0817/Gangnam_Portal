@@ -29,6 +29,9 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
+    public Long getId(String token) {
+        return extractAllClaims(token).get("id", Long.class);
+    }
     public String getEmail(String token) {
         return extractAllClaims(token).get("email", String.class);
     }
@@ -45,8 +48,9 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(String email, String provider) {
+    public String generateAccessToken(Long id, String email, String provider) {
         Claims claims = Jwts.claims();
+        claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
         claims.put("role", "ROLE_USER");

@@ -24,7 +24,7 @@ public class Department {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, columnDefinition = "VARCHAR(100)")
-    private DepartmentName departmentName;
+    private DepartmentName name;
 
     @OneToMany(mappedBy = "department")
     private List<Employee> employeeList;

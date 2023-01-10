@@ -59,10 +59,13 @@ public class SecurityConfig {
                 .antMatchers("/kakao/login", "/auth/kakao/callback").permitAll()
                 
                 //권한 부여
-//                .antMatchers("/hr/password").hasRole("ADMIN")
+                .antMatchers("/commute/update").hasRole("ADMIN")
+
+                // 난제 풀어야됨
+                .anyRequest().permitAll()
 
                 // 나머지는 다 인증 필요
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
 
                 /**JwtSecurityConfig 적용 */
                 .and()

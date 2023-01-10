@@ -1,11 +1,14 @@
 package com.gangnam.portal.controller;
 
 import com.gangnam.portal.dto.CommuteDTO;
+import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.CommuteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Date;
 
 @RestController
@@ -16,9 +19,12 @@ public class CommuteController {
 
     // 출근 등록
     @PostMapping("/commute/start")
-    public ResponseEntity commuteStart(@RequestBody CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+    public ResponseEntity commuteStart(@RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        ResponseData responseData = commuteService.commuteStart(commuteRegisterDTO);
 
-        return null;
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
     }
 
     // 퇴근 등록
@@ -28,7 +34,7 @@ public class CommuteController {
         return null;
     }
 
-    // 출퇴근 수정
+    // 출퇴근 수정 - 관리자 기능
     @PutMapping("/commute/update")
     public ResponseEntity commuteUpdate(@RequestBody CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
 

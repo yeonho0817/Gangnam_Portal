@@ -54,11 +54,6 @@ public class AuthController {
                 .body(responseData);
     }
 
-
-
-    // 카카오(?)
-
-
     // 토큰 만료 시, refreshToken 받아서 갱신 or 권한 거부
     @GetMapping("/reissue")
     public ResponseEntity reissueToken(@RequestHeader("Authorization") String accessToken,

@@ -11,6 +11,7 @@ public enum Status {
     LOGOUT_SUCCESS(200, HttpStatus.OK, "로그아웃했습니다."),
 
     NOT_FOUND_EMAIL(404, HttpStatus.NOT_FOUND, "해당 이메일을 찾지 못했습니다."),
+    NOT_FOUND_EMPLOYEE(404, HttpStatus.NOT_FOUND, "해당 직원을 찾지 못했습니다."),
 
     PROVIDER_ACCEPTED(406, HttpStatus.NOT_ACCEPTABLE, "해당 로그인은 정상적인 접속입니다."),
     PROVIDER_REJECTED(406, HttpStatus.NOT_ACCEPTABLE, "해당 로그인은 정상적인 접속이 아닙니다."),
@@ -19,12 +20,15 @@ public enum Status {
     TOKEN_EXPIRED(401, HttpStatus.UNAUTHORIZED, "해당 Token이 만료되었습니다."),
     TOKEN_SIGNATURE_ERROR(406, HttpStatus.NOT_ACCEPTABLE, "Token의 Signature가 잘못됐습니다."),
     TOKEN_DENIED(401, HttpStatus.UNAUTHORIZED, "해당 사용자는 접속할 권한이 없습니다."),
+    TOKEN_NOT_COINCIDE(400, HttpStatus.BAD_REQUEST, "Refresh Token 정보가 일치하지 않습니다."),
 
-    EMAIL_NOT_FOUND(404, HttpStatus.NOT_FOUND, "입력하신 이메일을 찾지 못했습니다."),
+    EMPLOYEE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "입력하신 이메일을 찾지 못했습니다."),
     PASSWORD_NOT_FOUND(404, HttpStatus.NOT_FOUND, "입력하신 비밀번호를 찾지 못했습니다."),
     FIND_PASSWORD_FAILED(404, HttpStatus.NOT_FOUND, "일치하는 이메일이 없습니다."),
-    UPDATE_HUMAN_RESOURCE_SUCCESS(200, HttpStatus.OK, "회원 정보 수정을 완료했습니다."),
-    UPDATE_HUMAN_RESOURCE_FAILED(409, HttpStatus.OK, "회원 정보 수정을 실패했습니다."),
+
+    FIND_EMPLOYEE_SUCCESS(200, HttpStatus.OK, "해당 직원 정보를 성공적으로 조회했습니다."),
+    UPDATE_EMPLOYEE_INFO_SUCCESS(200, HttpStatus.OK, "회원 정보 수정을 완료했습니다."),
+    UPDATE_EMPLOYEE_INFO_FAILED(409, HttpStatus.OK, "회원 정보 수정을 실패했습니다."),
 
     MONTHLY_COMMUTE_SUCCESS(200, HttpStatus.OK, "월별 출퇴근 조회를 완료했습니다."),
     COMMUTE_SUCCESS(200, HttpStatus.OK, "출퇴근 현황 조회를 완료했습니다."),
@@ -36,6 +40,12 @@ public enum Status {
 
     HUMAN_RESOURCE_SUCCESS(200, HttpStatus.OK, "인력 조회에 성공했습니다."),
     HUMAN_RESOURCE_DEPARTMENT_SUCCESS(200, HttpStatus.OK, "소속/부서 조회에 성공했습니다."),
+
+
+
+    // Valid Error Message
+    BLANK_ESSENTIAL_VALUE(406, HttpStatus.NOT_ACCEPTABLE, "필수 값이 없습니다.")
+
     ;
 
     Status(int code, HttpStatus httpStatus, String description) {

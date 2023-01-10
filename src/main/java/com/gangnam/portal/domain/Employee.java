@@ -70,7 +70,7 @@ public class Employee {
     private Date birthday;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "join_date", nullable = false, columnDefinition = "DATETIME")
+    @Column(name = "join_date", nullable = false, columnDefinition = "DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date joinDate;
 
