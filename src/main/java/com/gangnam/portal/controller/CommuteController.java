@@ -19,8 +19,9 @@ public class CommuteController {
 
     // 출근 등록
     @PostMapping("/commute/start")
-    public ResponseEntity commuteStart(@RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
-        ResponseData responseData = commuteService.commuteStart(commuteRegisterDTO);
+    public ResponseEntity commuteStart(@RequestHeader("Authorization") String accessToken,
+                                        @RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        ResponseData responseData = commuteService.commuteStart(accessToken, commuteRegisterDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -29,9 +30,13 @@ public class CommuteController {
 
     // 퇴근 등록
     @PostMapping("/commute/end")
-    public ResponseEntity commuteEnd(@RequestBody CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+    public ResponseEntity commuteEnd(@RequestHeader("Authorization") String accessToken,
+                                     @RequestBody CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        ResponseData responseData = commuteService.commuteEnd(accessToken, commuteRegisterDTO);
 
-        return null;
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
     }
 
     // 출퇴근 수정 - 관리자 기능

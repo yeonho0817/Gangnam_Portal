@@ -25,7 +25,7 @@ public class Commute {
     private Employee employee;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "register_date", nullable = false)
+    @Column(name = "register_date", nullable = false, columnDefinition = "DATE DEFAULT CURRENT_TIMESTAMP")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date registerDate;
 
