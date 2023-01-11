@@ -38,4 +38,14 @@ public class Commute {
     @Column(name = "end_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date endDate;
+
+    public void updateEndDate(Date date) {
+        this.endDate = date;
+    }
+    public void updateStartDate(Date date) {
+        this.startDate = date;
+    }
+    public void updateRegisterDate(Date date) {
+        this.registerDate = date;
+    }
 }

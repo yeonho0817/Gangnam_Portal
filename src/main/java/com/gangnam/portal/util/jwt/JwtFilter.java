@@ -2,16 +2,14 @@ package com.gangnam.portal.util.jwt;
 
 import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetailService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
+import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetails;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -51,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String provider = jwtTokenProvider.getProvider(accessToken);
 
                 if (email != null) {
-                    UserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
+                    CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
 
                     processSecurity(request, userDetails);
                 }
@@ -70,7 +68,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             if (token == null) throw new NullPointerException();
+
             claims = jwtTokenProvider.extractAllClaims(token);
+
+        } catch (SignatureException e) {
+            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+        } catch (MalformedJwtException ex) {
+            request.setAttribute("exception", Status.TOKEN_INVALID);
+        } catch (UnsupportedJwtException ex) {
+            request.setAttribute("exception", Status.TOKEN_INVALID);
+        } catch (IllegalArgumentException ex) {
+            request.setAttribute("exception", Status.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
             request.setAttribute("exception", Status.TOKEN_EXPIRED);
         } catch (JwtException e) {
@@ -86,6 +94,14 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             if (token == null) throw new NullPointerException();
             claims = jwtTokenProvider.extractAllClaims(token);
+        } catch (SignatureException e) {
+            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+        } catch (MalformedJwtException ex) {
+            request.setAttribute("exception", Status.TOKEN_INVALID);
+        } catch (UnsupportedJwtException ex) {
+            request.setAttribute("exception", Status.TOKEN_INVALID);
+        } catch (IllegalArgumentException ex) {
+            request.setAttribute("exception", Status.TOKEN_INVALID);
         } catch (JwtException e) {
             request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
         } catch (NullPointerException e) {
@@ -102,8 +118,14 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     // 검증 과정에 예외가 발생하지 않았다면, 해당 유저의 정보를 SecurityContext에 넣음
-    private void processSecurity(HttpServletRequest request, UserDetails userDetails) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
+    private void processSecurity(HttpServletRequest request, CustomUserDetails userDetails) {
+//        AuthenticationDTO authenticationDTO = AuthenticationDTO.builder()
+//                .id(userDetails.getId())
+//                .email(userDetails.getUsername())
+//                .provider(userDetails.getProvider())
+
+
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
     }

@@ -21,15 +21,18 @@ import java.util.stream.Collectors;
 @Builder
 public class CustomUserDetails implements UserDetails {
 
+    private Long id;
     private String username;
+    private String provider;
     private List<String> roles;
 
     public static CustomUserDetails of(EmployeeEmail employeeEmail) {
         List<String> roles = new ArrayList<>();
         roles.add(employeeEmail.getEmployee().getAuthority().getName().toString());
-        System.out.println(employeeEmail.getEmployee().getAuthority().getName().toString());
 
         return CustomUserDetails.builder()
+                .id(employeeEmail.getEmployee().getId())
+                .provider(employeeEmail.getProvider().name())
                 .username(employeeEmail.getEmail())
                 .roles(roles)
                 .build();

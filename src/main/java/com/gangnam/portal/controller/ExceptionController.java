@@ -4,21 +4,36 @@ import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
-@ControllerAdvice
+@RestControllerAdvice(/*basePackages = "com.gangnam.portal.controller"*/)
 public class ExceptionController {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity methodValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
 
         ResponseData responseData = makeErrorResponse(e.getBindingResult());
+
+        System.out.println(responseData);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity bindException(BindException e, HttpServletRequest request) {
+
+        ResponseData responseData = makeErrorResponse(e.getBindingResult());
+
+        System.out.println(responseData);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -38,13 +53,17 @@ public class ExceptionController {
 
             switch (Objects.requireNonNull(bindResultCode)) {
 
-                case "NotBlank":
+                case "NotBlank": case "NotNull":
                     status = Status.BLANK_ESSENTIAL_VALUE;
+                    break;
+
+                case "Pattern":
+                    status = Status.INVALID_PATTERN;
                     break;
 
             }
         }
 
-        return new ResponseData(status, message);
+        return new ResponseData(status, status.getDescription(), message);
     }
 }

@@ -44,9 +44,9 @@ public class AuthService {
         }
 
         if (responseEntity == null) {
-            return new ResponseData(Status.PROVIDER_REJECTED);
+            return new ResponseData(Status.PROVIDER_REJECTED, Status.PROVIDER_REJECTED.getDescription());
         } else {
-            return new ResponseData(Status.PROVIDER_ACCEPTED, responseEntity);
+            return new ResponseData(Status.PROVIDER_ACCEPTED, Status.PROVIDER_ACCEPTED.getDescription(), responseEntity);
         }
     }
 
@@ -67,7 +67,7 @@ public class AuthService {
         }
 
         if (isExists.isEmpty()) {
-            return new ResponseData(Status.LOGIN_FAILED);
+            return new ResponseData(Status.LOGIN_FAILED, Status.LOGIN_FAILED.getDescription());
         } else {
             // jwt 토큰 생성
             String accessToken = jwtTokenProvider.generateAccessToken(isExists.get().getEmployee().getId(), isExists.get().getEmail(), isExists.get().getProvider().toString());
@@ -87,7 +87,7 @@ public class AuthService {
 
             redisRepository.save(new RefreshToken(refreshToken, isExists.get().getEmail(), jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)).getTime()));
 
-            return new ResponseData(Status.LOGIN_SUCCESS, new EmployeeDTO.LoginResponseDTO(accessToken, refreshToken));
+            return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new EmployeeDTO.LoginResponseDTO(accessToken, refreshToken, isExists.get().getEmployee().getAuthority().getName().name()));
         }
     }
 
@@ -101,10 +101,10 @@ public class AuthService {
         String provider = jwtTokenProvider.getProvider(accessToken);
 
         Optional<EmployeeEmail> isExists = employeeEmailCustomRepository.isExists(email, provider);
-        if (isExists.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL);
+        if (isExists.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL, Status.NOT_FOUND_EMAIL.getDescription());
 
         String findRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email + "-" + provider);
-        if(!refreshToken.equals(refreshToken)) return new ResponseData(Status.TOKEN_NOT_COINCIDE);
+        if(!refreshToken.equals(refreshToken)) return new ResponseData(Status.TOKEN_NOT_COINCIDE, Status.TOKEN_NOT_COINCIDE.getDescription());
 
         // 새로운 jwt
         String issueAccessToken = jwtTokenProvider.generateAccessToken(isExists.get().getEmployee().getId(), isExists.get().getEmail(), isExists.get().getEmployee().getNameKr());
@@ -125,7 +125,7 @@ public class AuthService {
 //                        , issueRefreshToken,
 //                        JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue(), TimeUnit.MILLISECONDS);
 
-        return new ResponseData(Status.LOGIN_SUCCESS, new EmployeeDTO.LoginResponseDTO(issueAccessToken, issueRefreshToken));
+        return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new EmployeeDTO.LoginResponseDTO(issueAccessToken, issueRefreshToken, isExists.get().getEmployee().getAuthority().getName().name()));
     }
 
 
@@ -151,7 +151,7 @@ public class AuthService {
 //                    .set(accessToken, "logout", remainExpiration, TimeUnit.MILLISECONDS);
         }
 
-        return new ResponseData(Status.LOGOUT_SUCCESS);
+        return new ResponseData(Status.LOGOUT_SUCCESS, Status.LOGOUT_SUCCESS.getDescription());
     }
 
     private void saveRedis(Object key, Object value, Long timeout, TimeUnit timeUnit) {

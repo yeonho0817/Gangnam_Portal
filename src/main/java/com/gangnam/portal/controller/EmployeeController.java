@@ -6,6 +6,7 @@ import com.gangnam.portal.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,9 +18,9 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     // 회원 조회
-    @GetMapping("/hr/info/{id}")
-    public ResponseEntity findEmployeeInfo(@RequestHeader("Authorization") String accessToken, @PathVariable("id") Long id) {
-        ResponseData responseData = employeeService.findEmployeeInfo(accessToken, id);
+    @GetMapping("/hr/info")
+    public ResponseEntity findEmployeeInfo(UsernamePasswordAuthenticationToken authentication) {
+        ResponseData responseData = employeeService.findEmployeeInfo(authentication);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -34,5 +35,16 @@ public class EmployeeController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(responseData);
+    }
+
+    // 출퇴근 수정 시 직원 목록
+    @GetMapping("/hr/list")
+    public ResponseEntity readEmployeeNameList() {
+        ResponseData responseData = employeeService.readEmployeeNameList();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
+
     }
 }

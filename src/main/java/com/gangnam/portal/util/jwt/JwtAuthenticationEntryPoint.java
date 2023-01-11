@@ -20,13 +20,34 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         Status exception = (Status)request.getAttribute("exception");
 
-        if (exception == Status.TOKEN_EMPTY) {
-            setResponse(response, Status.TOKEN_EMPTY);
-        } else if (exception == Status.TOKEN_EXPIRED) {
-            setResponse(response,Status.TOKEN_EXPIRED);
-        } else if (exception == Status.TOKEN_SIGNATURE_ERROR) {
-            setResponse(response, Status.TOKEN_SIGNATURE_ERROR);
-        }
+
+//        catch (SignatureException e) {
+//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+//        } catch (MalformedJwtException ex) {
+//            request.setAttribute("exception", Status.TOKEN_INVALID);
+//        } catch (UnsupportedJwtException ex) {
+//            request.setAttribute("exception", Status.TOKEN_INVALID);
+//        } catch (IllegalArgumentException ex) {
+//            request.setAttribute("exception", Status.TOKEN_INVALID);
+//        } catch (ExpiredJwtException e) {
+//            request.setAttribute("exception", Status.TOKEN_EXPIRED);
+//        } catch (JwtException e) {
+//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+//        } catch (NullPointerException e) {
+//            request.setAttribute("exception", Status.TOKEN_EMPTY);
+//        }
+
+        System.out.println("dtgddfsdfsdf");
+        setResponse(response, exception);
+//        if (exception == Status.TOKEN_INVALID) {
+//            setResponse(response, Status.TOKEN_INVALID);
+//        } else if (exception == Status.TOKEN_EMPTY) {
+//            setResponse(response, Status.TOKEN_EMPTY);
+//        } else if (exception == Status.TOKEN_EXPIRED) {
+//            setResponse(response,Status.TOKEN_EXPIRED);
+//        } else if (exception == Status.TOKEN_SIGNATURE_ERROR) {
+//            setResponse(response, Status.TOKEN_SIGNATURE_ERROR);
+//        }
     }
 
     private void setResponse(HttpServletResponse response, Status status) throws IOException {

@@ -10,6 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -66,5 +67,20 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
 
 
         return Optional.ofNullable(employeeInfoDTO);
+    }
+
+    @Override
+    public List<EmployeeDTO.EmployeeNameList> readEmployeeNameList() {
+        QEmployee qEmployee = QEmployee.employee;
+
+        return jpaQueryFactory.select(Projections.fields(EmployeeDTO.EmployeeNameList.class,
+                    qEmployee.id.as("employeeId"),
+                    qEmployee.nameKr.as("nameKr")
+                ))
+                .from(qEmployee)
+                
+                .where(qEmployee.state.eq(false)) // false = 0 재직인 사람들
+                .fetch()
+                ;
     }
 }
