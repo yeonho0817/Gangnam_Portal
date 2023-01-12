@@ -59,7 +59,7 @@ public class EmployeeDTO {
     @AllArgsConstructor
     public static class EmployeeNameList {
         private Long employeeId;
-        private String employeeName;
+        private String nameKr;
     }
 
     @Data
@@ -71,5 +71,28 @@ public class EmployeeDTO {
         private String role;
     }
 
+    @Data
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class HRInfo {
+        private Long employeeId;
+        private String nameKr;
+        private String rank;
+        private String affiliation;
+        private String department;
+        private String email;
+        private String phone;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class HRDepartmentInfo {
+        private Long employeeId;
+        private String nameKr;
+        private String rank;
+        private String affiliation;
+        private String department;
+    }
 
 }

@@ -198,7 +198,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     }
 
 //    https://velog.io/@seungho1216/Querydsl%EB%8F%99%EC%A0%81-sorting%EC%9D%84-%EC%9C%84%ED%95%9C-OrderSpecifier-%ED%81%B4%EB%9E%98%EC%8A%A4-%EA%B5%AC%ED%98%84
-    private OrderSpecifier<Date> commuteSort(org.springframework.data.domain.Pageable pageable) {
+    private OrderSpecifier<String> commuteSort(Pageable pageable) {
         //서비스에서 보내준 Pageable 객체에 정렬조건 null 값 체크
         if (!pageable.getSort().isEmpty()) {
             //정렬값이 들어 있으면 for 사용하여 값을 가져온다
@@ -215,9 +215,6 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
             }
         }
         return null;
-
-
-
     }
 
 }

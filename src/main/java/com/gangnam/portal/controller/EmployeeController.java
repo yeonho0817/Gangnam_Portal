@@ -38,7 +38,7 @@ public class EmployeeController {
     }
 
     // 출퇴근 수정 시 직원 목록
-    @GetMapping("/hr/list")
+    @GetMapping("/hr/nameList")
     public ResponseEntity readEmployeeNameList() {
         ResponseData responseData = employeeService.readEmployeeNameList();
 

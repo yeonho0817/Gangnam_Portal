@@ -69,7 +69,9 @@ public class GoogleLoginInfo {
             String resultJson = restTemplate.getForObject(requestUrl, String.class);
 
             if(resultJson != null) {
-                UserInfoDto userInfoDto = objectMapper.readValue(resultJson, new TypeReference<UserInfoDto>() {});
+                UserInfoDto userInfoDto = objectMapper.readValue(resultJson, new TypeReference<>() {});
+
+                System.out.println(userInfoDto.getEmail());
 
                 return userInfoDto;
             }

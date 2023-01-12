@@ -80,7 +80,7 @@ public class CommuteController {
                                            @RequestParam(required = false) String endDate,
                                            @RequestParam(required = false) String name ) {
 
-        ResponseData responseData = commuteService.commuteStateList(sort.toLowerCase(), orderBy.toLowerCase(), pageNumber, pageSize, startDate, endDate, name);
+        ResponseData responseData = commuteService.commuteStateList(sort.toLowerCase(), orderBy.toUpperCase(), pageNumber, pageSize, startDate, endDate, name);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

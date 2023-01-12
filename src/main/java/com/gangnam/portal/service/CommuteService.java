@@ -3,6 +3,7 @@ package com.gangnam.portal.service;
 import com.gangnam.portal.domain.Commute;
 import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.dto.CommuteDTO;
+import com.gangnam.portal.dto.QueryConditionDTO;
 import com.gangnam.portal.dto.Response.AuthenticationDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -153,52 +153,36 @@ public class CommuteService {
 
     // 출퇴근 현황 조회
     public ResponseData commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, String name) {
-        if (! sort.equals("name") && ! sort.equals("date")) sort = "name";
-        if (! orderBy.equals("asc") && ! sort.equals("desc")) orderBy = "asc";
+        QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize, startDate, endDate);
+
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//
+//        Date formatStartDate;
+//        Date formatEndDate;
+//
+//        try {
+//            formatStartDate = simpleDateFormat.parse(startDate);
+//        } catch (IllegalArgumentException | ParseException e) {
+//            formatStartDate = new Date();
+//        }
+//
+//        try {
+//            formatEndDate = simpleDateFormat.parse(endDate);
+//        } catch (IllegalArgumentException | ParseException e) {
+//            formatEndDate = new Date();
+//        }
+//
+//        if (formatStartDate.compareTo(formatEndDate) == 1) {
+//            formatEndDate = new Date();
+//        }
 
 
-        try {
-            Integer.parseInt(pageNumber);
-        } catch (NumberFormatException e) {
-            pageNumber = "1";
-        }
+        System.out.println(queryConditionDTO.getStartDate() + " " + queryConditionDTO.getEndDate());
 
-        try {
-            Integer.parseInt(pageSize);
-        } catch (NumberFormatException e) {
-            pageSize = "10";
-        }
+        Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
+                Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-//        System.out.println(simpleDateFormat.format(endDate) + " " + simpleDateFormat.format(startDate));
-
-        Date formatStartDate;
-        Date formatEndDate;
-
-        try {
-            formatStartDate = simpleDateFormat.parse(startDate);
-        } catch (IllegalArgumentException | ParseException e) {
-            formatStartDate = new Date();
-        }
-
-        try {
-            formatEndDate = simpleDateFormat.parse(endDate);
-        } catch (IllegalArgumentException | ParseException e) {
-            formatEndDate = new Date();
-        }
-
-        if (formatStartDate.compareTo(formatEndDate) == 1) {
-            formatEndDate = new Date();
-        }
-
-
-        System.out.println(simpleDateFormat.format(formatStartDate) + " " + simpleDateFormat.format(formatEndDate));
-
-        Pageable pageable = PageRequest.of(Integer.parseInt(pageNumber), Integer.valueOf(pageSize),
-                Sort.by(Sort.Direction.fromString(orderBy), sort));
-
-        List<CommuteDTO.CommuteState> commuteStateList = commuteCustomRepository.readCommuteState(pageable, formatStartDate, formatEndDate, name);
+        List<CommuteDTO.CommuteState> commuteStateList = commuteCustomRepository.readCommuteState(pageable, queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
 
         return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteStateList);
     }

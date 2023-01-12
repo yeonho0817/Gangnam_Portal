@@ -23,5 +23,5 @@ public class UserInfoDto {
     private String alg;
     private String kid;
     private String typ;
-
+    private String hd;
 }
