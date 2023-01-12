@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,8 +76,8 @@ public class CommuteController {
                                            @RequestParam(defaultValue = "ASC") String orderBy,
                                            @RequestParam(defaultValue = "1") String pageNumber,
                                            @RequestParam(defaultValue = "10") String pageSize ,
-                                           @RequestParam(required = false) Date startDate,
-                                           @RequestParam(required = false) Date endDate,
+                                           @RequestParam(required = false) String startDate,
+                                           @RequestParam(required = false) String endDate,
                                            @RequestParam(required = false) String name ) {
 
         ResponseData responseData = commuteService.commuteStateList(sort.toLowerCase(), orderBy.toLowerCase(), pageNumber, pageSize, startDate, endDate, name);

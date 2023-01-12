@@ -11,9 +11,13 @@ import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.custom.CommuteCustomRepository;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -148,9 +152,10 @@ public class CommuteService {
 
 
     // 출퇴근 현황 조회
-    public ResponseData commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, Date startDate, Date endDate, String name) {
+    public ResponseData commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, String name) {
         if (! sort.equals("name") && ! sort.equals("date")) sort = "name";
         if (! orderBy.equals("asc") && ! sort.equals("desc")) orderBy = "asc";
+
 
         try {
             Integer.parseInt(pageNumber);
@@ -164,7 +169,37 @@ public class CommuteService {
             pageSize = "10";
         }
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        return null;
+//        System.out.println(simpleDateFormat.format(endDate) + " " + simpleDateFormat.format(startDate));
+
+        Date formatStartDate;
+        Date formatEndDate;
+
+        try {
+            formatStartDate = simpleDateFormat.parse(startDate);
+        } catch (IllegalArgumentException | ParseException e) {
+            formatStartDate = new Date();
+        }
+
+        try {
+            formatEndDate = simpleDateFormat.parse(endDate);
+        } catch (IllegalArgumentException | ParseException e) {
+            formatEndDate = new Date();
+        }
+
+        if (formatStartDate.compareTo(formatEndDate) == 1) {
+            formatEndDate = new Date();
+        }
+
+
+        System.out.println(simpleDateFormat.format(formatStartDate) + " " + simpleDateFormat.format(formatEndDate));
+
+        Pageable pageable = PageRequest.of(Integer.parseInt(pageNumber), Integer.valueOf(pageSize),
+                Sort.by(Sort.Direction.fromString(orderBy), sort));
+
+        List<CommuteDTO.CommuteState> commuteStateList = commuteCustomRepository.readCommuteState(pageable, formatStartDate, formatEndDate, name);
+
+        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteStateList);
     }
 }

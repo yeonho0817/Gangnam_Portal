@@ -70,7 +70,7 @@ public class CommuteDTO {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CommuteStateList {
+    public static class CommuteState {
         private String registerDate;
         private String startDate;
         private String endDate;
