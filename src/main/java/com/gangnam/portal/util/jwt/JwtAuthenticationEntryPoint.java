@@ -37,22 +37,21 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 //            request.setAttribute("exception", Status.TOKEN_EMPTY);
 //        }
 
-        System.out.println("dtgddfsdfsdf");
-        setResponse(response, exception);
-//        if (exception == Status.TOKEN_INVALID) {
-//            setResponse(response, Status.TOKEN_INVALID);
-//        } else if (exception == Status.TOKEN_EMPTY) {
-//            setResponse(response, Status.TOKEN_EMPTY);
-//        } else if (exception == Status.TOKEN_EXPIRED) {
-//            setResponse(response,Status.TOKEN_EXPIRED);
-//        } else if (exception == Status.TOKEN_SIGNATURE_ERROR) {
-//            setResponse(response, Status.TOKEN_SIGNATURE_ERROR);
-//        }
+        if (exception == Status.TOKEN_INVALID) {
+            setResponse(response, Status.TOKEN_INVALID);
+        } else if (exception == Status.TOKEN_EMPTY) {
+            setResponse(response, Status.TOKEN_EMPTY);
+        } else if (exception == Status.TOKEN_EXPIRED) {
+            setResponse(response,Status.TOKEN_EXPIRED);
+        } else if (exception == Status.TOKEN_SIGNATURE_ERROR) {
+            setResponse(response, Status.TOKEN_SIGNATURE_ERROR);
+        }
     }
 
     private void setResponse(HttpServletResponse response, Status status) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
 
         response.getWriter().println("{ \"code\" : \"" + status.getCode()
                 + "\", \"status\" : \"" +  status.getHttpStatus().toString()

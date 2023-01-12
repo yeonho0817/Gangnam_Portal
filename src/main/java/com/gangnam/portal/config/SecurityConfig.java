@@ -62,16 +62,17 @@ public class SecurityConfig {
                 // 구글 로그인
                 .antMatchers("/google/login", "/auth/google/callback").permitAll()
                 .antMatchers("/kakao/login", "/auth/kakao/callback").permitAll()
+                .antMatchers("/reissue").permitAll()
                 
                 //권한 부여
                 .antMatchers("/commute/update").hasRole("ADMIN")
 
                 // 난제 없애야됨
-                .anyRequest().permitAll()
+//                .anyRequest().permitAll()
 
                 // 난제 풀어야함
                 // 나머지는 다 인증 필요
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated()
 
                 /**JwtSecurityConfig 적용 */
                 .and()

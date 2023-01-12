@@ -9,8 +9,8 @@ import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
 import com.gangnam.portal.repository.redis.RedisRepository;
 import com.gangnam.portal.util.jwt.JwtExpirationEnums;
 import com.gangnam.portal.util.jwt.JwtTokenProvider;
-import com.gangnam.portal.util.jwt.redis.RefreshToken;
 import com.gangnam.portal.util.loginApi.googleApi.GoogleLoginInfo;
+import com.gangnam.portal.util.loginApi.googleApi.UserInfoDto;
 import com.gangnam.portal.util.loginApi.kakaoApi.KaKaoLoginInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -55,7 +55,12 @@ public class AuthService {
         Optional<EmployeeEmail> isExists = null;
 
         if (provider == Provider.google) {
-            email = googleLoginInfo.googleRedirectInfo(authCode).getEmail();
+            UserInfoDto userInfoDto = googleLoginInfo.googleRedirectInfo(authCode);
+            email = userInfoDto.getEmail();
+
+//            String googleAccessToken = kaKaoLoginInfo.getGoogleGoogleAccess(authCode);
+//            email = kaKaoLoginInfo.getGoogleGoogle(googleAccessToken);
+//            System.out.println(email);
 
             isExists = employeeEmailCustomRepository.isExists(email, Provider.google.name());
         } else if (provider == Provider.kakao) {
@@ -85,7 +90,7 @@ public class AuthService {
 //                    .set("RT:" + isExists.get().getEmail() + "-" + isExists.get().getProvider().name(), refreshToken,
 //                    JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue(), TimeUnit.MILLISECONDS);
 
-            redisRepository.save(new RefreshToken(refreshToken, isExists.get().getEmail(), jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)).getTime()));
+//            redisRepository.save(new RefreshToken(refreshToken, isExists.get().getEmail(), jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)).getTime()));
 
             return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new EmployeeDTO.LoginResponseDTO(accessToken, refreshToken, isExists.get().getEmployee().getAuthority().getName().name()));
         }
@@ -94,11 +99,12 @@ public class AuthService {
     // 토큰 재발급
     @Transactional
     public ResponseData reissueToken(String accessToken, String refreshToken) {
+        System.out.println("진입");
         // filter에서 정상 처리 완료
         // refresh token 비교 -> access token 재생성, refresh token 업데이트
 
-        String email = jwtTokenProvider.getEmail(accessToken);
-        String provider = jwtTokenProvider.getProvider(accessToken);
+        String email = jwtTokenProvider.getEmail(jwtTokenProvider.getResolveToken(accessToken));
+        String provider = jwtTokenProvider.getProvider(jwtTokenProvider.getResolveToken(accessToken));
 
         Optional<EmployeeEmail> isExists = employeeEmailCustomRepository.isExists(email, provider);
         if (isExists.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL, Status.NOT_FOUND_EMAIL.getDescription());
@@ -135,6 +141,7 @@ public class AuthService {
         String resolveAccessToken = jwtTokenProvider.getResolveToken(accessToken);
 
         String email = jwtTokenProvider.getEmail(resolveAccessToken);
+
         String provider = jwtTokenProvider.getProvider(resolveAccessToken);
 
         if (redisTemplate.opsForValue().get("RT:" + email + "-" + provider) != null) {

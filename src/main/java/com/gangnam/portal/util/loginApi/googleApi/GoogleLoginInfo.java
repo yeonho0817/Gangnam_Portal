@@ -63,12 +63,15 @@ public class GoogleLoginInfo {
             // 사용자의 정보는 JWT Token으로 저장되어 있고, Id_Token에 값을 저장한다.
             String jwtToken = googleLoginResponse.getIdToken();
 
+            System.out.println(jwtToken);
+
             // JWT Token을 전달해 JWT 저장된 사용자 정보 확인
             String requestUrl = UriComponentsBuilder.fromHttpUrl(configUtils.getGoogleAuthUrl() + "/tokeninfo").queryParam("id_token", jwtToken).toUriString();
 
             String resultJson = restTemplate.getForObject(requestUrl, String.class);
 
             if(resultJson != null) {
+                System.out.println(resultJson);
                 UserInfoDto userInfoDto = objectMapper.readValue(resultJson, new TypeReference<>() {});
 
                 System.out.println(userInfoDto.getEmail());
@@ -85,4 +88,6 @@ public class GoogleLoginInfo {
 
         return null;
     }
+
+
 }

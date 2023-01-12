@@ -56,7 +56,8 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
         } else if (accessToken != null && refreshToken != null && request.getRequestURI().equals("/reissue")){  // accessToken + refreshToken 일 때 (재발급)
-            getSimpleAuthentication(request, accessToken);
+//            getSimpleAuthentication(request, accessToken);
+            System.out.println(accessToken + "\n" + refreshToken);
             getAuthentication(request, refreshToken);
         }
 
@@ -73,11 +74,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         } catch (SignatureException e) {
             request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-        } catch (MalformedJwtException ex) {
-            request.setAttribute("exception", Status.TOKEN_INVALID);
-        } catch (UnsupportedJwtException ex) {
-            request.setAttribute("exception", Status.TOKEN_INVALID);
-        } catch (IllegalArgumentException ex) {
+        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
             request.setAttribute("exception", Status.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
             request.setAttribute("exception", Status.TOKEN_EXPIRED);
@@ -88,43 +85,29 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
-    private void getSimpleAuthentication(HttpServletRequest request, String token) {
-        Claims claims = null;
-
-        try {
-            if (token == null) throw new NullPointerException();
-            claims = jwtTokenProvider.extractAllClaims(token);
-        } catch (SignatureException e) {
-            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-        } catch (MalformedJwtException ex) {
-            request.setAttribute("exception", Status.TOKEN_INVALID);
-        } catch (UnsupportedJwtException ex) {
-            request.setAttribute("exception", Status.TOKEN_INVALID);
-        } catch (IllegalArgumentException ex) {
-            request.setAttribute("exception", Status.TOKEN_INVALID);
-        } catch (JwtException e) {
-            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-        } catch (NullPointerException e) {
-            request.setAttribute("exception", Status.TOKEN_EMPTY);
-        }
-    }
-    private boolean isLogout(String accessToken) {
-//        if (logoutAccessTokenRedisRepository.existsById(accessToken)) {
+//    private void getSimpleAuthentication(HttpServletRequest request, String token) {
+//        Claims claims = null;
 //
-//            throw new IllegalArgumentException("이미 로그아웃된 회원입니다.");
+//        try {
+//            if (token == null) throw new NullPointerException();
+//            claims = jwtTokenProvider.extractAllClaims(token);
+//        } /*catch (SignatureException e) {
+//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+//        }*/ catch (MalformedJwtException ex) {
+//            request.setAttribute("exception", Status.TOKEN_INVALID);
+//        } catch (UnsupportedJwtException ex) {
+//            request.setAttribute("exception", Status.TOKEN_INVALID);
+//        } catch (IllegalArgumentException ex) {
+//            request.setAttribute("exception", Status.TOKEN_INVALID);
+//        } catch (JwtException e) {
+//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+//        } catch (NullPointerException e) {
+//            request.setAttribute("exception", Status.TOKEN_EMPTY);
 //        }
-
-        return false;
-    }
+//    }
 
     // 검증 과정에 예외가 발생하지 않았다면, 해당 유저의 정보를 SecurityContext에 넣음
     private void processSecurity(HttpServletRequest request, CustomUserDetails userDetails) {
-//        AuthenticationDTO authenticationDTO = AuthenticationDTO.builder()
-//                .id(userDetails.getId())
-//                .email(userDetails.getUsername())
-//                .provider(userDetails.getProvider())
-
-
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

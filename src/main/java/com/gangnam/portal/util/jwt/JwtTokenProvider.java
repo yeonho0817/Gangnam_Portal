@@ -22,6 +22,7 @@ public class JwtTokenProvider {
     private String SECRET_KEY;
 
     public Claims extractAllClaims(String token) {
+
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey(SECRET_KEY))
                 .build()
@@ -58,7 +59,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.LONG_ACCESS_TOKEN_EXPIRATION_TIME.getValue()))
+                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums./*TEST_SHORT_*/ACCESS_TOKEN_EXPIRATION_TIME.getValue()))
                 .signWith(getSigningKey(SECRET_KEY), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -67,8 +68,6 @@ public class JwtTokenProvider {
 
     // refresh token은 claim을 추가하지 않음
     public String generateRefreshToken() {
-        // redis 저장
-
         String refreshToken = Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()))
