@@ -59,7 +59,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums./*TEST_SHORT_*/ACCESS_TOKEN_EXPIRATION_TIME.getValue()))
+                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.ACCESS_TOKEN_EXPIRATION_TIME.getValue()))
                 .signWith(getSigningKey(SECRET_KEY), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -75,6 +75,7 @@ public class JwtTokenProvider {
         claims.put("role", "ROLE_USER");
 
         String refreshToken = Jwts.builder()
+                .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()))
                 .signWith(getSigningKey(SECRET_KEY), SignatureAlgorithm.HS256)
@@ -94,10 +95,11 @@ public class JwtTokenProvider {
     // 로그아웃 -> access 만료 시간 - 현재 시간
     public Long getRemainExpiration(String accessToken) {
         // accessToken 남은 유효시간
-        Date expiration = Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(accessToken).getBody().getExpiration();
+        System.out.println(accessToken);
+        Long expiration = extractAllClaims(accessToken).getExpiration().getTime();
         // 현재 시간
         Long now = new Date().getTime();
-        return (expiration.getTime() - now);
+        return expiration - now;
     }
 
 

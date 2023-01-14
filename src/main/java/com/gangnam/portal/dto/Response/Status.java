@@ -9,6 +9,7 @@ public enum Status {
     LOGIN_FAILED(404, HttpStatus.NOT_FOUND, "로그인을 실패했습니다."),
 
     LOGOUT_SUCCESS(200, HttpStatus.OK, "로그아웃했습니다."),
+    LOGOUT_ALREADY(401, HttpStatus.UNAUTHORIZED, "이미 로그아웃한 정보입니다."),
 
     NOT_FOUND_EMAIL(404, HttpStatus.NOT_FOUND, "해당 이메일을 찾지 못했습니다."),
     NOT_FOUND_EMPLOYEE(404, HttpStatus.NOT_FOUND, "해당 직원을 찾지 못했습니다."),

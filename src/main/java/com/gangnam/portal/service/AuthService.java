@@ -2,7 +2,7 @@ package com.gangnam.portal.service;
 
 import com.gangnam.portal.domain.EmployeeEmail;
 import com.gangnam.portal.domain.Provider;
-import com.gangnam.portal.dto.EmployeeDTO;
+import com.gangnam.portal.dto.AuthDTO;
 import com.gangnam.portal.dto.Response.AuthenticationDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
@@ -48,6 +48,7 @@ public class AuthService {
         if (responseEntity == null) {
             return new ResponseData(Status.PROVIDER_REJECTED, Status.PROVIDER_REJECTED.getDescription());
         } else {
+//            AuthDTO.LoginUriDTO loginUriDTO = new LoginU responseEntity.getHeaders().get("Location");
             return new ResponseData(Status.PROVIDER_ACCEPTED, Status.PROVIDER_ACCEPTED.getDescription(), responseEntity);
         }
     }
@@ -94,7 +95,7 @@ public class AuthService {
 
 //            redisRepository.save(new RefreshToken(refreshToken, isExists.get().getEmail(), jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)).getTime()));
 
-            return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new EmployeeDTO.TokenDTO(accessToken, refreshToken, isExists.get().getEmployee().getAuthority().getName().name()));
+            return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.get().getEmployee().getAuthority().getName().name()));
         }
     }
 
@@ -106,14 +107,14 @@ public class AuthService {
         // filter에서 정상 처리 완료
         // refresh token 비교 -> access token 재생성, refresh token 업데이트
 
-        String email = jwtTokenProvider.getEmail(jwtTokenProvider.getResolveToken(authenticationDTO.getEmail()));
-        String provider = jwtTokenProvider.getProvider(jwtTokenProvider.getResolveToken(authenticationDTO.getProvider()));
+        String email = authenticationDTO.getEmail();
+        String provider = authenticationDTO.getProvider();
 
 //        Optional<EmployeeEmail> isExists = employeeEmailCustomRepository.isExists(email, provider);
 //        if (isExists.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL, Status.NOT_FOUND_EMAIL.getDescription());
 
         String findRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email + "-" + provider);
-        if(!refreshToken.equals(refreshToken)) return new ResponseData(Status.TOKEN_NOT_COINCIDE, Status.TOKEN_NOT_COINCIDE.getDescription());
+        if(!refreshToken.equals(findRefreshToken)) return new ResponseData(Status.TOKEN_NOT_COINCIDE, Status.TOKEN_NOT_COINCIDE.getDescription());
 
         // 새로운 jwt
         String issueAccessToken = jwtTokenProvider.generateAccessToken(authenticationDTO.getId(), authenticationDTO.getEmail(), authenticationDTO.getProvider());
@@ -134,7 +135,7 @@ public class AuthService {
 //                        , issueRefreshToken,
 //                        JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue(), TimeUnit.MILLISECONDS);
 
-        return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new EmployeeDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
+        return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
     }
 
 
@@ -154,7 +155,7 @@ public class AuthService {
         }
 
         // redis에 access Token 등록
-        Long remainExpiration = jwtTokenProvider.getRemainExpiration(accessToken);
+        Long remainExpiration = jwtTokenProvider.getRemainExpiration(resolveAccessToken);
         if (jwtTokenProvider.getRemainExpiration(resolveAccessToken) > 0) {
             saveRedis(accessToken, "logout", remainExpiration, TimeUnit.MILLISECONDS);
 //            redisTemplate.opsForValue()

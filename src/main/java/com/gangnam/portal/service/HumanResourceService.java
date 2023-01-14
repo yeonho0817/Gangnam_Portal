@@ -20,6 +20,13 @@ import java.util.List;
 public class HumanResourceService {
     private final EmployeeCustomRepository employeeCustomRepository;
 
+    // 소속/부서 이름 조회
+    public ResponseData findAffiliationDepartment() {
+
+
+        return null;
+    }
+
     // 인력 조회
     public ResponseData findHumanResource(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);

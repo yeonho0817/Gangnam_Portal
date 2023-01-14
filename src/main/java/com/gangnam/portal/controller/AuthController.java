@@ -1,8 +1,10 @@
 package com.gangnam.portal.controller;
 
 import com.gangnam.portal.domain.Provider;
+import com.gangnam.portal.dto.AuthDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.AuthService;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +25,7 @@ public class AuthController {
     @GetMapping("/google/login")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "구글 로그인 URI 반환",
-                content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))}),
+                content = {@Content(mediaType = "application/json", schema = @Schema(implementation = AuthDTO.LoginUriDTO.class))}),
 //        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
@@ -38,7 +40,7 @@ public class AuthController {
     // 구글 로그인 리다이렉트 -> 로그인 성공 시 서버 JWT 토큰 넘겨줌
     @GetMapping("/auth/google/callback")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "구글 로그인 리다이렉트(서버)",
+            @ApiResponse(responseCode = "200", description = "구글 로그인 리다이렉트",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))}),
 //        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))

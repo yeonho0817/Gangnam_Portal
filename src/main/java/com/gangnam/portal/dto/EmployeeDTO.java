@@ -62,14 +62,14 @@ public class EmployeeDTO {
         private String nameKr;
     }
 
-    @Data
-    @RequiredArgsConstructor
-    @AllArgsConstructor
-    public static class TokenDTO {
-        private String accessToken;
-        private String refreshToken;
-        private String role;
-    }
+//    @Data
+//    @RequiredArgsConstructor
+//    @AllArgsConstructor
+//    public static class TokenDTO {
+//        private String accessToken;
+//        private String refreshToken;
+//        private String role;
+//    }
 
     @Data
     @RequiredArgsConstructor

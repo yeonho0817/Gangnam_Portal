@@ -1,4 +1,4 @@
-package com.gangnam.portal.controller;
+package com.gangnam.portal.exception;
 
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
@@ -13,15 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
-@RestControllerAdvice(/*basePackages = "com.gangnam.portal.controller"*/)
+@RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
 public class ExceptionController {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity methodValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
 
         ResponseData responseData = makeErrorResponse(e.getBindingResult());
-
-        System.out.println(responseData);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -32,8 +30,6 @@ public class ExceptionController {
     public ResponseEntity bindException(BindException e, HttpServletRequest request) {
 
         ResponseData responseData = makeErrorResponse(e.getBindingResult());
-
-        System.out.println(responseData);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

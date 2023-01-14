@@ -43,7 +43,8 @@ public class JwtFilter extends OncePerRequestFilter {
             getAuthentication(request, accessToken);
 
             // 로그아웃인지 확인
-            String isLogout = (String)redisTemplate.opsForValue().get(request.getHeader(AUTHORIZATION_HEADER));
+            String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
+            System.out.println(accessToken + "\n" + redisTemplate.opsForValue().get("Bearer " + accessToken));
             if (ObjectUtils.isEmpty(isLogout)){
                 String email = jwtTokenProvider.getEmail(accessToken);
                 String provider = jwtTokenProvider.getProvider(accessToken);
@@ -52,21 +53,34 @@ public class JwtFilter extends OncePerRequestFilter {
                     CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
 
                     processSecurity(request, userDetails);
+                } else {
+                    request.setAttribute("exception", Status.NOT_FOUND_EMAIL);
+                    throw new IllegalArgumentException();
                 }
+            } else {
+                request.setAttribute("exception", Status.LOGOUT_ALREADY);
+                throw new IllegalArgumentException();
             }
 
         } else if (accessToken != null && refreshToken != null && request.getRequestURI().equals("/reissue")){  // accessToken + refreshToken 일 때 (재발급)
             getAuthentication(request, refreshToken);
 
-            String email = jwtTokenProvider.getEmail(accessToken);
-            String provider = jwtTokenProvider.getProvider(accessToken);
+
+            String email = jwtTokenProvider.getEmail(refreshToken);
+            String provider = jwtTokenProvider.getProvider(refreshToken);
 
             if (email != null) {
+
                 CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
 
                 processSecurity(request, userDetails);
+            } else {
+                request.setAttribute("exception", Status.NOT_FOUND_EMAIL);
+                throw new IllegalArgumentException();
             }
         }
+
+        System.out.println(request.getRequestURI());
 
         filterChain.doFilter(request, response);
     }

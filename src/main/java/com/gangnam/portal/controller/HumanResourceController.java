@@ -17,6 +17,16 @@ public class HumanResourceController {
     private final HumanResourceService humanResourceService;
 
 
+    // 소속/부서 이름 조회
+    @GetMapping("/teamList")
+    public ResponseEntity findAffiliationDepartment() {
+        ResponseData responseData = humanResourceService.findAffiliationDepartment();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
+    }
+
 
     // 인력 조회
     @GetMapping("/management")

@@ -28,6 +28,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             setResponse(response,Status.TOKEN_EXPIRED);
         } else if (exception == Status.TOKEN_SIGNATURE_ERROR) {
             setResponse(response, Status.TOKEN_SIGNATURE_ERROR);
+        } else if (exception == Status.LOGOUT_ALREADY) {
+            setResponse(response, Status.LOGOUT_ALREADY);
+        } else if (exception == Status.NOT_FOUND_EMAIL) {
+            setResponse(response, Status.NOT_FOUND_EMAIL);
         }
     }
 

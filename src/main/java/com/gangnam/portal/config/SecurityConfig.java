@@ -38,6 +38,11 @@ public class SecurityConfig {
         return http
                 .csrf().disable()
 
+                .logout()
+                .logoutUrl("/logout")
+
+                .and()
+
                 /**401, 403 Exception 핸들링 */
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -62,7 +67,7 @@ public class SecurityConfig {
                 // 구글 로그인
                 .antMatchers("/google/login", "/auth/google/callback").permitAll()
                 .antMatchers("/kakao/login", "/auth/kakao/callback").permitAll()
-                .antMatchers("/reissue").permitAll()
+                .antMatchers("/logout1").permitAll()
                 
                 //권한 부여
                 .antMatchers("/commute/update").hasRole("ADMIN")
