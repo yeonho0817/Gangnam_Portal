@@ -4,7 +4,9 @@ import com.gangnam.portal.dto.EmployeeDTO;
 import com.gangnam.portal.dto.QueryConditionDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
+import com.gangnam.portal.dto.TeamDTO;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
+import com.gangnam.portal.repository.custom.TeamCustomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,12 +21,13 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class HumanResourceService {
     private final EmployeeCustomRepository employeeCustomRepository;
+    private final TeamCustomRepository teamCustomRepository;
 
     // 소속/부서 이름 조회
     public ResponseData findAffiliationDepartment() {
+        List<TeamDTO.AffiliationNameDTO> affiliationNameDTOList = teamCustomRepository.findAffiliationDepartment();
 
-
-        return null;
+        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), affiliationNameDTOList);
     }
 
     // 인력 조회

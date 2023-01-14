@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,11 +23,16 @@ public class TeamCustomRepositoryImpl implements TeamCustomRepository {
     public List<TeamDTO.AffiliationNameDTO> findAffiliationDepartment() {
 
         return jpaQueryFactory.select(Projections.fields(TeamDTO.AffiliationNameDTO.class,
-                        qAffiliation.id.as("affiliationId")
+                    qAffiliation.id.as("affiliationId"),
+                    qAffiliation.name.stringValue().as("affiliationName")
                 ))
                 .from(qAffiliation)
 
+                .leftJoin(qAffiliation.departmentList, qDepartment)
+
+
                 .fetch()
-                ;
+                .stream().distinct().collect(Collectors.toList());
+
     }
 }
