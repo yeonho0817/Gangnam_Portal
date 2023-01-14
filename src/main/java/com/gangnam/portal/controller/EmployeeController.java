@@ -28,9 +28,10 @@ public class EmployeeController {
     }
     
     // 회원 수정
-    @PutMapping("/hr/info/update")
-    public ResponseEntity updateEmployeeInfo(@RequestBody @Valid EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
-        ResponseData responseData = employeeService.updateEmployeeInfo(updateInfoDTO);
+    @PutMapping("/hr/info")
+    public ResponseEntity updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken,
+                                             @RequestBody @Valid EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
+        ResponseData responseData = employeeService.updateEmployeeInfo(authenticationToken, updateInfoDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

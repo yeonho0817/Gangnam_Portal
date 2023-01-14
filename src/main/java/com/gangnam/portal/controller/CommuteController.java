@@ -40,8 +40,18 @@ public class CommuteController {
     }
 
     // 출퇴근 수정 - 관리자 기능
-    @PutMapping("/commute/update")
+    @PutMapping("/commute")
     public ResponseEntity commuteUpdate(@RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
+        ResponseData responseData = commuteService.commuteUpdate(commuteUpdateDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseData);
+    }
+
+    // 출퇴근 수정 - 관리자 기능
+    @PostMapping("/commute")
+    public ResponseEntity commuteCreate(@RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
         ResponseData responseData = commuteService.commuteUpdate(commuteUpdateDTO);
 
         return ResponseEntity
@@ -50,7 +60,7 @@ public class CommuteController {
     }
     
     // 월별 출퇴근 조회
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity commuteMy(@ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo,
                                     UsernamePasswordAuthenticationToken authenticationToken) {
         ResponseData responseData = commuteService.commuteMy(authenticationToken, commuteDateInfo);

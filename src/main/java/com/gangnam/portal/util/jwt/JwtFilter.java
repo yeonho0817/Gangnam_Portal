@@ -56,9 +56,16 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
         } else if (accessToken != null && refreshToken != null && request.getRequestURI().equals("/reissue")){  // accessToken + refreshToken 일 때 (재발급)
-//            getSimpleAuthentication(request, accessToken);
-            System.out.println(accessToken + "\n" + refreshToken);
             getAuthentication(request, refreshToken);
+
+            String email = jwtTokenProvider.getEmail(accessToken);
+            String provider = jwtTokenProvider.getProvider(accessToken);
+
+            if (email != null) {
+                CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
+
+                processSecurity(request, userDetails);
+            }
         }
 
         filterChain.doFilter(request, response);
@@ -72,8 +79,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
             claims = jwtTokenProvider.extractAllClaims(token);
 
-        } catch (SignatureException e) {
-            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
             request.setAttribute("exception", Status.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {

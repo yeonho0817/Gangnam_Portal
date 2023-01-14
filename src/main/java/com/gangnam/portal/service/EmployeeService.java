@@ -30,25 +30,27 @@ public class EmployeeService {
 
         Optional<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo = employeeCustomRepository.findEmployeeInfo(authenticationDTO.getId());
 
-        if (findEmployeeInfo.isEmpty()) {
-            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
-        } else {
+//        if (findEmployeeInfo.isEmpty()) {
+//            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
+//        } else {
             findEmployeeInfo.get().setEmail(authenticationDTO.getEmail());
             findEmployeeInfo.get().setRole(authenticationDTO.getRole());
             findEmployeeInfo.get().setGender( (findEmployeeInfo.get().getGen()%2 == 0 ? "여자" : "남자") );
 
             return new ResponseData(Status.FIND_EMPLOYEE_SUCCESS, Status.FIND_EMPLOYEE_SUCCESS.getDescription(), findEmployeeInfo.get());
-        }
+//        }
 
     }
 
     // 회원 수정
-    public ResponseData updateEmployeeInfo(EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
+    public ResponseData updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken, EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
+        AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
+
         Optional<Employee> findEmployee = employeeRepository.findById(updateInfoDTO.getEmployeeId());
 
-        if (findEmployee.isEmpty()) {
-            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
-        } else {
+//        if (findEmployee.isEmpty()) {
+//            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
+//        } else {
             employeeRepository.updateEmployeeInfo(updateInfoDTO.getEmployeeId(),
                     updateInfoDTO.getNameKr()==null ? findEmployee.get().getNameKr() : updateInfoDTO.getNameKr(),
                     updateInfoDTO.getNameEn()==null ? findEmployee.get().getNameEn() : updateInfoDTO.getNameEn(),
@@ -57,7 +59,7 @@ public class EmployeeService {
             );
 
             return new ResponseData(Status.UPDATE_EMPLOYEE_INFO_SUCCESS, Status.UPDATE_EMPLOYEE_INFO_SUCCESS.getDescription());
-        }
+//        }
     }
 
     // 출퇴근 수정 -> 직원 목록

@@ -40,8 +40,8 @@ public class JwtTokenProvider {
         return extractAllClaims(token).get("provider", String.class);
     }
 
-    public Date getExpiration(String token) {
-        return extractAllClaims(token).getExpiration();
+    public Long getExpiration(String token) {
+        return extractAllClaims(token).getExpiration().getTime();
     }
 
     private Key getSigningKey(String secretKey) {
@@ -67,7 +67,13 @@ public class JwtTokenProvider {
     }
 
     // refresh token은 claim을 추가하지 않음
-    public String generateRefreshToken() {
+    public String generateRefreshToken(Long id, String email, String provider) {
+        Claims claims = Jwts.claims();
+        claims.put("id", id);
+        claims.put("email", email);
+        claims.put("provider", provider);
+        claims.put("role", "ROLE_USER");
+
         String refreshToken = Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()))

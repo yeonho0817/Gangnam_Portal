@@ -36,9 +36,6 @@ public class CommuteService {
     public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken/*, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO*/) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
-        if (findEmployee.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
-
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String today = formatter.format(new Date());
         
@@ -56,6 +53,8 @@ public class CommuteService {
         }
 //        Optional<Commute> findTodayCommute = commuteCustomRepository.isAlreadyStart(today, authenticationDTO.getId());
 //        if (findTodayCommute.isPresent()) return new ResponseData(Status.COMMUTE_START_FAILED, Status.COMMUTE_START_FAILED.getDescription());
+
+        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
         
         Commute newCommute = Commute.builder()
                 .employee(findEmployee.get())
@@ -73,8 +72,8 @@ public class CommuteService {
     public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken/*, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO*/) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
-        if (findEmployee.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL, Status.NOT_FOUND_EMAIL.getDescription());
+//        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
+//        if (findEmployee.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL, Status.NOT_FOUND_EMAIL.getDescription());
 
         // 가장 최근 것
         Optional<Commute> findLatestCommute = commuteCustomRepository.findLatestCommute(authenticationDTO.getId());

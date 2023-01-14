@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class HumanResourceController {
     private final HumanResourceService humanResourceService;
 
+
+
     // 인력 조회
     @GetMapping("/management")
     public ResponseEntity findHumanResource(@RequestParam(defaultValue = "name") String sort,

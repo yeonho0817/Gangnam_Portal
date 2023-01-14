@@ -65,7 +65,7 @@ public class EmployeeDTO {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public static class LoginResponseDTO {
+    public static class TokenDTO {
         private String accessToken;
         private String refreshToken;
         private String role;

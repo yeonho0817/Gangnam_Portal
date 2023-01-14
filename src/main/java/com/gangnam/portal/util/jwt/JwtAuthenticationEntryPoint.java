@@ -20,23 +20,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         Status exception = (Status)request.getAttribute("exception");
 
-
-//        catch (SignatureException e) {
-//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-//        } catch (MalformedJwtException ex) {
-//            request.setAttribute("exception", Status.TOKEN_INVALID);
-//        } catch (UnsupportedJwtException ex) {
-//            request.setAttribute("exception", Status.TOKEN_INVALID);
-//        } catch (IllegalArgumentException ex) {
-//            request.setAttribute("exception", Status.TOKEN_INVALID);
-//        } catch (ExpiredJwtException e) {
-//            request.setAttribute("exception", Status.TOKEN_EXPIRED);
-//        } catch (JwtException e) {
-//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-//        } catch (NullPointerException e) {
-//            request.setAttribute("exception", Status.TOKEN_EMPTY);
-//        }
-
         if (exception == Status.TOKEN_INVALID) {
             setResponse(response, Status.TOKEN_INVALID);
         } else if (exception == Status.TOKEN_EMPTY) {
