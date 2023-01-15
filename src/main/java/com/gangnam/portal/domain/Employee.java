@@ -80,4 +80,19 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private List<EmployeeEmail> employeeEmailList;
 
+    public void updateNameEn(String nameEn){
+        if (nameEn == null) return;
+        this.nameEn = nameEn;
+    }
+
+    public void updatePhone(String phone){
+        if (phone == null) return;
+        this.phone = phone;
+    }
+
+    public void updateAddress(String address){
+        if (address == null) return;
+        this.address = address;
+    }
+
 }

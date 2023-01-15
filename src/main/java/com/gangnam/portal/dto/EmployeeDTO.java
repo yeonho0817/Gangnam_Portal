@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class EmployeeDTO {
@@ -24,9 +23,8 @@ public class EmployeeDTO {
 
          */
 
-        @NotNull(message = "직원 ID가 없습니다.")
-        private Long employeeId;
-        private String nameKr;
+//        @NotNull(message = "직원 ID가 없습니다.")
+//        private Long employeeId;
         private String nameEn;
         private String phone;
         private String address;

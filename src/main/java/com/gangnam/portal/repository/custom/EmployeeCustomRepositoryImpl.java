@@ -2,11 +2,13 @@ package com.gangnam.portal.repository.custom;
 
 import com.gangnam.portal.domain.*;
 import com.gangnam.portal.dto.EmployeeDTO;
-import com.querydsl.core.types.*;
+import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.querydsl.core.group.GroupBy.groupBy;
 
 @Repository
 @RequiredArgsConstructor
@@ -90,29 +94,14 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     public Page<EmployeeDTO.HRInfoData> readHumanResource(Pageable pageable, String selectValue, String searchText) {
         // selectValue = 이름, 직급, 소속
         // searchText = 검색어
-        
-        // 이메일 id 젤 빠른거 한개만
-        List<EmployeeDTO.HRInfoData> hrInfoList = jpaQueryFactory.select(Projections.fields(EmployeeDTO.HRInfoData.class,
-                        qEmployee.id.as("employeeId"),
-                        qEmployee.nameKr.as("nameKr"),
-                        qRanks.name.stringValue().as("rank"),
-                        qAffiliation.name.stringValue().as("affiliation"),
-                        qDepartment.name.stringValue().as("department"),
-                        qEmployee.phone.as("phone"),
 
-                        ExpressionUtils.as(
-                                JPAExpressions.select(qEmployeeEmail.email)
-                                        .from(qEmployeeEmail)
-                                        .leftJoin(qEmployeeEmail.employee, qEmployee)
-                                        .on(qEmployeeEmail.employee.id.eq(qEmployee.id))
-                                        .where(qEmployeeEmail.id.eq(qEmployee.id)),
-                                "email")
-                ))
-                .from(qEmployee)
+        // 이메일 twolinecode꺼만
+        List<EmployeeDTO.HRInfoData> hrInfoList = jpaQueryFactory.selectFrom(qEmployee)
 
-                .leftJoin(qEmployee.ranks, qRanks)
-                .leftJoin(qEmployee.affiliation, qAffiliation)
-                .leftJoin(qEmployee.department, qDepartment)
+                .leftJoin(qEmployee.ranks, qRanks).on(qEmployee.ranks.id.eq(qRanks.id))
+                .leftJoin(qEmployee.affiliation, qAffiliation).on(qEmployee.affiliation.id.eq(qAffiliation.id))
+                .leftJoin(qEmployee.department, qDepartment).on(qEmployee.department.id.eq(qDepartment.id))
+                .leftJoin(qEmployee.employeeEmailList, qEmployeeEmail).on(qEmployee.id.eq(qEmployeeEmail.employee.id).and(qEmployeeEmail.email.endsWith("@twolinecode.com")))
 
                 .where(containsSearchText(selectValue, searchText),
                         qEmployee.state.eq(false))
@@ -122,18 +111,28 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
 
-                .fetch();
+                .distinct()
+
+                .transform(
+                        groupBy(qEmployee.id).list(
+                                Projections.fields(EmployeeDTO.HRInfoData.class,
+                                        qEmployee.id.as("employeeId"),
+                                        qEmployee.nameKr.as("nameKr"),
+                                        qRanks.name.stringValue().as("rank"),
+                                        qAffiliation.name.stringValue().as("affiliation"),
+                                        qDepartment.name.stringValue().as("department"),
+                                        qEmployee.phone.as("phone"),
+                                        qEmployeeEmail.email.as("email")
+                                ))
+                );
+
 
         return new PageImpl<>(hrInfoList, pageable, getHRTotalPage(selectValue, searchText));
     }
 
     private Long getHRTotalPage(String selectValue, String searchText) {
-        return jpaQueryFactory.select(qEmployee.count())
+        return jpaQueryFactory.selectDistinct(qEmployee.id.count())
                 .from(qEmployee)
-
-                .leftJoin(qEmployee.ranks, qRanks)
-                .leftJoin(qEmployee.affiliation, qAffiliation)
-                .leftJoin(qEmployee.department, qDepartment)
 
                 .where(containsSearchText(selectValue, searchText),
                         qEmployee.state.eq(false))
@@ -184,27 +183,21 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     @Override
     public Page<EmployeeDTO.HRDepartmentInfoData> readHumanResourceDepartment(Pageable pageable, String name, String affiliation, String department) {
 
-        List<EmployeeDTO.HRDepartmentInfoData> hrDepartmentInfoList = jpaQueryFactory.select(Projections.fields(EmployeeDTO.HRDepartmentInfoData.class,
-                        qEmployee.id.as("employeeId"),
-                        qEmployee.nameKr.as("nameKr"),
-                        qRanks.name.as("rank"),
-                        qAffiliation.name.as("affiliation"),
-                        qDepartment.name.as("department")
-                ))
-                .from(qEmployee)
+        List<EmployeeDTO.HRDepartmentInfoData> hrDepartmentInfoList = jpaQueryFactory.selectFrom(qEmployee)
 
-                .leftJoin(qEmployee.department, qDepartment)
+                .join(qEmployee.department, qDepartment)
                 .on(qEmployee.department.id.eq(qDepartment.id))
 
-                .leftJoin(qEmployee.ranks, qRanks)
+                .join(qEmployee.ranks, qRanks)
                 .on(qEmployee.ranks.id.eq(qRanks.id))
 
-                .leftJoin(qEmployee.affiliation, qAffiliation)
+                .join(qEmployee.affiliation, qAffiliation)
                 .on(qEmployee.affiliation.id.eq(qAffiliation.id))
 
                 .where(containsName(name),
                         eqAffiliation(affiliation),
-                        eqDepartment(department)
+                        eqDepartment(department),
+                        qEmployee.state.eq(false)
                 )
 
                 .orderBy(humanResourceSort(pageable))
@@ -212,8 +205,20 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
 
-                .fetch()
-                ;
+                .distinct()
+
+                .transform(
+                        groupBy(qEmployee.id).list(
+                                Projections.fields(EmployeeDTO.HRDepartmentInfoData.class,
+                                        qEmployee.id.as("employeeId"),
+                                        qEmployee.nameKr.as("nameKr"),
+                                        qRanks.name.stringValue().as("rank"),
+                                        qAffiliation.name.stringValue().as("affiliation"),
+                                        qDepartment.name.stringValue().as("department")
+                                ))
+                );
+
+        System.out.println(getTeamTotalPage(name, affiliation, department));
 
         return new PageImpl<>(hrDepartmentInfoList, pageable, getTeamTotalPage(name, affiliation, department));
     }
@@ -225,16 +230,16 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .leftJoin(qEmployee.department, qDepartment)
                 .on(qEmployee.department.id.eq(qDepartment.id))
 
-                .leftJoin(qEmployee.ranks, qRanks)
-                .on(qEmployee.ranks.id.eq(qRanks.id))
-
-                .leftJoin(qEmployee.affiliation, qAffiliation)
+                .join(qEmployee.affiliation, qAffiliation)
                 .on(qEmployee.affiliation.id.eq(qAffiliation.id))
 
                 .where(containsName(name),
                         eqAffiliation(affiliation),
-                        eqDepartment(department)
+                        eqDepartment(department),
+                        qEmployee.state.eq(false)
                 )
+
+                .distinct()
 
                 .fetchOne()
                 ;

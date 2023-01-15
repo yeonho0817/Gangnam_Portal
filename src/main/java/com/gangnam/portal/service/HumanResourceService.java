@@ -54,6 +54,8 @@ public class HumanResourceService {
 
         Page<EmployeeDTO.HRDepartmentInfoData> hrDepartmentInfoList = employeeCustomRepository.readHumanResourceDepartment(pageable, name, affiliation, department);
 
+
+
         return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRDepartmentInfo(hrDepartmentInfoList.getTotalPages(), hrDepartmentInfoList.stream().collect(Collectors.toList())));
     }
 }

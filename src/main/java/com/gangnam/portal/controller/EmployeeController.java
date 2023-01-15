@@ -20,7 +20,7 @@ import java.util.List;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    // 사원 조회
+    // 사원 조회        O
     @GetMapping("/hr/info")
     @Operation(operationId = "hrInfo", summary = "자신의 정보 조회", description = "자신의 사원 정보를 조회합니다.")
     @ApiResponses(value = {
@@ -51,7 +51,7 @@ public class EmployeeController {
         return responseData;
     }
 
-    // 출퇴근 수정 시 직원 목록
+    // 출퇴근 수정 시 직원 목록       O
     @GetMapping("/hr/nameList")
     @Operation(operationId = "hrNameList", summary = "전체 사원 이름 조회", description = "모든 사원의 이름을 조회합니다.")
     @ApiResponses(value = {

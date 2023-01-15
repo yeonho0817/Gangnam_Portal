@@ -44,7 +44,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 로그아웃인지 확인
             String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
-            System.out.println(accessToken + "\n" + redisTemplate.opsForValue().get("Bearer " + accessToken));
             if (ObjectUtils.isEmpty(isLogout)){
                 String email = jwtTokenProvider.getEmail(accessToken);
                 String provider = jwtTokenProvider.getProvider(accessToken);

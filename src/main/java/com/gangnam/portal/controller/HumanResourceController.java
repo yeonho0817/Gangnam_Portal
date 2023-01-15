@@ -22,7 +22,7 @@ import java.util.List;
 public class HumanResourceController {
     private final HumanResourceService humanResourceService;
 
-    // 소속/부서 이름 조회
+    // 소속/부서 이름 조회      -  O
     @GetMapping("/teamList")
     @Operation(operationId = "teamList", summary = "소속/부서 이름 조회", description = "모든 소속/부서의 이름을 조회합니다.")
     @ApiResponses(value = {
@@ -38,7 +38,7 @@ public class HumanResourceController {
     }
 
 
-    // 인력 조회
+    // 인력 조회        O
     @GetMapping("/management")
     @Operation(operationId = "hrManagement", summary = "전체 인력 조회", description = "전체 사원을 조회합니다.")
     @ApiResponses(value = {
@@ -48,18 +48,18 @@ public class HumanResourceController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<EmployeeDTO.HRInfo> findHumanResource(@RequestParam(defaultValue = "name") String sort,
-                                                                        @RequestParam(defaultValue = "ASC") String orderBy,
-                                                                        @RequestParam(required = false) String selectValue,
-                                                                        @RequestParam(required = false) String searchText,
-                                                                        @RequestParam(required = false, defaultValue = "1") String pageNumber,
-                                                                        @RequestParam(required = false, defaultValue = "10") String pageSize)
+                                                            @RequestParam(defaultValue = "ASC") String orderBy,
+                                                            @RequestParam(required = false) String selectValue,
+                                                            @RequestParam(required = false) String searchText,
+                                                            @RequestParam(required = false, defaultValue = "1") String pageNumber,
+                                                            @RequestParam(required = false, defaultValue = "10") String pageSize)
     {
         ResponseData responseData = humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
 
         return responseData;
     }
-    
-    // 소속/부서 조회
+
+    // 소속/부서 조회     O
     @GetMapping("/dept")
     @Operation(operationId = "hrDept", summary = "전체 사원 조회", description = "소속/부서 기준으로 전체 사원을 조회합니다.")
     @ApiResponses(value = {

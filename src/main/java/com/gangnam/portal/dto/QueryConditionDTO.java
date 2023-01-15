@@ -23,7 +23,7 @@ public class QueryConditionDTO {
         try {
             Integer.parseInt(pageNumber);
         } catch (NumberFormatException e) {
-            pageNumber = "1";
+            pageNumber = "0";
         }
 
         try {
@@ -34,7 +34,7 @@ public class QueryConditionDTO {
 
         this.sort = sort;
         this.orderBy = orderBy;
-        this.pageNumber = Integer.parseInt(pageNumber);
+        this.pageNumber = Integer.parseInt(pageNumber)-1;
         this.pageSize = Integer.parseInt(pageSize);
     }
 
@@ -45,7 +45,7 @@ public class QueryConditionDTO {
         try {
             Integer.parseInt(pageNumber);
         } catch (NumberFormatException e) {
-            pageNumber = "1";
+            pageNumber = "0";
         }
 
         try {
@@ -56,7 +56,7 @@ public class QueryConditionDTO {
 
         this.sort = sort;
         this.orderBy = orderBy;
-        this.pageNumber = Integer.parseInt(pageNumber);
+        this.pageNumber = Integer.parseInt(pageNumber)-1;
         this.pageSize = Integer.parseInt(pageSize);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

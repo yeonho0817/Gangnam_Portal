@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,17 +24,27 @@ public class TeamCustomRepositoryImpl implements TeamCustomRepository {
     @Override
     public List<TeamDTO.AffiliationNameDTO> findAffiliationDepartment() {
 
-        return jpaQueryFactory.select(Projections.fields(TeamDTO.AffiliationNameDTO.class,
-                    qAffiliation.id.as("affiliationId"),
-                    qAffiliation.name.stringValue().as("affiliationName")
-                ))
-                .from(qAffiliation)
+        List<TeamDTO.AffiliationNameDTO> affiliationList = jpaQueryFactory.selectFrom(qAffiliation)
 
                 .leftJoin(qAffiliation.departmentList, qDepartment)
+                .on(qAffiliation.id.eq(qDepartment.affiliation.id))
+
+                .transform(
+                    groupBy(qAffiliation.id).list(
+                        Projections.fields(TeamDTO.AffiliationNameDTO.class,
+                            qAffiliation.id.as("affiliationId"),
+                            qAffiliation.name.stringValue().as("affiliationName"),
+                            list(
+                                    Projections.fields(
+                                            TeamDTO.DepartmentNameDTO.class,
+                                            qDepartment.id.as("departmentId"),
+                                            qDepartment.name.stringValue().as("departmentName")
+                                    )
+                            ).as("departmentNameDTOList")
+                    ))
+                );
 
 
-                .fetch()
-                .stream().distinct().collect(Collectors.toList());
-
+        return affiliationList;
     }
 }

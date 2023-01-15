@@ -12,6 +12,7 @@ import com.gangnam.portal.util.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,21 +43,25 @@ public class EmployeeService {
 
     }
 
-    // 회원 수정
+    // 회원 수정    O
+    @Transactional
     public ResponseData updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken, EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-        Optional<Employee> findEmployee = employeeRepository.findById(updateInfoDTO.getEmployeeId());
+        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
 
 //        if (findEmployee.isEmpty()) {
 //            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
 //        } else {
-            employeeRepository.updateEmployeeInfo(updateInfoDTO.getEmployeeId(),
-                    updateInfoDTO.getNameKr()==null ? findEmployee.get().getNameKr() : updateInfoDTO.getNameKr(),
+            employeeRepository.updateEmployeeInfo(authenticationDTO.getId(),
                     updateInfoDTO.getNameEn()==null ? findEmployee.get().getNameEn() : updateInfoDTO.getNameEn(),
                     updateInfoDTO.getPhone()==null ? findEmployee.get().getPhone() : updateInfoDTO.getPhone(),
                     updateInfoDTO.getAddress()==null ? findEmployee.get().getAddress() : updateInfoDTO.getAddress()
             );
+
+        findEmployee.get().updateNameEn(updateInfoDTO.getNameEn());
+        findEmployee.get().updatePhone(updateInfoDTO.getPhone());
+        findEmployee.get().updateAddress(updateInfoDTO.getAddress());
 
             return new ResponseData(Status.UPDATE_EMPLOYEE_INFO_SUCCESS, Status.UPDATE_EMPLOYEE_INFO_SUCCESS.getDescription());
 //        }
