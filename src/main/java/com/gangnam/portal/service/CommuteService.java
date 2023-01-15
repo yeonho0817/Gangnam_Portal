@@ -12,6 +12,7 @@ import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.custom.CommuteCustomRepository;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class CommuteService {
 
     // 출근 등록
 
-    public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken/*, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO*/) {
+    public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -59,7 +61,7 @@ public class CommuteService {
         Commute newCommute = Commute.builder()
                 .employee(findEmployee.get())
                 .registerDate(new Date())
-                .startDate(new Date())
+                .startDate(commuteRegisterDTO.getDate())
                 .build();
 
         commuteRepository.save(newCommute);
@@ -69,7 +71,7 @@ public class CommuteService {
 
     // 퇴근 등록
     // 무조건 전날껄 등록해야 함 -> 출근이든 퇴근이든
-    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken/*, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO*/) {
+    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
 //        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
@@ -89,7 +91,7 @@ public class CommuteService {
                 return new ResponseData(Status.COMMUTE_ALREADY_END, Status.COMMUTE_ALREADY_END.getDescription());
         }
 
-        findLatestCommute.get().updateEndDate(new Date());
+        findLatestCommute.get().updateEndDate(commuteRegisterDTO.getDate());
 //        commuteRepository.updateCommuteEnd(findLatestCommute.get().getId(), new Date());
 
         return new ResponseData(Status.COMMUTE_END_SUCCESS, Status.COMMUTE_END_SUCCESS.getDescription());
@@ -153,36 +155,15 @@ public class CommuteService {
     // 출퇴근 현황 조회
     public ResponseData commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, String name) {
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize, startDate, endDate);
-
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//
-//        Date formatStartDate;
-//        Date formatEndDate;
-//
-//        try {
-//            formatStartDate = simpleDateFormat.parse(startDate);
-//        } catch (IllegalArgumentException | ParseException e) {
-//            formatStartDate = new Date();
-//        }
-//
-//        try {
-//            formatEndDate = simpleDateFormat.parse(endDate);
-//        } catch (IllegalArgumentException | ParseException e) {
-//            formatEndDate = new Date();
-//        }
-//
-//        if (formatStartDate.compareTo(formatEndDate) == 1) {
-//            formatEndDate = new Date();
-//        }
-
-
+        
         System.out.println(queryConditionDTO.getStartDate() + " " + queryConditionDTO.getEndDate());
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
+        
+        // 전체 페이지 갯수 표시 해줘야 함
+        Page<CommuteDTO.CommuteStateData> commuteStateList = commuteCustomRepository.readCommuteState(pageable, queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
 
-        List<CommuteDTO.CommuteState> commuteStateList = commuteCustomRepository.readCommuteState(pageable, queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
-
-        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteStateList);
+        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new CommuteDTO.CommuteState(commuteStateList.getTotalPages(), commuteStateList.stream().collect(Collectors.toList())));
     }
 }

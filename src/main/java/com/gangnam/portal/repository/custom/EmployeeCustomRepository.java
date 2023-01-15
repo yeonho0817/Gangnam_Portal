@@ -2,6 +2,7 @@ package com.gangnam.portal.repository.custom;
 
 
 import com.gangnam.portal.dto.EmployeeDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -15,11 +16,11 @@ public interface EmployeeCustomRepository {
     
     
     // 인력조회
-    List<EmployeeDTO.HRInfo> readHumanResource(Pageable pageable, String selectValue, String searchText);
+    Page<EmployeeDTO.HRInfoData> readHumanResource(Pageable pageable, String selectValue, String searchText);
     
     
     // 소속/부서 조회
-    List<EmployeeDTO.HRDepartmentInfo> readHumanResourceDepartment(Pageable pageable, String name, String affiliation, String department);
+    Page<EmployeeDTO.HRDepartmentInfoData> readHumanResourceDepartment(Pageable pageable, String name, String affiliation, String department);
     
 
 }

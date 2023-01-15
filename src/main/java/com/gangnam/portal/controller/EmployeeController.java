@@ -3,13 +3,16 @@ package com.gangnam.portal.controller;
 import com.gangnam.portal.dto.EmployeeDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("")
@@ -17,35 +20,50 @@ import javax.validation.Valid;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    // 회원 조회
+    // 사원 조회
     @GetMapping("/hr/info")
-    public ResponseEntity findEmployeeInfo(UsernamePasswordAuthenticationToken authentication) {
+    @Operation(operationId = "hrInfo", summary = "자신의 정보 조회", description = "자신의 사원 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사원 정보 조회",
+                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
+//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
+//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+    })
+    public ResponseData<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(UsernamePasswordAuthenticationToken authentication) {
         ResponseData responseData = employeeService.findEmployeeInfo(authentication);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseData);
+        return responseData;
     }
     
     // 회원 수정
     @PutMapping("/hr/info")
-    public ResponseEntity updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken,
+    @Operation(operationId = "hrInfoUpdate", summary = "자신의 정보 수정", description = "자신의 사원 정보를 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사원 정보 수정",
+                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
+//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
+//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+    })
+    public ResponseData updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken,
                                              @RequestBody @Valid EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
         ResponseData responseData = employeeService.updateEmployeeInfo(authenticationToken, updateInfoDTO);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseData);
+        return responseData;
     }
 
     // 출퇴근 수정 시 직원 목록
     @GetMapping("/hr/nameList")
-    public ResponseEntity readEmployeeNameList() {
+    @Operation(operationId = "hrNameList", summary = "전체 사원 이름 조회", description = "모든 사원의 이름을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "전체 사원 이름 조회",
+                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
+//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
+//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+    })
+    public ResponseData<List<EmployeeDTO.EmployeeNameList>> readEmployeeNameList() {
         ResponseData responseData = employeeService.readEmployeeNameList();
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseData);
+        return responseData;
 
     }
 }

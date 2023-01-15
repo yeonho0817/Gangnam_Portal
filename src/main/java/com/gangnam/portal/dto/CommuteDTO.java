@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
+import java.util.List;
 
 public class CommuteDTO {
 
@@ -71,6 +72,14 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteState {
+        private Integer totalPages;
+        private List<CommuteStateData> commuteStateData;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommuteStateData {
         private String registerDate;
         private String startDate;
         private String endDate;

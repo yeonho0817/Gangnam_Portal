@@ -8,6 +8,7 @@ import com.gangnam.portal.dto.TeamDTO;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
 import com.gangnam.portal.repository.custom.TeamCustomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +39,9 @@ public class HumanResourceService {
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
 
-        List<EmployeeDTO.HRInfo> hrInfoList = employeeCustomRepository.readHumanResource(pageable, selectValue, searchText);
+        Page<EmployeeDTO.HRInfoData> hrInfoList = employeeCustomRepository.readHumanResource(pageable, selectValue, searchText);
 
-        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), hrInfoList);
+        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), hrInfoList.stream().collect(Collectors.toList())));
     }
 
     // 소속/부서 조회
@@ -50,8 +52,8 @@ public class HumanResourceService {
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
 
 
-        List<EmployeeDTO.HRDepartmentInfo> hrDepartmentInfoList = employeeCustomRepository.readHumanResourceDepartment(pageable, name, affiliation, department);
+        Page<EmployeeDTO.HRDepartmentInfoData> hrDepartmentInfoList = employeeCustomRepository.readHumanResourceDepartment(pageable, name, affiliation, department);
 
-        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), hrDepartmentInfoList);
+        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRDepartmentInfo(hrDepartmentInfoList.getTotalPages(), hrDepartmentInfoList.stream().collect(Collectors.toList())));
     }
 }

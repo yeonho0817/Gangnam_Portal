@@ -13,6 +13,8 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -129,8 +131,8 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     }
 
     @Override
-    public List<CommuteDTO.CommuteState> readCommuteState(Pageable pageable,
-                                                              Date startDate, Date endDate, String name) {
+    public Page<CommuteDTO.CommuteStateData> readCommuteState(Pageable pageable,
+                                                          Date startDate, Date endDate, String name) {
         StringTemplate formatRegisterDate = Expressions.stringTemplate(
                 "DATE_FORMAT({0}, {1})"
                 , qCommute.registerDate
@@ -147,7 +149,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
 
 
-        return jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteState.class,
+        List<CommuteDTO.CommuteStateData> commuteStateDataList = jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteStateData.class,
                         qEmployee.nameKr.as("nameKr"),
                         formatRegisterDate.as("registerDate"),
                         formatStartDate.as("startDate"),
@@ -169,6 +171,24 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 .limit(pageable.getPageSize())
 
                 .fetch()
+                ;
+
+        return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, name));
+    }
+
+    public Long getTotalPage(Date startDate, Date endDate, String name) {
+        return jpaQueryFactory.select(qCommute.count())
+                .from(qCommute)
+
+                .leftJoin(qCommute.employee, qEmployee)
+
+                .where(
+                        goeStartDate(startDate),
+                        loeEndDate(endDate),
+                        containsName(name)
+                )
+
+                .fetchOne()
                 ;
     }
 

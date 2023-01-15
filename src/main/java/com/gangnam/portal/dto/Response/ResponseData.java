@@ -5,12 +5,12 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class ResponseData {
+public class ResponseData<T> {
     private Status status;
     private String message;
-    private Object data;
+    private T data;
 
-    public ResponseData(Status status, String message, Object data) {
+    public ResponseData(Status status, String message, T data) {
         this.status = status;
         this.message = message;
         this.data = data;

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class EmployeeDTO {
 
@@ -75,6 +76,14 @@ public class EmployeeDTO {
     @RequiredArgsConstructor
     @AllArgsConstructor
     public static class HRInfo {
+        private Integer totalPage;
+        List<HRInfoData> hrInfoData;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class HRInfoData {
         private Long employeeId;
         private String nameKr;
         private String rank;
@@ -88,6 +97,14 @@ public class EmployeeDTO {
     @RequiredArgsConstructor
     @AllArgsConstructor
     public static class HRDepartmentInfo {
+        private Integer totalPage;
+        private List<HRDepartmentInfoData> hrDepartmentInfoDataList;
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class HRDepartmentInfoData {
         private Long employeeId;
         private String nameKr;
         private String rank;

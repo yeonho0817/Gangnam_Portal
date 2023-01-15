@@ -48,8 +48,7 @@ public class AuthService {
         if (responseEntity == null) {
             return new ResponseData(Status.PROVIDER_REJECTED, Status.PROVIDER_REJECTED.getDescription());
         } else {
-//            AuthDTO.LoginUriDTO loginUriDTO = new LoginU responseEntity.getHeaders().get("Location");
-            return new ResponseData(Status.PROVIDER_ACCEPTED, Status.PROVIDER_ACCEPTED.getDescription(), responseEntity);
+            return new ResponseData(Status.PROVIDER_ACCEPTED, Status.PROVIDER_ACCEPTED.getDescription(), new AuthDTO.LoginUriDTO(responseEntity.getHeaders().get("Location").get(0)));
         }
     }
 
@@ -101,7 +100,7 @@ public class AuthService {
 
     // 토큰 재발급
     @Transactional
-    public ResponseData reissueToken(UsernamePasswordAuthenticationToken authenticationToken/*String accessToken*/, String refreshToken) {
+    public ResponseData reissueToken(UsernamePasswordAuthenticationToken authenticationToken, String refreshToken) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
         System.out.println("진입");
         // filter에서 정상 처리 완료
@@ -140,7 +139,7 @@ public class AuthService {
 
 
     // 로그아웃
-    public ResponseData logout(String accessToken, String refreshToken) {
+    public ResponseData logout(String accessToken) {
         // refresh 삭제 -> access Redis에 등록
         String resolveAccessToken = jwtTokenProvider.getResolveToken(accessToken);
 

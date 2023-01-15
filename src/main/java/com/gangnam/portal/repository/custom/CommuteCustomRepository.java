@@ -2,6 +2,7 @@ package com.gangnam.portal.repository.custom;
 
 import com.gangnam.portal.domain.Commute;
 import com.gangnam.portal.dto.CommuteDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
@@ -17,6 +18,6 @@ public interface CommuteCustomRepository {
 
     List<CommuteDTO.CommuteListBoard> readCommute(Long employeeId, Integer year, Integer month);
 
-    List<CommuteDTO.CommuteState> readCommuteState(Pageable pageable, Date startDate, Date endDate, String name);
+    Page<CommuteDTO.CommuteStateData> readCommuteState(Pageable pageable, Date startDate, Date endDate, String name);
 
 }
