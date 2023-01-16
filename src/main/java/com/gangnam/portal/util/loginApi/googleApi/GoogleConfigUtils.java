@@ -9,14 +9,19 @@ import java.util.stream.Collectors;
 
 @Component
 public class GoogleConfigUtils {
-    @Value("${spring.security.oauth2.client.registration.google.authUri}")
-    private String googleAuthUrl;
+
+
+    @Value("${spring.security.oauth2.client.registration.google.tokenUri}")
+    private String googleTokenUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.loginUri}")
     private String googleLoginUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.redirectUri}")
     private String googleRedirectUrl;
+
+    @Value("${spring.security.oauth2.client.registration.google.userInfoUri}")
+    private String googleUserInfoUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.clientId}")
     private String googleClientId;
@@ -31,7 +36,7 @@ public class GoogleConfigUtils {
     public String googleInitUrl() {
         Map<String, Object> params = new HashMap<>();
         params.put("client_id", getGoogleClientId());
-        params.put("redirect_uri", getGoogleRedirectUri());
+        params.put("redirect_uri", getGoogleRedirectUrl());
         params.put("response_type", "code");
         params.put("scope", getScopeUrl());
 
@@ -40,25 +45,28 @@ public class GoogleConfigUtils {
                 .collect(Collectors.joining("&"));
 
         return getGoogleLoginUrl()
-                + "/o/oauth2/v2/auth"
                 + "?"
                 + paramStr;
     }
 
-    public String getGoogleAuthUrl() {
-        return googleAuthUrl;
+    public String getGoogleTokenUrl() {
+        return googleTokenUrl;
     }
 
     public String getGoogleLoginUrl() {
         return googleLoginUrl;
     }
 
-    public String getGoogleClientId() {
-        return googleClientId;
+    public String getGoogleRedirectUrl() {
+        return googleRedirectUrl;
     }
 
-    public String getGoogleRedirectUri() {
-        return googleRedirectUrl;
+    public String getGoogleUserInfoUrl() {
+        return googleUserInfoUrl;
+    }
+
+    public String getGoogleClientId() {
+        return googleClientId;
     }
 
     public String getGoogleSecret() {

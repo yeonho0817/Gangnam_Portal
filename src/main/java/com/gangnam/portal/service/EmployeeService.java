@@ -3,12 +3,11 @@ package com.gangnam.portal.service;
 
 import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.dto.EmployeeDTO;
-import com.gangnam.portal.dto.Response.AuthenticationDTO;
+import com.gangnam.portal.dto.AuthenticationDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
-import com.gangnam.portal.util.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class EmployeeService {
-    private final JwtTokenProvider jwtTokenProvider;
-
     private final EmployeeRepository employeeRepository;
     private final EmployeeCustomRepository employeeCustomRepository;
 
@@ -31,16 +28,11 @@ public class EmployeeService {
 
         Optional<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo = employeeCustomRepository.findEmployeeInfo(authenticationDTO.getId());
 
-//        if (findEmployeeInfo.isEmpty()) {
-//            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
-//        } else {
-            findEmployeeInfo.get().setEmail(authenticationDTO.getEmail());
-            findEmployeeInfo.get().setRole(authenticationDTO.getRole());
-            findEmployeeInfo.get().setGender( (findEmployeeInfo.get().getGen()%2 == 0 ? "여자" : "남자") );
+        findEmployeeInfo.get().setEmail(authenticationDTO.getEmail());
+        findEmployeeInfo.get().setRole(authenticationDTO.getRole());
+        findEmployeeInfo.get().setGender( (findEmployeeInfo.get().getGen()%2 == 0 ? "여자" : "남자") );
 
-            return new ResponseData(Status.FIND_EMPLOYEE_SUCCESS, Status.FIND_EMPLOYEE_SUCCESS.getDescription(), findEmployeeInfo.get());
-//        }
-
+        return new ResponseData(Status.FIND_EMPLOYEE_SUCCESS, Status.FIND_EMPLOYEE_SUCCESS.getDescription(), findEmployeeInfo.get());
     }
 
     // 회원 수정    O
@@ -50,21 +42,12 @@ public class EmployeeService {
 
         Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
 
-//        if (findEmployee.isEmpty()) {
-//            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
-//        } else {
-//            employeeRepository.updateEmployeeInfo(authenticationDTO.getId(),
-//                    updateInfoDTO.getNameEn()==null ? findEmployee.get().getNameEn() : updateInfoDTO.getNameEn(),
-//                    updateInfoDTO.getPhone()==null ? findEmployee.get().getPhone() : updateInfoDTO.getPhone(),
-//                    updateInfoDTO.getAddress()==null ? findEmployee.get().getAddress() : updateInfoDTO.getAddress()
-//            );
-
         findEmployee.get().updateNameEn(updateInfoDTO.getNameEn());
         findEmployee.get().updatePhone(updateInfoDTO.getPhone());
         findEmployee.get().updateAddress(updateInfoDTO.getAddress());
 
-            return new ResponseData(Status.UPDATE_EMPLOYEE_INFO_SUCCESS, Status.UPDATE_EMPLOYEE_INFO_SUCCESS.getDescription());
-//        }
+        return new ResponseData(Status.UPDATE_EMPLOYEE_INFO_SUCCESS, Status.UPDATE_EMPLOYEE_INFO_SUCCESS.getDescription());
+
     }
 
     // 출퇴근 수정 -> 직원 목록

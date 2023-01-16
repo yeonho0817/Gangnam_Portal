@@ -4,7 +4,7 @@ import com.gangnam.portal.domain.Commute;
 import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.dto.CommuteDTO;
 import com.gangnam.portal.dto.QueryConditionDTO;
-import com.gangnam.portal.dto.Response.AuthenticationDTO;
+import com.gangnam.portal.dto.AuthenticationDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.repository.CommuteRepository;

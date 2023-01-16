@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class KakaoConfigUtils {
-    @Value("${spring.security.oauth2.client.provider.kakao.authUri}")
-    private String kakaoAuthUrl;
 
     @Value("${spring.security.oauth2.client.provider.kakao.tokenUri}")
     private String kakaoTokenUrl;
@@ -30,7 +28,6 @@ public class KakaoConfigUtils {
     @Value("${spring.security.oauth2.client.registration.kakao.clientSecret}")
     private String kakaoSecret;
 
-
     @Value("${spring.security.oauth2.client.registration.kakao.scope}")
     private String scopes;
 
@@ -49,10 +46,6 @@ public class KakaoConfigUtils {
         return getKakaoLoginUrl()
                 + "?"
                 + paramStr;
-    }
-
-    public String getKakaoAuthUrl() {
-        return kakaoAuthUrl;
     }
 
     public String getKakaoUserInfoUrl() {

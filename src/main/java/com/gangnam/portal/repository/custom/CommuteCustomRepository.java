@@ -10,13 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommuteCustomRepository {
-    Optional<Commute> isAlreadyStart(String date, Long employeeId);
-
     Optional<Commute> findLatestCommute(Long employeeId);
-
-    Optional<Commute> findCommuteInfo(Date date, Long employeeId);
-
-    Optional<Commute> findTodayCommute(Long employeeId);
 
     List<CommuteDTO.CommuteListBoard> readCommute(Long employeeId, Integer year, Integer month);
 

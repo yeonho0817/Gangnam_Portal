@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,25 +31,6 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     private final QCommute qCommute = QCommute.commute;
     private final QEmployee qEmployee = QEmployee.employee;
 
-    @Override
-    public Optional<Commute> isAlreadyStart(String date, Long employeeId) {
-        StringTemplate formatDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.registerDate
-                , ConstantImpl.create("%Y-%m-%d"));
-
-        Commute commute = jpaQueryFactory.selectFrom(qCommute)
-
-                .leftJoin(qCommute.employee, qEmployee).fetchJoin()
-
-                .where(formatDate.eq(date)
-                        .and(qEmployee.id.eq(employeeId)))
-
-                .fetchOne();
-
-
-        return Optional.ofNullable(commute);
-    }
 
     @Override
     public Optional<Commute> findLatestCommute(Long employeeId) {
@@ -69,71 +49,12 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     }
 
     @Override
-    public Optional<Commute> findCommuteInfo(Date date, Long employeeId) {
-
-        StringTemplate formatDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.registerDate
-                , ConstantImpl.create("%Y-%m-%d"));
-
-        Commute commute = jpaQueryFactory.selectFrom(qCommute)
-
-                .leftJoin(qCommute.employee, qEmployee).fetchJoin()
-
-                .where(
-                        qEmployee.id.eq(employeeId)
-                        .and(qCommute.registerDate.eq(date))
-                )
-
-                .fetchOne();
-
-        return Optional.ofNullable(commute);
-    }
-
-    @Override
-    public Optional<Commute> findTodayCommute(Long employeeId) {
-        StringTemplate formatDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.registerDate
-                , ConstantImpl.create("%Y-%m-%d"));
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-        Commute commute = jpaQueryFactory.selectFrom(qCommute)
-
-                .leftJoin(qCommute.employee, qEmployee).fetchJoin()
-
-                .where(qEmployee.id.eq(employeeId),
-                    formatDate.eq(format.format(new Date()))
-                )
-
-                .fetchOne();
-
-        return Optional.empty();
-    }
-
-    @Override
     public List<CommuteDTO.CommuteListBoard> readCommute(Long employeeId, Integer year, Integer month) {
 
         StringTemplate formatDay = Expressions.stringTemplate(
                 "DATE_FORMAT({0}, {1})"
                 , qCommute.registerDate
                 , ConstantImpl.create("%d"));
-
-        StringTemplate formatRegisterDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.registerDate
-                , ConstantImpl.create("%Y-%m-%d"));
-
-        StringTemplate formatStartDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.startDate
-                , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
-
-        StringTemplate formatEndDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.endDate
-                , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
 
         Calendar calendar= Calendar.getInstance();
         calendar.set(year, month-1,1, 0, 0, 0);
@@ -148,10 +69,10 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
         return jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteListBoard.class,
                             qCommute.id.as("commuteId"),
                             qEmployee.nameKr.as("nameKr"),
-                            formatRegisterDate.as("registerDate"),
+                            getRegisterDateStringTemplate().as("registerDate"),
                             formatDay.as("day"),
-                            formatStartDate.as("startDate"),
-                            formatEndDate.as("endDate")
+                            getStartDateStringTemplate().as("startDate"),
+                            getEndDateStringTemplate().as("endDate")
                         ))
                 .from(qCommute)
 
@@ -167,37 +88,17 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 ;
     }
 
-    private BooleanExpression eqEmployeeId(Long employeeId) {
-        if (employeeId == null) return null;
-
-        return qEmployee.id.eq(employeeId);
-    }
-
     @Override
     public Page<CommuteDTO.CommuteStateData> readCommuteState(Pageable pageable,
-                                                          Date startDate, Date endDate, String name) {
-        StringTemplate formatRegisterDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.registerDate
-                , ConstantImpl.create("%Y-%m-%d"));
-
-        StringTemplate formatStartDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.startDate
-                , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
-
-        StringTemplate formatEndDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.endDate
-                , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
+                                                              Date startDate, Date endDate, String name) {
 
         List<CommuteDTO.CommuteStateData> commuteStateDataList = jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteStateData.class,
                         qCommute.id.as("commuteId"),
                         qEmployee.nameKr.as("nameKr"),
-                        formatRegisterDate.as("registerDate"),
-                        formatStartDate.as("startDate"),
-                        formatEndDate.as("endDate")
-                    ))
+                        getRegisterDateStringTemplate().as("registerDate"),
+                        getStartDateStringTemplate().as("startDate"),
+                        getEndDateStringTemplate().as("endDate")
+                ))
                 .from(qCommute)
 
                 .leftJoin(qCommute.employee, qEmployee)
@@ -219,6 +120,13 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
         return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, name));
     }
 
+    private BooleanExpression eqEmployeeId(Long employeeId) {
+        if (employeeId == null) return null;
+
+        return qEmployee.id.eq(employeeId);
+    }
+
+
     public Long getTotalPage(Date startDate, Date endDate, String name) {
         return jpaQueryFactory.select(qCommute.count())
                 .from(qCommute)
@@ -239,26 +147,26 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     // x.gt(y) : x > y
     // x.loe(y) : x <= y
     // x.lt(y) : x < y
-//    private BooleanExpression goeStartDate(Date startDate) {
-//        if (startDate == null) {
-//            return null;
-//        }
-//
-//        return qCommute.registerDate.goe(startDate);
-//    }
-//
-//    private BooleanExpression loeEndDate(Date endDate) {
-//        if (endDate == null) {
-//            return null;
-//        }
-//        return qCommute.registerDate.loe(endDate);
-//    }
 
-    private BooleanExpression betweenStartDateEndDate(Date startDate, Date endDate) {
-        if (startDate == null || endDate == null) {
-            return null;
-        }
-        return qCommute.registerDate.between(startDate, endDate);
+    private StringTemplate getRegisterDateStringTemplate() {
+        return Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})"
+                , qCommute.registerDate
+                , ConstantImpl.create("%Y-%m-%d"));
+    }
+
+    private StringTemplate getStartDateStringTemplate() {
+        return Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})"
+                , qCommute.startDate
+                , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
+    }
+
+    private StringTemplate getEndDateStringTemplate() {
+        return Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})"
+                , qCommute.endDate
+                , ConstantImpl.create("%Y-%m-%d %H:%i:%s"));
     }
 
     private BooleanExpression containsName(String name) {

@@ -1,4 +1,4 @@
-package com.gangnam.portal.dto.Response;
+package com.gangnam.portal.dto;
 
 import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetails;
 import lombok.Data;

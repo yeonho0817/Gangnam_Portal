@@ -35,21 +35,4 @@ public class EmployeeEmailCustomRepositoryImpl implements EmployeeEmailCustomRep
         return Optional.ofNullable(employeeEmail);
     }
 
-    @Override
-    public Optional<EmployeeEmail> findByEmail(String email) {
-        QEmployeeEmail qEmployeeEmail = QEmployeeEmail.employeeEmail;
-        QEmployee qEmployee = QEmployee.employee;
-        QAuthority qAuthority = QAuthority.authority;
-
-        return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(qEmployeeEmail)
-                        .leftJoin(qEmployeeEmail.employee, qEmployee)
-                        .on(qEmployeeEmail.employee.id.eq(qEmployee.id))
-
-                        .leftJoin(qEmployee.authority, qAuthority)
-                        .on(qEmployee.authority.id.eq(qAuthority.id))
-
-                .where(qEmployeeEmail.email.eq(email))
-                .fetchOne());
-    }
 }

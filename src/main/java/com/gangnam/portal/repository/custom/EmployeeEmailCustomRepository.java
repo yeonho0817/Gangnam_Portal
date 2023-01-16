@@ -7,5 +7,4 @@ import java.util.Optional;
 public interface EmployeeEmailCustomRepository {
     Optional<EmployeeEmail> isExists(String email, String provider);
 
-    Optional<EmployeeEmail> findByEmail(String email);
 }
