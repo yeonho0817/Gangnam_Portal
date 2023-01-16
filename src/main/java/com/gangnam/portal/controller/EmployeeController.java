@@ -35,7 +35,7 @@ public class EmployeeController {
         return responseData;
     }
     
-    // 회원 수정
+    // 회원 수정            O
     @PutMapping("/hr/info")
     @Operation(operationId = "hrInfoUpdate", summary = "자신의 정보 수정", description = "자신의 사원 정보를 수정합니다.")
     @ApiResponses(value = {

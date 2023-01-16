@@ -13,6 +13,7 @@ public class QueryConditionDTO {
     private Integer pageNumber;
     private Integer pageSize;
 
+
     private Date startDate;
     private Date endDate;
 
@@ -61,21 +62,33 @@ public class QueryConditionDTO {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        try {
-            this.startDate = simpleDateFormat.parse(startDate);
-        } catch (IllegalArgumentException | ParseException e) {
-            this.startDate = new Date();
+        if (startDate != null && endDate != null) {
+            try {
+                this.startDate = simpleDateFormat.parse(startDate);
+            } catch (IllegalArgumentException | ParseException e) {
+                this.startDate = new Date();
+            }
+
+            try {
+                this.endDate = simpleDateFormat.parse(endDate);
+            } catch (IllegalArgumentException | ParseException e) {
+
+            }
+
+            if (this.startDate.compareTo(this.endDate) == 1) {
+                this.endDate = this.startDate;
+            }
+        } else {
+
+            try {
+                if (startDate == null) this.startDate = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
+                if (endDate == null) this.endDate = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
+            } catch (ParseException e) {
+
+            }
+
         }
 
-        try {
-            this.endDate = simpleDateFormat.parse(endDate);
-        } catch (IllegalArgumentException | ParseException e) {
-            this.endDate = new Date();
-        }
-
-        if (this.startDate.compareTo(this.endDate) == 1) {
-            this.endDate = this.startDate;
-        }
     }
 
 }

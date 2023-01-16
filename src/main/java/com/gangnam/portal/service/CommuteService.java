@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,33 +36,34 @@ public class CommuteService {
 
     // 출근 등록
 
-    public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+    @Transactional
+    public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String today = formatter.format(new Date());
-        
-        // 가장 최근 것
-        Optional<Commute> findLatestCommute = commuteCustomRepository.findLatestCommute(authenticationDTO.getId());
+        Optional<Commute> latestCommute = commuteCustomRepository.findLatestCommute(authenticationDTO.getId());
 
-        // 등록되어 있는게 없을 때는 출근 가능
-        // 가장 최근에 가져 온것이 오늘이 아닐 때 -> 퇴근이 비어있으면 불가능
-        if (formatter.format(findLatestCommute.get().getRegisterDate()) != formatter.format(new Date())) {
-            if (findLatestCommute.isPresent() && findLatestCommute.get().getEndDate() == null)
-                return new ResponseData(Status.COMMUTE_END_FORBIDDEN, Status.COMMUTE_END_FORBIDDEN.getDescription());
-        } else {
-            // 가장 최근에 가져온 것이 오늘일 때 == 이미 출근을 찍음
-            return new ResponseData(Status.COMMUTE_ALREADY_START, Status.COMMUTE_ALREADY_START.getDescription());
+        /*
+            최근께 없으면 바로 등록
+            최근께 있으면
+                - endDate == null : 출근을 이미 찍고 퇴근만 안찍음, 등록 불가능
+                - endDate != null : 출근을 안찍음, 등록
+        */
+
+        if (latestCommute.isPresent()) {
+            if (latestCommute.get().getEndDate() == null) return new ResponseData(Status.COMMUTE_START_FORBIDDEN, Status.COMMUTE_START_FORBIDDEN.getDescription());
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String today = formatter.format(new Date());
+
+            if (today.equals(formatter.format(latestCommute.get().getRegisterDate()))) return new ResponseData(Status.COMMUTE_ALREADY_START, Status.COMMUTE_ALREADY_START.getDescription());
         }
-//        Optional<Commute> findTodayCommute = commuteCustomRepository.isAlreadyStart(today, authenticationDTO.getId());
-//        if (findTodayCommute.isPresent()) return new ResponseData(Status.COMMUTE_START_FAILED, Status.COMMUTE_START_FAILED.getDescription());
 
         Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
         
         Commute newCommute = Commute.builder()
                 .employee(findEmployee.get())
+                .startDate(commuteStartEndDTO.getDate())
                 .registerDate(new Date())
-                .startDate(commuteRegisterDTO.getDate())
                 .build();
 
         commuteRepository.save(newCommute);
@@ -69,68 +71,72 @@ public class CommuteService {
         return new ResponseData(Status.COMMUTE_START_SUCCESS, Status.COMMUTE_START_SUCCESS.getDescription());
     }
 
-    // 퇴근 등록
-    // 무조건 전날껄 등록해야 함 -> 출근이든 퇴근이든
-    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+    // 퇴근 등록  :  무조건 전날껄 등록해야 함 -> 출근이든 퇴근이든
+    @Transactional
+    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-//        Optional<Employee> findEmployee = employeeRepository.findById(authenticationDTO.getId());
-//        if (findEmployee.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMAIL, Status.NOT_FOUND_EMAIL.getDescription());
+        /*
+            최근께 없으면 바로 등록 불가능
+            최근께 있으면
+                - endDate == null : 출근 찍고 퇴근 안찍음, 등록 가능
+                - endDate != null
+                    - 오늘꺼면 : 새로운 시간으로 덮어 씌움
+                    - 그게 아니면,  등록 불가능
+        */
 
-        // 가장 최근 것
         Optional<Commute> findLatestCommute = commuteCustomRepository.findLatestCommute(authenticationDTO.getId());
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String today = formatter.format(new Date());
 
-        // 아직 출근하지 않은 경우 + 없는 경우
-        if (findLatestCommute.isEmpty() || formatter.format(findLatestCommute.get().getRegisterDate()) != formatter.format(new Date())) {
-            return new ResponseData(Status.COMMUTE_START_FORBIDDEN, Status.COMMUTE_START_FORBIDDEN.getDescription());
-        } else {  // 이미 퇴근한 경우
-            if (findLatestCommute.get().getEndDate() != null)
-                return new ResponseData(Status.COMMUTE_ALREADY_END, Status.COMMUTE_ALREADY_END.getDescription());
-        }
+        if (findLatestCommute.isEmpty())
+            return new ResponseData(Status.COMMUTE_END_FORBIDDEN, Status.COMMUTE_END_FORBIDDEN.getDescription());
 
-        findLatestCommute.get().updateEndDate(commuteRegisterDTO.getDate());
-//        commuteRepository.updateCommuteEnd(findLatestCommute.get().getId(), new Date());
+        if (findLatestCommute.get().getEndDate() != null && ! formatter.format(findLatestCommute.get().getRegisterDate()).equals(today))
+            return new ResponseData(Status.COMMUTE_ALREADY_END, Status.COMMUTE_ALREADY_END.getDescription());
+
+        findLatestCommute.get().updateEndDate(commuteStartEndDTO.getDate());
+
+        System.out.println(findLatestCommute.get().getEndDate());
 
         return new ResponseData(Status.COMMUTE_END_SUCCESS, Status.COMMUTE_END_SUCCESS.getDescription());
     }
 
-    // 출퇴근 수정  => 날짜 + 회원 ID로 비교
-    // 기존께 없는데 등록할 때
-    // 기존께 있는데 등록할 때
-    public ResponseData commuteUpdate(CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
+    // 출퇴근 수정 - 관리자
+    @Transactional
+    public ResponseData commuteUpdateAdmin(CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
         // 등록일 + employee id 로 이미 있는 건지 조사
-        Optional<Commute> findCommuteInfo =  commuteCustomRepository.findCommuteInfo(commuteUpdateDTO.getRegisterDate(), commuteUpdateDTO.getEmployeeId());
+        Optional<Commute> findCommuteInfo =  commuteRepository.findById(commuteUpdateDTO.getCommuteId());
 
-        if (findCommuteInfo.isEmpty()) {  // 등록
-            Optional<Employee> findEmployee = employeeRepository.findById(commuteUpdateDTO.getEmployeeId());
-            if (findEmployee.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
+        if (findCommuteInfo.isEmpty()) return new ResponseData(Status.COMMUTE_READ_FAILED, Status.COMMUTE_READ_FAILED.getDescription());
 
-            Commute newCommute = Commute.builder()
-                    .employee(findEmployee.get())
-                    .registerDate(commuteUpdateDTO.getRegisterDate())
-                    .startDate(commuteUpdateDTO.getStartDate())
-                    .endDate(commuteUpdateDTO.getEndDate())
-
-                    .build();
-
-            commuteRepository.save(newCommute);
-
-        } else {    // 수정
-
-            findCommuteInfo.get().updateStartDate(commuteUpdateDTO.getStartDate());
-            findCommuteInfo.get().updateEndDate(commuteUpdateDTO.getEndDate());
-            findCommuteInfo.get().updateRegisterDate(commuteUpdateDTO.getRegisterDate());
-
-        }
+        findCommuteInfo.get().updateStartDate(commuteUpdateDTO.getStartDate());
+        findCommuteInfo.get().updateEndDate(commuteUpdateDTO.getEndDate());
 
         return new ResponseData(Status.COMMUTE_UPDATE_SUCCESS, Status.COMMUTE_UPDATE_SUCCESS.getDescription());
     }
 
-    // 월별 출퇴근 조회 - 내꺼, 전체꺼
-    // boolean expression
+    // 출퇴근 등록 - 관리자
+    public ResponseData commuteCreateAdmin(CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        // 등록일 + employee id 로 이미 있는 건지 조사
+        Optional<Employee> findEmployee = employeeRepository.findById(commuteRegisterDTO.getEmployeeId());
+        if (findEmployee.isEmpty()) return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
+
+        Commute newCommute = Commute.builder()
+                .employee(findEmployee.get())
+                .registerDate(commuteRegisterDTO.getRegisterDate())
+                .startDate(commuteRegisterDTO.getStartDate())
+                .endDate(commuteRegisterDTO.getEndDate())
+
+                .build();
+
+        commuteRepository.save(newCommute);
+
+        return new ResponseData(Status.COMMUTE_UPDATE_SUCCESS, Status.COMMUTE_UPDATE_SUCCESS.getDescription());
+    }
+
+    // 월별 출퇴근 조회 - 본인
     public ResponseData commuteMy(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteDateInfo commuteDateInfo) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
@@ -142,6 +148,7 @@ public class CommuteService {
         return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteListBoardList);
     }
 
+    // 월별 출퇴근 조회 - 전체
     public ResponseData commuteAll(CommuteDTO.CommuteDateInfo commuteDateInfo) {
         List<CommuteDTO.CommuteListBoard> commuteListBoardList = commuteCustomRepository.readCommute(null,
                 Integer.valueOf(commuteDateInfo.getYear()),
@@ -155,8 +162,6 @@ public class CommuteService {
     // 출퇴근 현황 조회
     public ResponseData commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, String name) {
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize, startDate, endDate);
-        
-        System.out.println(queryConditionDTO.getStartDate() + " " + queryConditionDTO.getEndDate());
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));

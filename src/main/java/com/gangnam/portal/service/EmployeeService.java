@@ -53,11 +53,11 @@ public class EmployeeService {
 //        if (findEmployee.isEmpty()) {
 //            return new ResponseData(Status.NOT_FOUND_EMPLOYEE, Status.NOT_FOUND_EMPLOYEE.getDescription());
 //        } else {
-            employeeRepository.updateEmployeeInfo(authenticationDTO.getId(),
-                    updateInfoDTO.getNameEn()==null ? findEmployee.get().getNameEn() : updateInfoDTO.getNameEn(),
-                    updateInfoDTO.getPhone()==null ? findEmployee.get().getPhone() : updateInfoDTO.getPhone(),
-                    updateInfoDTO.getAddress()==null ? findEmployee.get().getAddress() : updateInfoDTO.getAddress()
-            );
+//            employeeRepository.updateEmployeeInfo(authenticationDTO.getId(),
+//                    updateInfoDTO.getNameEn()==null ? findEmployee.get().getNameEn() : updateInfoDTO.getNameEn(),
+//                    updateInfoDTO.getPhone()==null ? findEmployee.get().getPhone() : updateInfoDTO.getPhone(),
+//                    updateInfoDTO.getAddress()==null ? findEmployee.get().getAddress() : updateInfoDTO.getAddress()
+//            );
 
         findEmployee.get().updateNameEn(updateInfoDTO.getNameEn());
         findEmployee.get().updatePhone(updateInfoDTO.getPhone());

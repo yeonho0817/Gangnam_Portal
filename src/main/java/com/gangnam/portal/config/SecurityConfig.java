@@ -65,12 +65,12 @@ public class SecurityConfig {
                 .permitAll()
 
                 // 구글 로그인
-                .antMatchers("/google/login", "/auth/google/callback").permitAll()
-                .antMatchers("/kakao/login", "/auth/kakao/callback").permitAll()
-                .antMatchers("/logout1").permitAll()
+                .antMatchers("/auth/google/login", "/auth/google/callback").permitAll()
+                .antMatchers("/auth/kakao/login", "/auth/kakao/callback").permitAll()
+                .antMatchers("/auth/logout").permitAll()
                 
                 //권한 부여
-                .antMatchers("/commute/update").hasRole("ADMIN")
+                .antMatchers("/commute/admin").hasRole("ADMIN")
 
                 // 난제 없애야됨
 //                .anyRequest().permitAll()

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("")
+@RequestMapping("/commute")
 public class CommuteController {
     private final CommuteService commuteService;
 
-    // 출근 등록
-    @PostMapping("/commute/start")
+    // 출근 등록    O
+    @PostMapping("/start")
     @Operation(operationId = "commuteStart", summary = "출근 등록 API", description = "출근을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출근 등록",
@@ -30,14 +31,14 @@ public class CommuteController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData commuteStart(UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
-                                        @RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
-        ResponseData responseData = commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteRegisterDTO);
+                                        @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
+        ResponseData responseData = commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteStartEndDTO);
 
         return responseData;
     }
 
-    // 퇴근 등록
-    @PostMapping("/commute/end")
+    // 퇴근 등록        O
+    @PostMapping("/end")
     @Operation(operationId = "commuteEnd", summary = "퇴근 등록 API", description = "퇴근을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "퇴근 등록",
@@ -46,14 +47,15 @@ public class CommuteController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken,
-                                     @RequestBody CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
-        ResponseData responseData = commuteService.commuteEnd(authenticationToken, commuteRegisterDTO);
+                                     @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
+        ResponseData responseData = commuteService.commuteEnd(authenticationToken, commuteStartEndDTO);
 
         return responseData;
     }
 
-    // 출퇴근 수정 - 관리자 기능
-    @PutMapping("/commute")
+    // 출퇴근 수정 - 관리자 기능      O
+    @PutMapping("/admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(operationId = "commuteUpdate", summary = "출근 수정 API(관리자 권한)", description = "사원의 출퇴근 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 수정 - 관리자",
@@ -62,13 +64,14 @@ public class CommuteController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData commuteUpdate(@RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
-        ResponseData responseData = commuteService.commuteUpdate(commuteUpdateDTO);
+        ResponseData responseData = commuteService.commuteUpdateAdmin(commuteUpdateDTO);
 
         return responseData;
     }
 
-    // 출퇴근 수정 - 관리자 기능
-    @PostMapping("/commute")
+    // 출퇴근 등록 - 관리자 기능      O
+    @PostMapping("/admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(operationId = "commuteCreate", summary = "출근 등록 API(관리자 권한)", description = "사원이 등록하지 못한 출퇴근 정보를 추가합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 등록 - 관리자",
@@ -76,14 +79,14 @@ public class CommuteController {
 //        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
-    public ResponseData commuteCreate(@RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
-        ResponseData responseData = commuteService.commuteUpdate(commuteUpdateDTO);
+    public ResponseData commuteCreate(@RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        ResponseData responseData = commuteService.commuteCreateAdmin(commuteRegisterDTO);
 
         return responseData;
     }
     
-    // 월별 출퇴근 조회
-    @GetMapping("/")
+    // 월별 출퇴근 조회        O
+    @GetMapping("/board")
     @Operation(operationId = "myCommute", summary = "월별 출퇴근 조회 - 본인", description = "자신의 월별 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 본인",
@@ -98,8 +101,8 @@ public class CommuteController {
         return responseData;
     }
 
-    // 월별 출퇴근 조회
-    @GetMapping("/all")
+    // 월별 출퇴근 조회        O
+    @GetMapping("/board/all")
     @Operation(operationId = "allCommute", summary = "월별 출퇴근 조회 - 전체", description = "모든 사원의 월별 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 전체",
@@ -113,8 +116,8 @@ public class CommuteController {
         return responseData;
     }
     
-    // 출퇴근 현황 조회
-    @GetMapping("/commute")
+    // 출퇴근 현황 조회    O
+    @GetMapping("")
     @Operation(operationId = "commuteState", summary = "출퇴근 현황 조회", description = "사원의 기록된 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 현황 조회",

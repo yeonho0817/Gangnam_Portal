@@ -34,12 +34,13 @@ public enum Status {
 
     MONTHLY_COMMUTE_SUCCESS(200, HttpStatus.OK, "월별 출퇴근 조회를 완료했습니다."),
     COMMUTE_SUCCESS(200, HttpStatus.OK, "출퇴근 현황 조회를 완료했습니다."),
+    COMMUTE_READ_FAILED(404, HttpStatus.NOT_FOUND, "해당 출퇴근 정보가 없습니다."),
     COMMUTE_START_SUCCESS(200, HttpStatus.FORBIDDEN, "출근 등록을 완료했습니다."),
     COMMUTE_END_SUCCESS(200, HttpStatus.FORBIDDEN, "퇴근 등록을 완료했습니다."),
     COMMUTE_ALREADY_START(409, HttpStatus.FORBIDDEN, "이미 출근한 상태입니다."),
     COMMUTE_ALREADY_END(409, HttpStatus.FORBIDDEN, "이미 퇴근한 상태입니다."),
-    COMMUTE_START_FORBIDDEN(409, HttpStatus.FORBIDDEN, "아직 출근을 하지 않았습니다."),
-    COMMUTE_END_FORBIDDEN(409, HttpStatus.FORBIDDEN, "아직 퇴근을 하지 않았습니다."),
+    COMMUTE_START_FORBIDDEN(409, HttpStatus.FORBIDDEN, "아직 퇴근을 하지 않았습니다."),
+    COMMUTE_END_FORBIDDEN(409, HttpStatus.FORBIDDEN, "아직 출근을 하지 않았습니다."),
     COMMUTE_UPDATE_SUCCESS(200, HttpStatus.FORBIDDEN, "출퇴근 수정을 완료했습니다"),
 
     HUMAN_RESOURCE_SUCCESS(200, HttpStatus.OK, "인력 조회에 성공했습니다."),

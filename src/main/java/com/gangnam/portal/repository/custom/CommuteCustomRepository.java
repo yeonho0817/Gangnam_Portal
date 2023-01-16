@@ -16,6 +16,8 @@ public interface CommuteCustomRepository {
 
     Optional<Commute> findCommuteInfo(Date date, Long employeeId);
 
+    Optional<Commute> findTodayCommute(Long employeeId);
+
     List<CommuteDTO.CommuteListBoard> readCommute(Long employeeId, Integer year, Integer month);
 
     Page<CommuteDTO.CommuteStateData> readCommuteState(Pageable pageable, Date startDate, Date endDate, String name);

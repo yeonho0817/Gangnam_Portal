@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface CommuteRepository extends JpaRepository<Commute, Long> {
@@ -15,5 +16,6 @@ public interface CommuteRepository extends JpaRepository<Commute, Long> {
     @Modifying
     @Query("UPDATE Commute c SET c.endDate=:endDate WHERE c.id=:commuteId")
     void updateCommuteEnd(@Param("commuteId") Long commuteId, @Param("endDate") Date endDate);
+
 
 }

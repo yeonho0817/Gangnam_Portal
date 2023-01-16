@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
@@ -16,12 +15,11 @@ public class CommuteDTO {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CommuteRegisterDTO {
+    public static class CommuteStartEndDTO {
 //        @NotBlank(message = "직원 ID가 없습니다.")
 //        private Long employeeId;
-        @NotBlank(message = "날짜가 없습니다.")
-        @Pattern(regexp = "\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+//        @Pattern(regexp = "\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date date; // start, end
     }
 
@@ -29,18 +27,31 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteUpdateDTO {
+        @NotNull(message = "춭뢰근 ID가 없습니다.")
         private Long commuteId;
-        @NotBlank(message = "직원 ID가 없습니다.")
-        private Long employeeId;
-        @NotBlank(message = "날짜가 없습니다.")
-        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "날짜 형식이 아닙니다.")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-        private Date registerDate;
-        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+//        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date startDate;
-        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+//        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        private Date endDate;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommuteRegisterDTO {
+        @NotNull(message = "직원 ID가 없습니다.")
+        private Long employeeId;
+//        @NotBlank(message = "날짜가 없습니다.")
+//        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "날짜 형식이 아닙니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        private Date registerDate;
+//        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        private Date startDate;
+//        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date endDate;
     }
 
@@ -61,11 +72,12 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteListBoard {
-        private String name;
-        private Date registerDate;
+        private Long commuteId;
+        private String nameKr;
+        private String registerDate;
         private String day;
-        private Date startDate;
-        private Date endDate;
+        private String startDate;
+        private String endDate;
     }
 
     @Data
@@ -80,10 +92,21 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteStateData {
+        private Long commuteId;
         private String registerDate;
         private String startDate;
         private String endDate;
         private String nameKr;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommuteStateCondition {
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        private Date startDate;
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        private Date endDate;
     }
 
 

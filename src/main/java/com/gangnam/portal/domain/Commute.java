@@ -24,8 +24,8 @@ public class Commute {
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "register_date", nullable = false, columnDefinition = "DATE DEFAULT CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "register_date", nullable = false, columnDefinition = "DATETIME")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date registerDate;
 
@@ -44,8 +44,5 @@ public class Commute {
     }
     public void updateStartDate(Date date) {
         this.startDate = date;
-    }
-    public void updateRegisterDate(Date date) {
-        this.registerDate = date;
     }
 }

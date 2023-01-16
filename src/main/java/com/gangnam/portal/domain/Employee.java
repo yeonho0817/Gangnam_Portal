@@ -58,7 +58,7 @@ public class Employee {
     @Column(name = "phone", nullable = false, columnDefinition = "VARCHAR(15)")
     private String phone;
 
-    @Column(name = "profile_img", nullable = false, columnDefinition = "VARCHAR(250)")
+    @Column(name = "profile_img", nullable = false, columnDefinition = "VARCHAR(500)")
     private String profileImg;
 
     @Column(name = "state", nullable = false, columnDefinition = "TINYINT(1)")
@@ -69,7 +69,7 @@ public class Employee {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date birthday;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     @Column(name = "join_date", nullable = false, columnDefinition = "DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date joinDate;
