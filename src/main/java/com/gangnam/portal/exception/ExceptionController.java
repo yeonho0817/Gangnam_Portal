@@ -1,43 +1,36 @@
 package com.gangnam.portal.exception;
 
-import com.gangnam.portal.dto.Response.ResponseData;
-import com.gangnam.portal.dto.Response.Status;
-import org.springframework.http.HttpStatus;
+import com.gangnam.portal.dto.Response.ErrorResponse;
+import com.gangnam.portal.dto.Response.ErrorStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 @RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
 public class ExceptionController {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
-    public ResponseEntity methodValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e) {
 
-        ResponseData responseData = makeErrorResponse(e.getBindingResult());
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseData);
+        return makeErrorResponse(e.getBindingResult());
     }
 
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity bindException(BindException e, HttpServletRequest request) {
+//    @ExceptionHandler(BindException.class)
+//    public ResponseEntity<ErrorResponse> bindException(BindException e) {
+//        return makeErrorResponse(e.getBindingResult());
+//    }
 
-        ResponseData responseData = makeErrorResponse(e.getBindingResult());
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(responseData);
+    @ExceptionHandler(value = { CustomException.class })
+    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        return ErrorResponse.of(e.getErrorStatus());
     }
 
-    private ResponseData makeErrorResponse(BindingResult bindingResult) {
-        Status status = null;
+    private ResponseEntity<ErrorResponse> makeErrorResponse(BindingResult bindingResult) {
+        ErrorStatus errorStatus = null;
         String message = null;
 
         if (bindingResult.hasErrors()) {
@@ -50,16 +43,16 @@ public class ExceptionController {
             switch (Objects.requireNonNull(bindResultCode)) {
 
                 case "NotBlank": case "NotNull":
-                    status = Status.BLANK_ESSENTIAL_VALUE;
+                    errorStatus = ErrorStatus.BLANK_ESSENTIAL_VALUE;
                     break;
 
                 case "Pattern":
-                    status = Status.INVALID_PATTERN;
+                    errorStatus = ErrorStatus.INVALID_PATTERN;
                     break;
 
             }
         }
 
-        return new ResponseData(status, status.getDescription(), message);
+        return ErrorResponse.of(errorStatus);
     }
 }

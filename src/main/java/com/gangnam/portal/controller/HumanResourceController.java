@@ -32,9 +32,7 @@ public class HumanResourceController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<List<TeamDTO.AffiliationNameDTO>> findAffiliationDepartment() {
-        ResponseData responseData = humanResourceService.findAffiliationDepartment();
-
-        return responseData;
+        return humanResourceService.findAffiliationDepartment();
     }
 
 
@@ -54,9 +52,7 @@ public class HumanResourceController {
                                                             @RequestParam(required = false, defaultValue = "1") String pageNumber,
                                                             @RequestParam(required = false, defaultValue = "10") String pageSize)
     {
-        ResponseData responseData = humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
-
-        return responseData;
+        return humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
     }
 
     // 소속/부서 조회     O
@@ -76,8 +72,6 @@ public class HumanResourceController {
                                                 @RequestParam(required = false) String affiliation,
                                                 @RequestParam(required = false) String department)
     {
-        ResponseData responseData = humanResourceService.findHumanResourceDept(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, name, affiliation, department);
-
-        return responseData;
+        return humanResourceService.findHumanResourceDept(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, name, affiliation, department);
     }
 }

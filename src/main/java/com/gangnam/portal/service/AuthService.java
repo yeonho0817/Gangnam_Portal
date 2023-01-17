@@ -4,8 +4,10 @@ import com.gangnam.portal.domain.EmployeeEmail;
 import com.gangnam.portal.domain.Provider;
 import com.gangnam.portal.dto.AuthDTO;
 import com.gangnam.portal.dto.AuthenticationDTO;
+import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
+import com.gangnam.portal.exception.CustomException;
 import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
 import com.gangnam.portal.repository.redis.RedisRepository;
 import com.gangnam.portal.util.jwt.JwtTokenProvider;
@@ -17,8 +19,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +38,7 @@ public class AuthService {
     private final RedisRepository redisRepository;
 
     // 로그인 API
-    public ResponseData login(Provider provider) {
+    public ResponseData<AuthDTO.LoginUriDTO> login(Provider provider) {
         ResponseEntity<Object> responseEntity = null;
 
         if (provider == Provider.google) {
@@ -45,59 +47,56 @@ public class AuthService {
             responseEntity = kaKaoLoginInfo.kakaoLoginUri();
         }
 
-        if (responseEntity == null) {
-            return new ResponseData(Status.PROVIDER_REJECTED, Status.PROVIDER_REJECTED.getDescription());
-        } else {
-            return new ResponseData(Status.PROVIDER_ACCEPTED, Status.PROVIDER_ACCEPTED.getDescription(), new AuthDTO.LoginUriDTO(responseEntity.getHeaders().get("Location").get(0)));
-        }
+        Optional.ofNullable(responseEntity)
+                .orElseThrow(() -> new CustomException(ErrorStatus.PROVIDER_REJECTED));
+
+        return new ResponseData<>(Status.PROVIDER_ACCEPTED, Status.PROVIDER_ACCEPTED.getDescription(), new AuthDTO.LoginUriDTO(responseEntity.getHeaders().get("Location").get(0)));
     }
 
-    public ResponseData redirectLogin(String authCode, Provider provider) {
+    @Transactional(rollbackFor = {Exception.class})
+    public ResponseData<AuthDTO.TokenDTO> redirectLogin(String authCode, Provider provider) {
         String email = null;
-        Optional<EmployeeEmail> isExists = null;
+        EmployeeEmail isExists = null;
 
         if (provider == Provider.google) {
             UserInfoDto userInfoDto = googleLoginInfo.googleRedirectInfo(authCode);
             email = userInfoDto.getEmail();
 
-            isExists = employeeEmailCustomRepository.isExists(email, Provider.google.name());
+            isExists = employeeEmailCustomRepository.isExists(email, Provider.google.name())
+                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMAIL));
+
         } else if (provider == Provider.kakao) {
             String kakaoAccessToken = kaKaoLoginInfo.getKaKaoAccessToken(authCode);
 
 
             email = kaKaoLoginInfo.getKakaoUserInfo(kakaoAccessToken);
 
-            isExists = employeeEmailCustomRepository.isExists(email, Provider.kakao.name());
+            isExists = employeeEmailCustomRepository.isExists(email, Provider.kakao.name())
+                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMAIL));
         }
 
+        // jwt 토큰 생성
+        String accessToken = jwtTokenProvider.generateAccessToken(isExists.getEmployee().getId(), isExists.getEmail(), isExists.getProvider().toString());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(isExists.getEmployee().getId(), isExists.getEmail(), isExists.getProvider().toString());
 
-        if (isExists.isEmpty()) {
-            return new ResponseData(Status.LOGIN_FAILED, Status.LOGIN_FAILED.getDescription());
-        } else {
-            // jwt 토큰 생성
-            String accessToken = jwtTokenProvider.generateAccessToken(isExists.get().getEmployee().getId(), isExists.get().getEmail(), isExists.get().getProvider().toString());
-            String refreshToken = jwtTokenProvider.generateRefreshToken(isExists.get().getEmployee().getId(), isExists.get().getEmail(), isExists.get().getProvider().toString());
+        // refresh -> redis에 저장
+        saveRedis("RT:" + isExists.getEmail() + "-" + isExists.getProvider().name(), refreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
 
-            // refresh -> redis에 저장
-            saveRedis("RT:" + isExists.get().getEmail() + "-" + isExists.get().getProvider().name(), refreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
+        return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.getEmployee().getAuthority().getName().name()));
 
-            return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.get().getEmployee().getAuthority().getName().name()));
-        }
     }
 
     // 토큰 재발급
-    @Transactional
-    public ResponseData reissueToken(UsernamePasswordAuthenticationToken authenticationToken, String refreshToken) {
+    @Transactional(rollbackFor = {Exception.class})
+    public ResponseData<AuthDTO.TokenDTO> reissueToken(UsernamePasswordAuthenticationToken authenticationToken, String refreshToken) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-        // filter에서 정상 처리 완료
         // refresh token 비교 -> access token 재생성, refresh token 업데이트
-
         String email = authenticationDTO.getEmail();
         String provider = authenticationDTO.getProvider();
 
         String findRefreshToken = (String)redisTemplate.opsForValue().get("RT:" + email + "-" + provider);
-        if(!refreshToken.equals(findRefreshToken)) return new ResponseData(Status.TOKEN_NOT_COINCIDE, Status.TOKEN_NOT_COINCIDE.getDescription());
+        if(!refreshToken.equals(findRefreshToken)) throw new CustomException(ErrorStatus.TOKEN_NOT_COINCIDE);
 
         // 새로운 jwt
         String issueAccessToken = jwtTokenProvider.generateAccessToken(authenticationDTO.getId(), authenticationDTO.getEmail(), authenticationDTO.getProvider());
@@ -109,17 +108,17 @@ public class AuthService {
         saveRedis("RT:" + authenticationDTO.getEmail() + "-" + authenticationDTO.getProvider(), issueRefreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
 
 
-        return new ResponseData(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
+        return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
     }
 
 
     // 로그아웃
+    @Transactional(rollbackFor = {Exception.class})
     public ResponseData logout(String accessToken) {
         // refresh 삭제 -> access Redis에 등록
         String resolveAccessToken = jwtTokenProvider.getResolveToken(accessToken);
 
         String email = jwtTokenProvider.getEmail(resolveAccessToken);
-
         String provider = jwtTokenProvider.getProvider(resolveAccessToken);
 
         // Refresh Token 삭제
@@ -133,7 +132,7 @@ public class AuthService {
             saveRedis(accessToken, "logout", remainExpiration);
         }
 
-        return new ResponseData(Status.LOGOUT_SUCCESS, Status.LOGOUT_SUCCESS.getDescription());
+        return new ResponseData<>(Status.LOGOUT_SUCCESS, Status.LOGOUT_SUCCESS.getDescription());
     }
 
     private void saveRedis(Object key, Object value, Long timeout) {

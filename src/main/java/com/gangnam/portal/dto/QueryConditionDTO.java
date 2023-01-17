@@ -40,7 +40,7 @@ public class QueryConditionDTO {
     }
 
     public QueryConditionDTO(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate) {
-        if (! sort.equals("name") && ! sort.equals("rank")) sort = "name";
+        if (! sort.equals("name") && ! sort.equals("rank") && ! sort.equals("date")) sort = "name";
         if (! orderBy.equals("ASC") && ! orderBy.equals("DESC")) orderBy = "ASC";
 
         try {
@@ -62,33 +62,21 @@ public class QueryConditionDTO {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        if (startDate != null && endDate != null) {
-            try {
-                this.startDate = simpleDateFormat.parse(startDate);
-            } catch (IllegalArgumentException | ParseException e) {
-                this.startDate = new Date();
-            }
+        if (endDate == null) endDate = simpleDateFormat.format(new Date());
+        if (startDate == null) startDate = simpleDateFormat.format(new Date());
 
-            try {
-                this.endDate = simpleDateFormat.parse(endDate);
-            } catch (IllegalArgumentException | ParseException e) {
-
-            }
-
-            if (this.startDate.compareTo(this.endDate) == 1) {
-                this.endDate = this.startDate;
-            }
-        } else {
-
-            try {
-                if (startDate == null) this.startDate = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
-                if (endDate == null) this.endDate = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
-            } catch (ParseException e) {
-
-            }
-
+        try {
+            this.startDate = simpleDateFormat.parse(startDate);
+            this.endDate = simpleDateFormat.parse(endDate);
+        } catch (IllegalArgumentException | ParseException e) {
+            this.startDate = new Date();
+            this.endDate = new Date();
         }
 
+        if (this.startDate.compareTo(this.endDate) == 1) {
+            this.endDate = this.startDate;
+        }
+        System.out.println(this.startDate + " " + this.endDate);
     }
 
 }

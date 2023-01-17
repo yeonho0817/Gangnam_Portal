@@ -26,14 +26,16 @@ public class HumanResourceService {
     private final TeamCustomRepository teamCustomRepository;
 
     // 소속/부서 이름 조회
-    public ResponseData findAffiliationDepartment() {
+    @Transactional(readOnly = true)
+    public ResponseData<List<TeamDTO.AffiliationNameDTO>> findAffiliationDepartment() {
         List<TeamDTO.AffiliationNameDTO> affiliationNameDTOList = teamCustomRepository.findAffiliationDepartment();
 
-        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), affiliationNameDTOList);
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), affiliationNameDTOList);
     }
 
     // 인력 조회
-    public ResponseData findHumanResource(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
+    @Transactional(readOnly = true)
+    public ResponseData<EmployeeDTO.HRInfo> findHumanResource(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
@@ -41,11 +43,12 @@ public class HumanResourceService {
 
         Page<EmployeeDTO.HRInfoData> hrInfoList = employeeCustomRepository.readHumanResource(pageable, selectValue, searchText);
 
-        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), hrInfoList.stream().collect(Collectors.toList())));
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), hrInfoList.stream().collect(Collectors.toList())));
     }
 
     // 소속/부서 조회
-    public ResponseData findHumanResourceDept(String sort, String orderBy, String pageSize, String pageNumber, String name, String affiliation, String department) {
+    @Transactional(readOnly = true)
+    public ResponseData<EmployeeDTO.HRDepartmentInfo> findHumanResourceDept(String sort, String orderBy, String pageSize, String pageNumber, String name, String affiliation, String department) {
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
@@ -54,8 +57,6 @@ public class HumanResourceService {
 
         Page<EmployeeDTO.HRDepartmentInfoData> hrDepartmentInfoList = employeeCustomRepository.readHumanResourceDepartment(pageable, name, affiliation, department);
 
-
-
-        return new ResponseData(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRDepartmentInfo(hrDepartmentInfoList.getTotalPages(), hrDepartmentInfoList.stream().collect(Collectors.toList())));
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRDepartmentInfo(hrDepartmentInfoList.getTotalPages(), hrDepartmentInfoList.stream().collect(Collectors.toList())));
     }
 }

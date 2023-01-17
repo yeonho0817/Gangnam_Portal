@@ -1,6 +1,6 @@
 package com.gangnam.portal.util.jwt;
 
-import com.gangnam.portal.dto.Response.Status;
+import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetailService;
 import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetails;
 import io.jsonwebtoken.*;
@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -20,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @Component
 @RequiredArgsConstructor
@@ -37,51 +37,51 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = jwtTokenProvider.getResolveToken(request.getHeader(AUTHORIZATION_HEADER));
         String refreshToken = jwtTokenProvider.getResolveToken(request.getHeader(REFRESH_TOKEN_HEADER));
 
-        // if문으로 accessToken만 있을 때랑 accessToken + refreshToken 이 있을 때를 나눠서 처리해야 하네. + 로그아웃
-        if (accessToken != null && refreshToken == null) { // accessToken만 있을 때
-            // 빈 토큰 or 만료 or 유효하지 않는 토큰 걸러냄
-            getAuthentication(request, accessToken);
+        System.out.println(refreshToken);
+        try {
 
-            // 로그아웃인지 확인
-            String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
-            if (ObjectUtils.isEmpty(isLogout)){
-                String email = jwtTokenProvider.getEmail(accessToken);
-                String provider = jwtTokenProvider.getProvider(accessToken);
+            if (accessToken == null) { // 아무 것도 없을 때
+                request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
+                throw new NullPointerException();
+            } else if (refreshToken == null) { // accessToken만 있을 때
+                if (request.getRequestURI().equals("/auth/reissue")) {
+                    request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
+                    throw new NullPointerException();
+                }
 
-                if (email != null) {
-                    CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
+                // 토큰 걸러냄
+                getAuthentication(request, accessToken);
 
-                    processSecurity(request, userDetails);
+                // 로그아웃인지 확인
+                String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
+
+                if (isLogout == null) {
+                    saveUserInfo(request, accessToken);
                 } else {
-                    request.setAttribute("exception", Status.NOT_FOUND_EMAIL);
+                    request.setAttribute("exception", ErrorStatus.LOGOUT_ALREADY);
                     throw new IllegalArgumentException();
                 }
-            } else {
-                request.setAttribute("exception", Status.LOGOUT_ALREADY);
-                throw new IllegalArgumentException();
+
+            } else if (request.getRequestURI().equals("/auth/reissue")){  // accessToken + refreshToken 일 때 (재발급)
+                getAuthentication(request, refreshToken);
+
+                saveUserInfo(request, refreshToken);
             }
-
-        } else if (accessToken != null && refreshToken != null && request.getRequestURI().equals("/reissue")){  // accessToken + refreshToken 일 때 (재발급)
-            getAuthentication(request, refreshToken);
-
-
-            String email = jwtTokenProvider.getEmail(refreshToken);
-            String provider = jwtTokenProvider.getProvider(refreshToken);
-
-            if (email != null) {
-
-                CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
-
-                processSecurity(request, userDetails);
-            } else {
-                request.setAttribute("exception", Status.NOT_FOUND_EMAIL);
-                throw new IllegalArgumentException();
-            }
+        } catch (NoSuchElementException e) {
+            request.setAttribute("exception", ErrorStatus.NOT_FOUND_EMAIL);
+            throw new IllegalArgumentException();
         }
 
-        System.out.println(request.getRequestURI());
-
         filterChain.doFilter(request, response);
+    }
+
+    private void saveUserInfo(HttpServletRequest request, String token) {
+        String email = jwtTokenProvider.getEmail(token);
+        String provider = jwtTokenProvider.getProvider(token);
+
+        CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
+
+        processSecurity(request, userDetails);
     }
 
     private void getAuthentication(HttpServletRequest request, String token) {
@@ -93,36 +93,15 @@ public class JwtFilter extends OncePerRequestFilter {
             claims = jwtTokenProvider.extractAllClaims(token);
 
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
-            request.setAttribute("exception", Status.TOKEN_INVALID);
+            request.setAttribute("exception", ErrorStatus.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
-            request.setAttribute("exception", Status.TOKEN_EXPIRED);
+            request.setAttribute("exception", ErrorStatus.TOKEN_EXPIRED);
         } catch (JwtException e) {
-            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
+            request.setAttribute("exception", ErrorStatus.TOKEN_SIGNATURE_ERROR);
         } catch (NullPointerException e) {
-            request.setAttribute("exception", Status.TOKEN_EMPTY);
+            request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
         }
     }
-
-//    private void getSimpleAuthentication(HttpServletRequest request, String token) {
-//        Claims claims = null;
-//
-//        try {
-//            if (token == null) throw new NullPointerException();
-//            claims = jwtTokenProvider.extractAllClaims(token);
-//        } /*catch (SignatureException e) {
-//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-//        }*/ catch (MalformedJwtException ex) {
-//            request.setAttribute("exception", Status.TOKEN_INVALID);
-//        } catch (UnsupportedJwtException ex) {
-//            request.setAttribute("exception", Status.TOKEN_INVALID);
-//        } catch (IllegalArgumentException ex) {
-//            request.setAttribute("exception", Status.TOKEN_INVALID);
-//        } catch (JwtException e) {
-//            request.setAttribute("exception", Status.TOKEN_SIGNATURE_ERROR);
-//        } catch (NullPointerException e) {
-//            request.setAttribute("exception", Status.TOKEN_EMPTY);
-//        }
-//    }
 
     // 검증 과정에 예외가 발생하지 않았다면, 해당 유저의 정보를 SecurityContext에 넣음
     private void processSecurity(HttpServletRequest request, CustomUserDetails userDetails) {

@@ -1,6 +1,6 @@
 package com.gangnam.portal.util.jwt;
 
-import com.gangnam.portal.dto.Response.Status;
+import com.gangnam.portal.dto.Response.ErrorStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -17,9 +17,9 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler{
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        response.getWriter().println("{ \"code\" : \"" + Status.TOKEN_DENIED.getCode()
-                + "\", \"status\" : \"" +  Status.TOKEN_DENIED.getHttpStatus().toString()
-                + "\", \"message\" : \"" + Status.TOKEN_DENIED.getDescription()
+        response.getWriter().println("{ \"code\" : \"" + ErrorStatus.TOKEN_DENIED.getCode()
+                + "\", \"status\" : \"" +  ErrorStatus.TOKEN_DENIED.getHttpStatus().toString()
+                + "\", \"message\" : \"" + ErrorStatus.TOKEN_DENIED.getDescription()
                 + "\"}");
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.data.redis.core.TimeToLive;
 
 @RedisHash(value = "refreshToken")  // 7일
 //@RedisHash(value = "refreshToken", timeToLive = 10)  // 테스트용 10초
-//HGETALL 자료형식
 public class RefreshToken {
     @Id
     private String refreshToken;

@@ -32,9 +32,7 @@ public class CommuteController {
     })
     public ResponseData commuteStart(UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
                                         @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
-        ResponseData responseData = commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteStartEndDTO);
-
-        return responseData;
+        return commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteStartEndDTO);
     }
 
     // 퇴근 등록        O
@@ -48,9 +46,7 @@ public class CommuteController {
     })
     public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken,
                                      @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
-        ResponseData responseData = commuteService.commuteEnd(authenticationToken, commuteStartEndDTO);
-
-        return responseData;
+        return commuteService.commuteEnd(authenticationToken, commuteStartEndDTO);
     }
 
     // 출퇴근 수정 - 관리자 기능      O
@@ -64,9 +60,7 @@ public class CommuteController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData commuteUpdate(@RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
-        ResponseData responseData = commuteService.commuteUpdateAdmin(commuteUpdateDTO);
-
-        return responseData;
+        return commuteService.commuteUpdateAdmin(commuteUpdateDTO);
     }
 
     // 출퇴근 등록 - 관리자 기능      O
@@ -80,9 +74,7 @@ public class CommuteController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData commuteCreate(@RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
-        ResponseData responseData = commuteService.commuteCreateAdmin(commuteRegisterDTO);
-
-        return responseData;
+        return commuteService.commuteCreateAdmin(commuteRegisterDTO);
     }
     
     // 월별 출퇴근 조회        O
@@ -96,9 +88,7 @@ public class CommuteController {
     })
     public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteMy(@ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo,
                                                                      UsernamePasswordAuthenticationToken authenticationToken) {
-        ResponseData responseData = commuteService.commuteMy(authenticationToken, commuteDateInfo);
-
-        return responseData;
+        return commuteService.commuteMy(authenticationToken, commuteDateInfo);
     }
 
     // 월별 출퇴근 조회        O
@@ -111,9 +101,7 @@ public class CommuteController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteAll(@ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo) {
-        ResponseData responseData = commuteService.commuteAll(commuteDateInfo);
-
-        return responseData;
+        return commuteService.commuteAll(commuteDateInfo);
     }
     
     // 출퇴근 현황 조회    O
@@ -125,16 +113,13 @@ public class CommuteController {
 //        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
-    public ResponseData<CommuteDTO.CommuteState> commuteStateList(@RequestParam(defaultValue = "name") String sort,
-                                           @RequestParam(defaultValue = "ASC") String orderBy,
-                                           @RequestParam(defaultValue = "1") String pageNumber,
-                                           @RequestParam(defaultValue = "10") String pageSize ,
-                                           @RequestParam(required = false) String startDate,
-                                           @RequestParam(required = false) String endDate,
-                                           @RequestParam(required = false) String name ) {
-
-        ResponseData responseData = commuteService.commuteStateList(sort.toLowerCase(), orderBy.toUpperCase(), pageNumber, pageSize, startDate, endDate, name);
-
-        return responseData;
+    public ResponseData<CommuteDTO.CommuteState> commuteStateList(@RequestParam(defaultValue = "date") String sort,
+                                                               @RequestParam(defaultValue = "DESC") String orderBy,
+                                                               @RequestParam(defaultValue = "1") String pageNumber,
+                                                               @RequestParam(defaultValue = "10") String pageSize ,
+                                                               @RequestParam(required = false) String startDate,
+                                                               @RequestParam(required = false) String endDate,
+                                                               @RequestParam(required = false) String name ) {
+        return commuteService.commuteStateList(sort.toLowerCase(), orderBy.toUpperCase(), pageNumber, pageSize, startDate, endDate, name);
     }
 }

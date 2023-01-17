@@ -21,4 +21,7 @@ public class ResponseData<T> {
         this.message = message;
         this.data = null;
     }
+
+
+
 }

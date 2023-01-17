@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,9 +29,7 @@ public class EmployeeController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(UsernamePasswordAuthenticationToken authentication) {
-        ResponseData responseData = employeeService.findEmployeeInfo(authentication);
-
-        return responseData;
+        return employeeService.findEmployeeInfo(authentication);
     }
     
     // 회원 수정            O
@@ -45,10 +42,8 @@ public class EmployeeController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken,
-                                             @RequestBody @Valid EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
-        ResponseData responseData = employeeService.updateEmployeeInfo(authenticationToken, updateInfoDTO);
-
-        return responseData;
+                                             @RequestBody EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
+        return employeeService.updateEmployeeInfo(authenticationToken, updateInfoDTO);
     }
 
     // 출퇴근 수정 시 직원 목록       O
@@ -61,9 +56,7 @@ public class EmployeeController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<List<EmployeeDTO.EmployeeNameList>> readEmployeeNameList() {
-        ResponseData responseData = employeeService.readEmployeeNameList();
-
-        return responseData;
+        return employeeService.readEmployeeNameList();
 
     }
 }

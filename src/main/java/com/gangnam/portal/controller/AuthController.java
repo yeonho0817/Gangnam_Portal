@@ -25,8 +25,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "구글 로그인 URI 반환",
                     content = {@Content(mediaType = "application/json")}),
-//        @ApiResponse(responseCode = "4XX", description = "잘못된 Oauth 접근", content = {@Content(mediaType = "application/json",
-//                schema = @Schema(implementation = ResponseData.class))}),
+//            @ApiResponse(responseCode = "4XX", description = "잘못된 Oauth 접근", content = {@Content(mediaType = "application/json",
+//                schema = @Schema(implementation = ErrorResponse.class))}),
     })
     public ResponseData<AuthDTO.LoginUriDTO> loginOfGoogle() {
         ResponseData responseData = authService.login(Provider.google);
@@ -39,7 +39,7 @@ public class AuthController {
     @Operation(operationId = "googleRedirectApi", summary = "사원 인증", description = "구글에서 인증된 정보와 DB의 정보를 비교합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "구글 로그인 리다이렉트",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
+                    content = {@Content(mediaType = "application/json")}),
 //        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
@@ -59,9 +59,9 @@ public class AuthController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<AuthDTO.LoginUriDTO> loginOfKakao() {
-        ResponseData responseData = authService.login(Provider.kakao);
+//        ResponseData responseData = authService.login(Provider.kakao);
 
-        return responseData;
+        return authService.login(Provider.kakao);
     }
 
     // 카카오 라다이렉트
@@ -74,9 +74,8 @@ public class AuthController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData<AuthDTO.TokenDTO> redirectInfoOfKakao(@RequestParam(value = "code") String authCode) {
-        ResponseData responseData = authService.redirectLogin(authCode, Provider.kakao);
 
-        return responseData;
+        return authService.redirectLogin(authCode, Provider.kakao);
     }
 
     // 토큰 만료 시, refreshToken 받아서 갱신 or 권한 거부
@@ -90,9 +89,7 @@ public class AuthController {
     })
     public ResponseData<AuthDTO.TokenDTO> reissueToken(UsernamePasswordAuthenticationToken authenticationToken,
                                        @RequestHeader("RefreshToken") String refreshToken) {
-        ResponseData responseData = authService.reissueToken(authenticationToken, refreshToken);
-
-        return responseData;
+        return authService.reissueToken(authenticationToken, refreshToken);
     }
 
     // logout
@@ -105,9 +102,7 @@ public class AuthController {
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
     public ResponseData logout(@RequestHeader("Authorization") String accessToken) {
-        ResponseData responseData = authService.logout(accessToken);
-
-        return responseData;
+       return authService.logout(accessToken);
     }
 
 }
