@@ -12,7 +12,6 @@ import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
 import com.gangnam.portal.repository.redis.RedisRepository;
 import com.gangnam.portal.util.jwt.JwtTokenProvider;
 import com.gangnam.portal.util.loginApi.googleApi.GoogleLoginInfo;
-import com.gangnam.portal.util.loginApi.googleApi.UserInfoDto;
 import com.gangnam.portal.util.loginApi.kakaoApi.KaKaoLoginInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -59,15 +58,15 @@ public class AuthService {
         EmployeeEmail isExists = null;
 
         if (provider == Provider.google) {
-            UserInfoDto userInfoDto = googleLoginInfo.googleRedirectInfo(authCode);
-            email = userInfoDto.getEmail();
+            String googleAccessToken = googleLoginInfo.getGoogleAccessToken(authCode);
+
+            email = googleLoginInfo.getGoogleUserInfo(googleAccessToken);
 
             isExists = employeeEmailCustomRepository.isExists(email, Provider.google.name())
                     .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMAIL));
 
         } else if (provider == Provider.kakao) {
             String kakaoAccessToken = kaKaoLoginInfo.getKaKaoAccessToken(authCode);
-
 
             email = kaKaoLoginInfo.getKakaoUserInfo(kakaoAccessToken);
 

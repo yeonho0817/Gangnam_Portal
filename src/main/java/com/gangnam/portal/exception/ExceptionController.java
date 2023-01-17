@@ -2,6 +2,7 @@ package com.gangnam.portal.exception;
 
 import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ErrorStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,12 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Objects;
 
 @RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
+@Slf4j
 public class ExceptionController {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e) {
 
-        return makeErrorResponse(e.getBindingResult());
+        return bindingError(e.getBindingResult());
     }
 
 //    @ExceptionHandler(BindException.class)
@@ -26,10 +28,12 @@ public class ExceptionController {
 
     @ExceptionHandler(value = { CustomException.class })
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        printLog(e.getErrorStatus().getHttpStatus().value(), e.getErrorStatus().getHttpStatus().name(), e.getErrorStatus().getDescription());
+
         return ErrorResponse.of(e.getErrorStatus());
     }
 
-    private ResponseEntity<ErrorResponse> makeErrorResponse(BindingResult bindingResult) {
+    private ResponseEntity<ErrorResponse> bindingError(BindingResult bindingResult) {
         ErrorStatus errorStatus = null;
         String message = null;
 
@@ -53,6 +57,13 @@ public class ExceptionController {
             }
         }
 
+        printLog(errorStatus.getHttpStatus().value(), errorStatus.getHttpStatus().name(), message);
+
+
         return ErrorResponse.of(errorStatus);
+    }
+
+    private void printLog(Integer errorStatus, String errorCode, String errorMessage) {
+        log.error("Exception Handler\n\tError Status - {}\n\tError Code - {}\n\tError Message - {}", errorStatus, errorCode, errorMessage);
     }
 }

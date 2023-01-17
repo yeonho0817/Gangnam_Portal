@@ -15,16 +15,6 @@ public class EmployeeDTO {
     @RequiredArgsConstructor
     @AllArgsConstructor
     public static class UpdateInfoDTO {
-        /*
-
-        @NotBlank 는 null 과 "" 과 " "
-        @NotEmpty 는 null 과 "" 둘 다 허용하지 않게 합니다.
-        @NotNull 은 위에 살펴본 것 처럼 이름 그대로 Null만 허용하지 않습니다. 따라서, "" 이나 " " 은 허용하게 됩니다.
-
-         */
-
-//        @NotNull(message = "직원 ID가 없습니다.")
-//        private Long employeeId;
         private String nameEn;
         private String phone;
         private String address;
@@ -49,6 +39,8 @@ public class EmployeeDTO {
         private String phone;
         private String address;
         private String joinDate;
+        private String state;
+
 
         private String role;
     }
@@ -60,15 +52,6 @@ public class EmployeeDTO {
         private Long employeeId;
         private String nameKr;
     }
-
-//    @Data
-//    @RequiredArgsConstructor
-//    @AllArgsConstructor
-//    public static class TokenDTO {
-//        private String accessToken;
-//        private String refreshToken;
-//        private String role;
-//    }
 
     @Data
     @RequiredArgsConstructor

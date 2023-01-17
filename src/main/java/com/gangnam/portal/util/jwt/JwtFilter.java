@@ -37,13 +37,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = jwtTokenProvider.getResolveToken(request.getHeader(AUTHORIZATION_HEADER));
         String refreshToken = jwtTokenProvider.getResolveToken(request.getHeader(REFRESH_TOKEN_HEADER));
 
-        System.out.println(refreshToken);
         try {
-
-            if (accessToken == null) { // 아무 것도 없을 때
-                request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
-                throw new NullPointerException();
-            } else if (refreshToken == null) { // accessToken만 있을 때
+            if (accessToken != null && refreshToken == null) { // accessToken만 있을 때
                 if (request.getRequestURI().equals("/auth/reissue")) {
                     request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
                     throw new NullPointerException();
@@ -62,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     throw new IllegalArgumentException();
                 }
 
-            } else if (request.getRequestURI().equals("/auth/reissue")){  // accessToken + refreshToken 일 때 (재발급)
+            } else if (accessToken != null && refreshToken != null && request.getRequestURI().equals("/auth/reissue")){  // accessToken + refreshToken 일 때 (재발급)
                 getAuthentication(request, refreshToken);
 
                 saveUserInfo(request, refreshToken);
@@ -80,18 +75,14 @@ public class JwtFilter extends OncePerRequestFilter {
         String provider = jwtTokenProvider.getProvider(token);
 
         CustomUserDetails userDetails = customUserDetailService.loadUserByUsername(email, provider);
-
         processSecurity(request, userDetails);
     }
 
     private void getAuthentication(HttpServletRequest request, String token) {
-        Claims claims = null;
-
-        try {
+      try {
             if (token == null) throw new NullPointerException();
 
-            claims = jwtTokenProvider.extractAllClaims(token);
-
+            jwtTokenProvider.extractAllClaims(token);
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
             request.setAttribute("exception", ErrorStatus.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {

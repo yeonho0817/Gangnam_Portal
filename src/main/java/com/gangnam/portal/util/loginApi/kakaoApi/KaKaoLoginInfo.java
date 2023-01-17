@@ -108,7 +108,7 @@ public class KaKaoLoginInfo {
 
             while ((line = br.readLine()) != null) {
                 result += line;
-            }            //Gson 라이브러리로 JSON파싱
+            }            //Gson 라이브러리로 JSWON파싱
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(result);
 
@@ -128,6 +128,5 @@ public class KaKaoLoginInfo {
 
         return null;
     }
-
 
 }

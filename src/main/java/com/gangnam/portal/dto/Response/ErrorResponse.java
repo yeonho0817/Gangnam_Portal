@@ -1,17 +1,23 @@
 package com.gangnam.portal.dto.Response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 
+@Schema(description = "ErrorResponse")
 @Getter
 @Builder
 public class ErrorResponse {
-    private final String localDateTime;
+    @Schema(description = "Error Time")
+    private final String localDateTime = LocalDateTime.now().toString();
+    @Schema(description = "Error Status")
     private final Integer status;
+    @Schema(description = "Error Name")
     private final String error;
+    @Schema(description = "Error Message")
     private final String message;
 
     public static ResponseEntity<ErrorResponse> of(ErrorStatus errorStatus) {
@@ -19,7 +25,6 @@ public class ErrorResponse {
                 .status(errorStatus.getHttpStatus())
                 .body(
                         ErrorResponse.builder()
-                                .localDateTime(LocalDateTime.now().toString())
                                 .status(errorStatus.getHttpStatus().value())
                                 .error(errorStatus.getHttpStatus().name())
                                 .message(errorStatus.getDescription())

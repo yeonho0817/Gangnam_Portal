@@ -4,7 +4,9 @@ import com.gangnam.portal.dto.CommuteDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.CommuteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +28,12 @@ public class CommuteController {
     @Operation(operationId = "commuteStart", summary = "출근 등록 API", description = "출근을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출근 등록",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
 //        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
 //                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
     })
-    public ResponseData commuteStart(UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
-                                        @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
+    public ResponseData commuteStart(@Parameter(hidden = true) UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
+                                     @Parameter(description = "출근 시간 정보") @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         return commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteStartEndDTO);
     }
 
@@ -40,12 +42,10 @@ public class CommuteController {
     @Operation(operationId = "commuteEnd", summary = "퇴근 등록 API", description = "퇴근을 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "퇴근 등록",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
     })
     public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken,
-                                     @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
+                                   @Parameter(description = "퇴근 시간 정보")  @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         return commuteService.commuteEnd(authenticationToken, commuteStartEndDTO);
     }
 
@@ -55,11 +55,9 @@ public class CommuteController {
     @Operation(operationId = "commuteUpdate", summary = "출근 수정 API(관리자 권한)", description = "사원의 출퇴근 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 수정 - 관리자",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
     })
-    public ResponseData commuteUpdate(@RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
+    public ResponseData commuteUpdate(@Parameter(description = "출퇴근 수정 정보") @RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
         return commuteService.commuteUpdateAdmin(commuteUpdateDTO);
     }
 
@@ -69,11 +67,9 @@ public class CommuteController {
     @Operation(operationId = "commuteCreate", summary = "출근 등록 API(관리자 권한)", description = "사원이 등록하지 못한 출퇴근 정보를 추가합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 등록 - 관리자",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
     })
-    public ResponseData commuteCreate(@RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+    public ResponseData commuteCreate(@Parameter(description = "출퇴근 등록 정보") @RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
         return commuteService.commuteCreateAdmin(commuteRegisterDTO);
     }
     
@@ -82,12 +78,10 @@ public class CommuteController {
     @Operation(operationId = "myCommute", summary = "월별 출퇴근 조회 - 본인", description = "자신의 월별 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 본인",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+                    content = {@Content(mediaType = "application/json")}),
     })
-    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteMy(@ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo,
-                                                                     UsernamePasswordAuthenticationToken authenticationToken) {
+    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteMy(@Parameter(description = "월별 출퇴근 정보") @ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo,
+                                                                     @Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken) {
         return commuteService.commuteMy(authenticationToken, commuteDateInfo);
     }
 
@@ -96,11 +90,9 @@ public class CommuteController {
     @Operation(operationId = "allCommute", summary = "월별 출퇴근 조회 - 전체", description = "모든 사원의 월별 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 전체",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+                    content = {@Content(mediaType = "application/json")}),
     })
-    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteAll(@ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo) {
+    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteAll(@Parameter(description = "월별 출퇴근 정보") @ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo) {
         return commuteService.commuteAll(commuteDateInfo);
     }
     
@@ -109,17 +101,15 @@ public class CommuteController {
     @Operation(operationId = "commuteState", summary = "출퇴근 현황 조회", description = "사원의 기록된 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 현황 조회",
-                    content = {@Content(mediaType = "application/json"/*, schema = @Schema(implementation = AuthDTO.TokenDTO.class)*/)}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+                    content = {@Content(mediaType = "application/json")}),
     })
-    public ResponseData<CommuteDTO.CommuteState> commuteStateList(@RequestParam(defaultValue = "date") String sort,
-                                                               @RequestParam(defaultValue = "DESC") String orderBy,
-                                                               @RequestParam(defaultValue = "1") String pageNumber,
-                                                               @RequestParam(defaultValue = "10") String pageSize ,
-                                                               @RequestParam(required = false) String startDate,
-                                                               @RequestParam(required = false) String endDate,
-                                                               @RequestParam(required = false) String name ) {
+    public ResponseData<CommuteDTO.CommuteState> commuteStateList(@Parameter(description = "정렬 기준") @RequestParam(defaultValue = "date") String sort,
+                                                                  @Parameter(description = "정렬 방식(ASC, DESC)") @RequestParam(defaultValue = "DESC") String orderBy,
+                                                                  @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "1") String pageNumber,
+                                                                  @Parameter(description = "페이지 양") @RequestParam(defaultValue = "10") String pageSize ,
+                                                                  @Parameter(description = "시작 날짜") @RequestParam(required = false) String startDate,
+                                                                  @Parameter(description = "끝 날짜") @RequestParam(required = false) String endDate,
+                                                                  @Parameter(description = "이름") @RequestParam(required = false) String name ) {
         return commuteService.commuteStateList(sort.toLowerCase(), orderBy.toUpperCase(), pageNumber, pageSize, startDate, endDate, name);
     }
 }

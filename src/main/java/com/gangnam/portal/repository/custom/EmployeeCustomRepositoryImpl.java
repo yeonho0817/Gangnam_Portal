@@ -62,7 +62,8 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                     formatJoinDate.as("joinDate"),
                     qRanks.name.as("rank"),
                     qAffiliation.name.as("affiliation"),
-                    qDepartment.name.as("department")
+                    qDepartment.name.as("department"),
+                    qEmployee.state.stringValue().as("state")
                 ))
                 .from(qEmployee)
 

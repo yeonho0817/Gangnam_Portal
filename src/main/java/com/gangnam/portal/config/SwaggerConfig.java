@@ -18,10 +18,16 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 
     @Bean
     public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2).select()
+        final String securitySchemeName = "Authentication";
+
+        return new Docket(DocumentationType.SWAGGER_2)
+
+                .useDefaultResponseMessages(false)
+                .select()
                 .apis(RequestHandlerSelectors.basePackage("com.gangnam.portal.controller"))
-                .paths(PathSelectors.ant("/*/**"))
-                .build().apiInfo(apiInfoMetaData());
+                .paths(PathSelectors.any())
+                .build()
+                .apiInfo(apiInfoMetaData());
     }
 
     private ApiInfo apiInfoMetaData() {

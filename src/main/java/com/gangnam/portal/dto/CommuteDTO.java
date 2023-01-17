@@ -1,6 +1,8 @@
 package com.gangnam.portal.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,8 @@ public class CommuteDTO {
 //        @NotBlank(message = "직원 ID가 없습니다.")
 //        private Long employeeId;
 //        @Pattern(regexp = "\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @Schema(description = "출퇴근 시간")
+        @NotNull(message = "필수 값이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date date; // start, end
     }
@@ -27,12 +31,17 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteUpdateDTO {
-        @NotNull(message = "춭뢰근 ID가 없습니다.")
+        @Schema(description = "출퇴근 ID")
+        @NotNull(message = "필수 값이 없습니다.")
         private Long commuteId;
 //        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @Schema(description = "출근 날짜 + 시간")
+        @NotNull(message = "필수 값이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date startDate;
 //        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @Schema(description = "퇴근 날짜 + 시간")
+        @NotNull(message = "필수 값이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date endDate;
     }
@@ -41,16 +50,23 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteRegisterDTO {
-        @NotNull(message = "직원 ID가 없습니다.")
+        @Schema(description = "사원 ID")
+        @NotNull(message = "필수 값이 없습니다.")
         private Long employeeId;
 //        @NotBlank(message = "날짜가 없습니다.")
 //        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "날짜 형식이 아닙니다.")
+        @Schema(description = "등록 날짜")
+        @NotNull(message = "필수 값이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
         private Date registerDate;
 //        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @Schema(description = "출근 날짜 + 시간")
+        @NotNull(message = "필수 값이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date startDate;
 //        @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) (0[1-9]|1[0-9]|2[0-4]):(0[1-9]|[1-5][0-9]):(0[1-9]|[1-5][0-9])$", message = "날짜 형식이 아닙니다.")
+        @Schema(description = "퇴근 날짜 + 시간")
+        @NotNull(message = "필수 값이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date endDate;
     }
@@ -59,12 +75,14 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteDateInfo {
-        @NotNull(message = "년도를 입력해주세요")
-        @Pattern(regexp = "^\\d{4}$", message = "년도가 유효하지 않습니다.")
+        @Parameter(description = "년도", required = true)
+        @NotNull(message = "필수 값이 없습니다.")
+        @Pattern(regexp = "^\\d{4}$", message = "올바른 형식이 아닙니다.")
         private String year;
 
-        @NotNull(message = "월을 입력해주세요")
-        @Pattern(regexp = "^(0?[1-9]|1[012])$", message = "월이 유효하지 않습니다.")
+        @Parameter(description = "월", required = true)
+        @NotNull(message = "필수 값이 없습니다.")
+        @Pattern(regexp = "^(0?[1-9]|1[012])$", message = "올바른 형식이 아닙니다.")
         private String month;
     }
 
