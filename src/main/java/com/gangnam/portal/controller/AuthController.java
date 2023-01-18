@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -26,14 +28,12 @@ public class AuthController {
     @Operation(operationId = "googleLoginApi", summary = "구글 로그인 API", description = "구글 로그인 URI를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "구글 로그인 URI 반환",
-                    content = {@Content(mediaType = "application/json")}),
-//            @ApiResponse(responseCode = "4XX, 5XX", description = "구글 로그인 URI 반환 실패",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+                        content = {@Content(mediaType = "application/json")}),
+//                @ApiResponse(responseCode = "4XX", description = "구글 로그인 URI 반환 실패",
+//                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData<AuthDTO.LoginUriDTO> loginOfGoogle() {
-        ResponseData responseData = authService.login(Provider.google);
-
-        return responseData;
+    public ResponseData<AuthDTO.LoginUriDTO> loginOfGoogle(HttpServletResponse response) {
+        return authService.login(Provider.google);
     }
 
     // 구글 로그인 리다이렉트 -> 로그인 성공 시 서버 JWT 토큰 넘겨줌
@@ -43,10 +43,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "구글 로그인 리다이렉트",
                     content = {@Content(mediaType = "application/json")}),
     })
-    public ResponseData<AuthDTO.TokenDTO> redirectInfoOfGoogle(@RequestParam(value = "code") String authCode) {
-        ResponseData responseData = authService.redirectLogin(authCode, Provider.google);
+    public void redirectInfoOfGoogle(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
 
-        return responseData;
+        AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.google);
+
+        response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
+
+        response.setStatus(302);
     }
 
     // 카카오
@@ -67,9 +70,12 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "카카오 로그인 리다이렉트",
                     content = {@Content(mediaType = "application/json")}),
     })
-    public ResponseData<AuthDTO.TokenDTO> redirectInfoOfKakao(@RequestParam(value = "code") String authCode) {
+    public void redirectInfoOfKakao(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
+        AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.kakao);
 
-        return authService.redirectLogin(authCode, Provider.kakao);
+        response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
+
+        response.setStatus(302);
     }
 
     // 토큰 만료 시, refreshToken 받아서 갱신 or 권한 거부

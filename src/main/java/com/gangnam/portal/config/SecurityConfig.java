@@ -24,7 +24,13 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
         return (web) -> web.ignoring()
-                .antMatchers("/swagger/**", "/swagger-ui.html","/swagger-resources/**", "/webjars/**", "/v2/api-docs");
+                .antMatchers(  "/css/**", "/images/**", "/js/**"
+                        // -- Swagger UI v2
+                        , "/v2/api-docs", "/swagger-resources/**"
+                        , "/swagger-ui.html", "/webjars/**", "/swagger/**"
+                        // -- Swagger UI v3 (Open API)
+                        , "/v3/api-docs/**", "/swagger-ui/**"
+                );
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,7 +38,7 @@ public class SecurityConfig {
                 .csrf().disable()
 
                 .logout()
-                .logoutUrl("/logout")
+                .logoutUrl("/auth/logout")
 
                 .and()
 
@@ -50,14 +56,13 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
 
-                .antMatchers(
-                        "/swagger-resources/**",
-                        "/swagger-ui.html",
-                        "/v2/api-docs",
-                        "/webjars/**")
-                .permitAll()
+//                .antMatchers("/swagger-resources/**", "/swagger-ui/index.html",
+//                        "/swagger-ui.html",
+//                        "/v2/api-docs",
+//                        "/webjars/**")
+//                .permitAll()
 
-                // 구글 로그인
+                // 로그인 API
                 .antMatchers("/auth/google/login", "/auth/google/callback").permitAll()
                 .antMatchers("/auth/kakao/login", "/auth/kakao/callback").permitAll()
                 .antMatchers("/auth/logout").permitAll()

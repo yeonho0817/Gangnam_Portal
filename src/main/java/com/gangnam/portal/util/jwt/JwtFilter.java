@@ -51,6 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
 
                 if (isLogout == null) {
+
                     saveUserInfo(request, accessToken);
                 } else {
                     request.setAttribute("exception", ErrorStatus.LOGOUT_ALREADY);

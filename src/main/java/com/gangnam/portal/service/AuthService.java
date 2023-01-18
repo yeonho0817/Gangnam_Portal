@@ -53,7 +53,7 @@ public class AuthService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseData<AuthDTO.TokenDTO> redirectLogin(String authCode, Provider provider) {
+    public /*ResponseData<AuthDTO.TokenDTO>*/ AuthDTO.TokenDTO redirectLogin(String authCode, Provider provider) {
         String email = null;
         EmployeeEmail isExists = null;
 
@@ -81,7 +81,8 @@ public class AuthService {
         // refresh -> redis에 저장
         saveRedis("RT:" + isExists.getEmail() + "-" + isExists.getProvider().name(), refreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
 
-        return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.getEmployee().getAuthority().getName().name()));
+//        return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.getEmployee().getAuthority().getName().name()));
+        return new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.getEmployee().getAuthority().getName().name());
 
     }
 
