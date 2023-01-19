@@ -1,6 +1,7 @@
 package com.gangnam.portal.controller;
 
 import com.gangnam.portal.dto.EmployeeDTO;
+import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,8 @@ public class EmployeeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사원 정보 조회",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "사원 정보 조회 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(UsernamePasswordAuthenticationToken authentication) {
         return employeeService.findEmployeeInfo(authentication);
@@ -38,6 +41,8 @@ public class EmployeeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사원 정보 수정",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
+            @ApiResponse(responseCode = "4XX", description = "사원 정보 수정 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken,
                                            @Parameter(description = "사원 정보") @RequestBody EmployeeDTO.UpdateInfoDTO updateInfoDTO) {

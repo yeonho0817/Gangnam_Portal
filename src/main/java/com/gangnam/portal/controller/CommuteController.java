@@ -1,6 +1,7 @@
 package com.gangnam.portal.controller;
 
 import com.gangnam.portal.dto.CommuteDTO;
+import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.CommuteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +30,8 @@ public class CommuteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출근 등록",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
-//        @ApiResponse(responseCode = "4XX, 5XX", description = "버스 등록 실패",
-//                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorVO.class)))
+            @ApiResponse(responseCode = "4XX", description = "출근 등록 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData commuteStart(@Parameter(hidden = true) UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
                                      @Parameter(description = "출근 시간 정보") @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
@@ -43,6 +44,8 @@ public class CommuteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "퇴근 등록",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
+            @ApiResponse(responseCode = "4XX", description = "퇴근 등록 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken,
                                    @Parameter(description = "퇴근 시간 정보")  @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
@@ -54,8 +57,10 @@ public class CommuteController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(operationId = "commuteUpdate", summary = "출근 수정 API(관리자 권한)", description = "사원의 출퇴근 정보를 수정합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "출퇴근 수정 - 관리자",
+            @ApiResponse(responseCode = "200", description = "출퇴근 수정",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
+            @ApiResponse(responseCode = "4XX", description = "출퇴근 수정 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData commuteUpdate(@Parameter(description = "출퇴근 수정 정보") @RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
         return commuteService.commuteUpdateAdmin(commuteUpdateDTO);
@@ -66,8 +71,10 @@ public class CommuteController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(operationId = "commuteCreate", summary = "출근 등록 API(관리자 권한)", description = "사원이 등록하지 못한 출퇴근 정보를 추가합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "출퇴근 등록 - 관리자",
+            @ApiResponse(responseCode = "200", description = "출퇴근 등록",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
+            @ApiResponse(responseCode = "4XX", description = "출퇴근 등록 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData commuteCreate(@Parameter(description = "출퇴근 등록 정보") @RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
         return commuteService.commuteCreateAdmin(commuteRegisterDTO);
@@ -79,6 +86,8 @@ public class CommuteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 본인",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "월별 출퇴근 조회 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteMy(@Parameter(description = "월별 출퇴근 정보") @ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo,
                                                                      @Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken) {
@@ -91,6 +100,8 @@ public class CommuteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 전체",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "월별 출퇴근 조회 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteAll(@Parameter(description = "월별 출퇴근 정보") @ModelAttribute @Valid CommuteDTO.CommuteDateInfo commuteDateInfo) {
         return commuteService.commuteAll(commuteDateInfo);
@@ -102,6 +113,8 @@ public class CommuteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 현황 조회",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "출퇴근 현황 조회 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<CommuteDTO.CommuteState> commuteStateList(@Parameter(description = "정렬 기준") @RequestParam(defaultValue = "date") String sort,
                                                                   @Parameter(description = "정렬 방식(ASC, DESC)") @RequestParam(defaultValue = "DESC") String orderBy,

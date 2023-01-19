@@ -9,7 +9,6 @@ import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.exception.CustomException;
 import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
-import com.gangnam.portal.repository.redis.RedisRepository;
 import com.gangnam.portal.util.jwt.JwtTokenProvider;
 import com.gangnam.portal.util.loginApi.googleApi.GoogleLoginInfo;
 import com.gangnam.portal.util.loginApi.kakaoApi.KaKaoLoginInfo;
@@ -34,7 +33,6 @@ public class AuthService {
     private final RedisTemplate redisTemplate;
 
     private final EmployeeEmailCustomRepository employeeEmailCustomRepository;
-    private final RedisRepository redisRepository;
 
     // 로그인 API
     public ResponseData<AuthDTO.LoginUriDTO> login(Provider provider) {
@@ -53,7 +51,7 @@ public class AuthService {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public /*ResponseData<AuthDTO.TokenDTO>*/ AuthDTO.TokenDTO redirectLogin(String authCode, Provider provider) {
+    public AuthDTO.TokenDTO redirectLogin(String authCode, Provider provider) {
         String email = null;
         EmployeeEmail isExists = null;
 
@@ -81,9 +79,7 @@ public class AuthService {
         // refresh -> redis에 저장
         saveRedis("RT:" + isExists.getEmail() + "-" + isExists.getProvider().name(), refreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
 
-//        return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.getEmployee().getAuthority().getName().name()));
         return new AuthDTO.TokenDTO(accessToken, refreshToken, isExists.getEmployee().getAuthority().getName().name());
-
     }
 
     // 토큰 재발급
@@ -106,7 +102,6 @@ public class AuthService {
 
         deleteRedis("RT:" + email + "-" + provider);
         saveRedis("RT:" + authenticationDTO.getEmail() + "-" + authenticationDTO.getProvider(), issueRefreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
-
 
         return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
     }

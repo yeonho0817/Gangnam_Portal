@@ -4,6 +4,7 @@ import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,10 +23,10 @@ public class ExceptionController {
         return bindingError(e.getBindingResult());
     }
 
-//    @ExceptionHandler(BindException.class)
-//    public ResponseEntity<ErrorResponse> bindException(BindException e) {
-//        return makeErrorResponse(e.getBindingResult());
-//    }
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> bindException(BindException e) {
+        return bindingError(e.getBindingResult());
+    }
 
     @ExceptionHandler(value = { CustomException.class })
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletResponse response) {
@@ -60,7 +61,6 @@ public class ExceptionController {
             String bindResultCode = bindingResult.getFieldError().getCode();
 
             switch (Objects.requireNonNull(bindResultCode)) {
-
                 case "NotBlank": case "NotNull":
                     errorStatus = ErrorStatus.BLANK_ESSENTIAL_VALUE;
                     break;

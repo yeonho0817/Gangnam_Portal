@@ -59,7 +59,7 @@ public class CommuteService {
         }
 
         Employee findEmployee = employeeRepository.findById(authenticationDTO.getId())
-                .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMAIL));
+                .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));
         
         Commute newCommute = Commute.builder()
                 .employee(findEmployee)

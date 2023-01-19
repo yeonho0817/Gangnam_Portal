@@ -1,5 +1,7 @@
 package com.gangnam.portal.config;
 
+import com.fasterxml.classmate.TypeResolver;
+import com.gangnam.portal.dto.Response.ErrorResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -19,11 +21,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig extends WebMvcConfigurationSupport {
 
     @Bean
-    public Docket api() {
+    public Docket api(TypeResolver typeResolver) {
         final String securitySchemeName = "Authentication";
 
         return new Docket(DocumentationType.SWAGGER_2)
-
+                .additionalModels(typeResolver.resolve(ErrorResponse.class))
                 .useDefaultResponseMessages(false)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.gangnam.portal.controller"))
@@ -33,7 +35,6 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
     }
 
     private ApiInfo apiInfoMetaData() {
-
         return new ApiInfoBuilder().title("강남 포탈")
                 .description("강남 포탈 API")
                 .version("1.0.0")

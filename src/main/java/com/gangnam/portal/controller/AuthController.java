@@ -2,6 +2,7 @@ package com.gangnam.portal.controller;
 
 import com.gangnam.portal.domain.Provider;
 import com.gangnam.portal.dto.AuthDTO;
+import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +30,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "구글 로그인 URI 반환",
                         content = {@Content(mediaType = "application/json")}),
-//                @ApiResponse(responseCode = "4XX", description = "구글 로그인 URI 반환 실패",
-//                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "4XX", description = "구글 로그인 URI 반환 실패",
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<AuthDTO.LoginUriDTO> loginOfGoogle(HttpServletResponse response) {
         return authService.login(Provider.google);
@@ -38,10 +39,12 @@ public class AuthController {
 
     // 구글 로그인 리다이렉트 -> 로그인 성공 시 서버 JWT 토큰 넘겨줌
     @GetMapping("/google/callback")
-    @Operation(operationId = "googleRedirectApi", summary = "사원 인증", description = "구글에서 인증된 정보와 DB의 정보를 비교합니다.", hidden = true)
+    @Operation(operationId = "googleRedirectApi", summary = "사원 인증 및 토근 반환", description = "구글에서 인증된 정보와 DB의 정보를 비교하여 토큰을 발급합니다.", hidden = true)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "구글 로그인 리다이렉트",
+            @ApiResponse(responseCode = "200", description = "토큰 정보 반환",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "사원 인증 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public void redirectInfoOfGoogle(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
 
@@ -58,6 +61,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카카오 로그인 URI 반환",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "카카오 로그인 URI 반환",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<AuthDTO.LoginUriDTO> loginOfKakao() {
         return authService.login(Provider.kakao);
@@ -65,10 +70,12 @@ public class AuthController {
 
     // 카카오 라다이렉트
     @GetMapping("/kakao/callback")
-    @Operation(operationId = "kakaoRedirectApi", summary = "사원 인증", description = "카카오에서 인증된 정보와 DB의 정보를 비교합니다.", hidden = true)
+    @Operation(operationId = "kakaoRedirectApi", summary = "사원 인증", description = "카카오에서 인증된 정보와 DB의 정보를 비교하여 토큰을 발급합니다.", hidden = true)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "카카오 로그인 리다이렉트",
+            @ApiResponse(responseCode = "200", description = "토큰 정보 반환",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "사원 인증 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public void redirectInfoOfKakao(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
         AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.kakao);
@@ -80,10 +87,12 @@ public class AuthController {
 
     // 토큰 만료 시, refreshToken 받아서 갱신 or 권한 거부
     @GetMapping("/reissue")
-    @Operation(operationId = "reissue", summary = "토큰 재발급", description = "토큰이 만료된 경우 인증된 후 재발급합니다.")
+    @Operation(operationId = "reissue", summary = "토큰 재발급", description = "토큰이 만료된 경우 인증 후 재발급합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 재발급",
                     content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "4XX", description = "토큰 재발급 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<AuthDTO.TokenDTO> reissueToken(@Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken,
                                                        @Parameter(hidden = true) @RequestHeader("RefreshToken") String refreshToken) {
@@ -96,6 +105,8 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그아웃",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ResponseData.class))}),
+            @ApiResponse(responseCode = "4XX", description = "로그아웃 실패",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData logout(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken) {
        return authService.logout(accessToken);
