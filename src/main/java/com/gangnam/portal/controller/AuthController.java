@@ -70,7 +70,7 @@ public class AuthController {
 
     // 카카오 라다이렉트
     @GetMapping("/kakao/callback")
-    @Operation(operationId = "kakaoRedirectApi", summary = "사원 인증", description = "카카오에서 인증된 정보와 DB의 정보를 비교하여 토큰을 발급합니다.", hidden = true)
+    @Operation(operationId = "kakaoRedirectApi", summary = "사원 인증 및 토큰 반환", description = "카카오에서 인증된 정보와 DB의 정보를 비교하여 토큰을 발급합니다.", hidden = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 정보 반환",
                     content = {@Content(mediaType = "application/json")}),

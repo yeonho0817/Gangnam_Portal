@@ -66,7 +66,6 @@ public class JwtTokenProvider {
         return "Bearer " + token;
     }
 
-    // refresh token은 claim을 추가하지 않음
     public String generateRefreshToken(Long id, String email, String provider) {
         Claims claims = Jwts.claims();
         claims.put("id", id);
@@ -95,12 +94,9 @@ public class JwtTokenProvider {
     // 로그아웃 -> access 만료 시간 - 현재 시간
     public Long getRemainExpiration(String accessToken) {
         // accessToken 남은 유효시간
-        System.out.println(accessToken);
         Long expiration = extractAllClaims(accessToken).getExpiration().getTime();
         // 현재 시간
         Long now = new Date().getTime();
         return expiration - now;
     }
-
-
 }

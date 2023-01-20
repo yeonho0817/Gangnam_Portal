@@ -103,6 +103,8 @@ public class CommuteService {
     // 출퇴근 수정 - 관리자
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData commuteUpdateAdmin(CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
+        if (commuteUpdateDTO.getStartDate().after(commuteUpdateDTO.getEndDate())) throw new CustomException(ErrorStatus.COMMUTE_END_DATE_ERROR);
+
         // 등록일 + employee id 로 이미 있는 건지 조사
         Commute findCommuteInfo =  commuteRepository.findById(commuteUpdateDTO.getCommuteId())
                 .orElseThrow(() -> new CustomException(ErrorStatus.COMMUTE_READ_FAILED));
@@ -116,9 +118,16 @@ public class CommuteService {
     // 출퇴근 등록 - 관리자
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData commuteCreateAdmin(CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
-        // 등록일 + employee id 로 이미 있는 건지 조사
+        // 등록일이 오늘 넘어가면, 퇴근이 출근보다 빠르면 error
+        if (commuteRegisterDTO.getRegisterDate().compareTo(new Date()) > 0) throw new CustomException(ErrorStatus.COMMUTE_REGISTER_DATE_ERROR);
+        if (commuteRegisterDTO.getStartDate().after(commuteRegisterDTO.getEndDate())) throw new CustomException(ErrorStatus.COMMUTE_END_DATE_ERROR);
+
         Employee findEmployee = employeeRepository.findById(commuteRegisterDTO.getEmployeeId())
                 .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));
+
+        // 등록일 + employee id 로 이미 있으면 안됨.
+        Optional<Commute> findCommute = commuteCustomRepository.findCommute(commuteRegisterDTO.getEmployeeId(), commuteRegisterDTO.getRegisterDate());
+        if (findCommute.isPresent()) throw new CustomException(ErrorStatus.COMMUTE_ALREADY_EXISTS);
 
         Commute newCommute = Commute.builder()
                 .employee(findEmployee)
@@ -130,7 +139,7 @@ public class CommuteService {
 
         commuteRepository.save(newCommute);
 
-        return new ResponseData(Status.COMMUTE_UPDATE_SUCCESS, Status.COMMUTE_UPDATE_SUCCESS.getDescription());
+        return new ResponseData(Status.COMMUTE_CREATE_SUCCESS, Status.COMMUTE_CREATE_SUCCESS.getDescription());
     }
 
     // 월별 출퇴근 조회 - 본인
@@ -161,7 +170,6 @@ public class CommuteService {
     // 출퇴근 현황 조회
     @Transactional(readOnly = true)
     public ResponseData<CommuteDTO.CommuteState> commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, String name) {
-
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize, startDate, endDate);
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),

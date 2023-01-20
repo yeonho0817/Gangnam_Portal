@@ -9,14 +9,15 @@ public enum Status {
     // 로그인, 로그아웃
     LOGIN_SUCCESS(200, HttpStatus.OK, "로그인을 성공했습니다."),
     LOGOUT_SUCCESS(200, HttpStatus.OK, "로그아웃했습니다."),
-    PROVIDER_ACCEPTED(406, HttpStatus.NOT_ACCEPTABLE, "해당 로그인은 정상적인 접속입니다."),
+    PROVIDER_ACCEPTED(200, HttpStatus.OK, "해당 로그인은 정상적인 접속입니다."),
 
     // 출퇴근 현황
     MONTHLY_COMMUTE_SUCCESS(200, HttpStatus.OK, "월별 출퇴근 조회를 완료했습니다."),
     COMMUTE_SUCCESS(200, HttpStatus.OK, "출퇴근 현황 조회를 완료했습니다."),
-    COMMUTE_START_SUCCESS(200, HttpStatus.FORBIDDEN, "출근 등록을 완료했습니다."),
-    COMMUTE_END_SUCCESS(200, HttpStatus.FORBIDDEN, "퇴근 등록을 완료했습니다."),
-    COMMUTE_UPDATE_SUCCESS(200, HttpStatus.FORBIDDEN, "출퇴근 수정을 완료했습니다"),
+    COMMUTE_START_SUCCESS(200, HttpStatus.OK, "출근 등록을 완료했습니다."),
+    COMMUTE_END_SUCCESS(200, HttpStatus.OK, "퇴근 등록을 완료했습니다."),
+    COMMUTE_CREATE_SUCCESS(200, HttpStatus.OK, "출퇴근 등록을 완료했습니다"),
+    COMMUTE_UPDATE_SUCCESS(200, HttpStatus.OK, "출퇴근 수정을 완료했습니다"),
 
     // 인사조회
     HUMAN_RESOURCE_SUCCESS(200, HttpStatus.OK, "인력 조회에 성공했습니다."),

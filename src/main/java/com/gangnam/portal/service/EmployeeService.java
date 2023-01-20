@@ -45,7 +45,7 @@ public class EmployeeService {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
         Employee findEmployee = employeeRepository.findById(authenticationDTO.getId())
-                .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));;
+                .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));
 
         findEmployee.updateNameEn(updateInfoDTO.getNameEn());
         findEmployee.updatePhone(updateInfoDTO.getPhone());

@@ -63,6 +63,8 @@ public class CommuteController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData commuteUpdate(@Parameter(description = "출퇴근 수정 정보") @RequestBody @Valid CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
+        System.out.println(commuteUpdateDTO.getCommuteId() + " " + commuteUpdateDTO.getStartDate() + " " + commuteUpdateDTO.getEndDate());
+
         return commuteService.commuteUpdateAdmin(commuteUpdateDTO);
     }
 
@@ -77,6 +79,7 @@ public class CommuteController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData commuteCreate(@Parameter(description = "출퇴근 등록 정보") @RequestBody @Valid CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        System.out.println("create");
         return commuteService.commuteCreateAdmin(commuteRegisterDTO);
     }
     

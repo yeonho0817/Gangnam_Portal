@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -118,6 +119,27 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 ;
 
         return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, name));
+    }
+
+    @Override
+    public Optional<Commute> findCommute(Long employeeId, Date registerDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+
+        Commute commute = jpaQueryFactory.selectFrom(qCommute)
+
+                .leftJoin(qCommute.employee, qEmployee).fetchJoin()
+
+                .where(
+                        qEmployee.id.eq(employeeId),
+                        getRegisterDateStringTemplate().eq(formatter.format(registerDate))
+                )
+
+                .fetchOne();
+
+
+
+        return Optional.ofNullable(commute);
     }
 
     private BooleanExpression eqEmployeeId(Long employeeId) {

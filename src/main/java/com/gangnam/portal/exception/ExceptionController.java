@@ -53,6 +53,8 @@ public class ExceptionController {
         ErrorStatus errorStatus = null;
         String message = null;
 
+
+
         if (bindingResult.hasErrors()) {
             //DTO에 설정한 message값을 가져온다.
             message = bindingResult.getFieldError().getDefaultMessage();

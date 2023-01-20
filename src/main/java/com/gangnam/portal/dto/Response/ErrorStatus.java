@@ -24,6 +24,10 @@ public enum ErrorStatus {
     COMMUTE_ALREADY_START(409, HttpStatus.FORBIDDEN, "이미 출근한 상태입니다."),
     COMMUTE_END_FORBIDDEN(409, HttpStatus.FORBIDDEN, "아직 출근을 하지 않았습니다."),
     COMMUTE_ALREADY_END(409, HttpStatus.FORBIDDEN, "이미 퇴근한 상태입니다."),
+    COMMUTE_ALREADY_EXISTS(409, HttpStatus.FORBIDDEN, "이미 오늘 출퇴근 정보가 존재합니다."),
+
+    COMMUTE_REGISTER_DATE_ERROR(409, HttpStatus.FORBIDDEN, "등록일이 오늘을 넘을 수 없습니다."),
+    COMMUTE_END_DATE_ERROR(409, HttpStatus.FORBIDDEN, "퇴근 시간이 출근 시간보다 빠를 수 없습니다."),
 
 
     // Valid Error Message

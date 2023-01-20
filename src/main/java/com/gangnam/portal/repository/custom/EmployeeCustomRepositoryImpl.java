@@ -153,7 +153,6 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 // 서비스에서 넣어준 DESC or ASC 를 가져온다.
                 Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
 
-                System.out.println(order.getProperty() + " " + order.getDirection().name());
                 // 서비스에서 넣어준 정렬 조건을 스위치 케이스 문을 활용하여 셋팅하여 준다.
                 switch (order.getProperty()){
                     case "name":
@@ -170,7 +169,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         if (selectValue == null || searchText == null) return null;
 
         switch (selectValue) {
-            case "이름": case "name":
+            case "이름": case "nameKr":
                 return containsName(searchText);
             case "직급": case "rank":
                 return qRanks.name.stringValue().contains(searchText);
@@ -219,7 +218,6 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                                 ))
                 );
 
-        System.out.println(getTeamTotalPage(name, affiliation, department));
 
         return new PageImpl<>(hrDepartmentInfoList, pageable, getTeamTotalPage(name, affiliation, department));
     }
@@ -254,13 +252,13 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     }
 
     private BooleanExpression eqAffiliation(String affiliation) {
-        if (affiliation == null) return null;
+        if (affiliation == null || affiliation.equals("")) return null;
 
         return qAffiliation.name.stringValue().eq(affiliation);
     }
 
     private BooleanExpression eqDepartment(String department) {
-        if (department == null) return null;
+        if (department == null || department.equals("")) return null;
 
         return qDepartment.name.stringValue().eq(department);
     }

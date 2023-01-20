@@ -51,6 +51,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private void printLog(Integer errorStatus, String errorCode, String errorMessage) {
         log.error("Exception JWT\n\tError Status - {}\n\tError Code - {}\n\tError Message - {}", errorStatus, errorCode, errorMessage);
     }
-
-
 }

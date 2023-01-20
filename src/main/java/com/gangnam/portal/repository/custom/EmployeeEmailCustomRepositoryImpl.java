@@ -19,6 +19,8 @@ public class EmployeeEmailCustomRepositoryImpl implements EmployeeEmailCustomRep
         QEmployeeEmail qEmployeeEmail = QEmployeeEmail.employeeEmail;
         QEmployee qEmployee = QEmployee.employee;
         QAuthority qAuthority = QAuthority.authority;
+        QDepartment qDepartment = QDepartment.department;
+        QRanks qRanks =QRanks.ranks;
 
         EmployeeEmail employeeEmail = jpaQueryFactory
                 .selectFrom(qEmployeeEmail)
@@ -26,6 +28,10 @@ public class EmployeeEmailCustomRepositoryImpl implements EmployeeEmailCustomRep
                 .leftJoin(qEmployeeEmail.employee, qEmployee).fetchJoin()
 
                 .leftJoin(qEmployee.authority, qAuthority).fetchJoin()
+
+                .leftJoin(qEmployee.department, qDepartment).fetchJoin()
+
+                .leftJoin(qEmployee.ranks, qRanks).fetchJoin()
 
                 .where(qEmployeeEmail.email.eq(email)
                         .and(qEmployeeEmail.provider.eq(enumProvider))

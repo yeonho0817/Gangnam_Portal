@@ -51,14 +51,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
 
                 if (isLogout == null) {
-
                     saveUserInfo(request, accessToken);
                 } else {
                     request.setAttribute("exception", ErrorStatus.LOGOUT_ALREADY);
                     throw new IllegalArgumentException();
                 }
 
-            } else if (accessToken != null && refreshToken != null && request.getRequestURI().equals("/auth/reissue")){  // accessToken + refreshToken 일 때 (재발급)
+            } else if (accessToken != null && request.getRequestURI().equals("/auth/reissue")){  // accessToken + refreshToken 일 때 (재발급)
                 getAuthentication(request, refreshToken);
 
                 saveUserInfo(request, refreshToken);
@@ -67,6 +66,8 @@ public class JwtFilter extends OncePerRequestFilter {
             request.setAttribute("exception", ErrorStatus.NOT_FOUND_EMAIL);
             throw new IllegalArgumentException();
         }
+
+        System.out.println(request.getRequestURI());
 
         filterChain.doFilter(request, response);
     }

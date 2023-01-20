@@ -76,7 +76,6 @@ public class QueryConditionDTO {
         if (this.startDate.compareTo(this.endDate) == 1) {
             this.endDate = this.startDate;
         }
-        System.out.println(this.startDate + " " + this.endDate);
     }
 
 }
