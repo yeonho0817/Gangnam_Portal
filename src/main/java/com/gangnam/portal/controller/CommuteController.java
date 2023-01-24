@@ -115,11 +115,11 @@ public class CommuteController {
 
     // 출퇴근 엑셀 API
     @GetMapping("/excel")
-    @Operation(operationId = "commuteState", summary = "출퇴근 현황 조회", description = "사원의 기록된 출퇴근 현황을 조회합니다.")
+    @Operation(operationId = "commuteState(excel)", summary = "출퇴근 현황 조회 - 엑셀 추출", description = "엑셀로 출력하기 위한 출퇴근 현황 데이터를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "출퇴근 현황 조회",
+            @ApiResponse(responseCode = "200", description = "출퇴근 현황 Excel 데이터 조회",
                     content = {@Content(mediaType = "application/json")}),
-            @ApiResponse(responseCode = "4XX", description = "출퇴근 현황 조회 실패",
+            @ApiResponse(responseCode = "4XX", description = "출퇴근 현황 Excel 데이터 조회 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<List<CommuteDTO.CommuteExcelData>> excelData(@Parameter(description = "시작 날짜") @RequestParam(required = false) String startDate,
