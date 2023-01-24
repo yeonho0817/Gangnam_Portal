@@ -3,12 +3,9 @@ package com.gangnam.portal.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.Date;
 import java.util.List;
 
@@ -65,16 +62,19 @@ public class CommuteDTO {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CommuteDateInfo {
+    public static class CommuteBoardData {
+        @Parameter(description = "구분(all or my) : default Value(my)")
+        private String range = "my";
+
         @Parameter(description = "년도", required = true)
         @NotNull(message = "필수 값이 없습니다.")
-        @Pattern(regexp = "^\\d{4}$", message = "올바른 형식이 아닙니다.")
-        private String year;
+//        @Pattern(regexp = "^\\d{4}$", message = "올바른 형식이 아닙니다.")
+        private Integer year;
 
         @Parameter(description = "월", required = true)
         @NotNull(message = "필수 값이 없습니다.")
-        @Pattern(regexp = "^(0?[1-9]|1[012])$", message = "올바른 형식이 아닙니다.")
-        private String month;
+//        @Pattern(regexp = "^(0?[1-9]|1[012])$", message = "올바른 형식이 아닙니다.")
+        private Integer month;
     }
 
     @Data
@@ -94,12 +94,13 @@ public class CommuteDTO {
     @AllArgsConstructor
     public static class CommuteState {
         private Integer totalPages;
-        private List<CommuteStateData> commuteStateData;
+        private List<CommuteStateData> commuteStateDataList;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class CommuteStateData {
         private Long commuteId;
         private String registerDate;
@@ -107,6 +108,24 @@ public class CommuteDTO {
         private String endDate;
         private String nameKr;
     }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CommuteExcelData {
+        private Long commuteId;
+        private Long employeeId;
+        private Long employeeNo;
+        private String nameKr;
+        private String rank;
+        private String affiliation;
+        private String department;
+        private String registerDate;
+        private String dayOfTheWeek;
+        private String startDate;
+        private String endDate;
+    }
+
 
     @Data
     @NoArgsConstructor
@@ -117,8 +136,5 @@ public class CommuteDTO {
         @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
         private Date endDate;
     }
-
-
-
 
 }

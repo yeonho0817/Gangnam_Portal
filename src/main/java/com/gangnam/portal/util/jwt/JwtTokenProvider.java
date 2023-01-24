@@ -49,12 +49,12 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(Long id, String email, String provider) {
+    public String generateAccessToken(Long id, String email, String provider, String roleType) {
         Claims claims = Jwts.claims();
         claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
-        claims.put("role", "ROLE_USER");
+        claims.put("role", roleType);
 
         String token = Jwts.builder()
                 .setClaims(claims)
@@ -66,12 +66,12 @@ public class JwtTokenProvider {
         return "Bearer " + token;
     }
 
-    public String generateRefreshToken(Long id, String email, String provider) {
+    public String generateRefreshToken(Long id, String email, String provider, String roleType) {
         Claims claims = Jwts.claims();
         claims.put("id", id);
         claims.put("email", email);
         claims.put("provider", provider);
-        claims.put("role", "ROLE_USER");
+        claims.put("role", roleType);
 
         String refreshToken = Jwts.builder()
                 .setClaims(claims)

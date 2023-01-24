@@ -4,6 +4,7 @@ import com.gangnam.portal.domain.Commute;
 import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.dto.AuthenticationDTO;
 import com.gangnam.portal.dto.CommuteDTO;
+import com.gangnam.portal.dto.EmployeeDTO;
 import com.gangnam.portal.dto.QueryConditionDTO;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.dto.Response.ResponseData;
@@ -12,6 +13,7 @@ import com.gangnam.portal.exception.CustomException;
 import com.gangnam.portal.repository.CommuteRepository;
 import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.custom.CommuteCustomRepository;
+import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,9 +33,9 @@ public class CommuteService {
     private final EmployeeRepository employeeRepository;
     private final CommuteRepository commuteRepository;
     private final CommuteCustomRepository commuteCustomRepository;
+    private final EmployeeCustomRepository employeeCustomRepository;
 
     // 출근 등록
-
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
@@ -141,29 +141,26 @@ public class CommuteService {
 
         return new ResponseData(Status.COMMUTE_CREATE_SUCCESS, Status.COMMUTE_CREATE_SUCCESS.getDescription());
     }
-
-    // 월별 출퇴근 조회 - 본인
+    // 월별 출퇴근 조회
     @Transactional(readOnly = true)
-    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteMy(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteDateInfo commuteDateInfo) {
+    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteBoard(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteBoardData commuteBoardData) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
-        List<CommuteDTO.CommuteListBoard> commuteListBoardList = commuteCustomRepository.readCommute(authenticationDTO.getId(),
-                Integer.valueOf(commuteDateInfo.getYear()),
-                Integer.valueOf((commuteDateInfo.getMonth()))
-        );
-
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteListBoardList);
+        if (commuteBoardData.getRange().equals("my")) {
+            return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteMy(authenticationDTO, commuteBoardData.getYear(), commuteBoardData.getMonth()));
+        } else {
+            return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteAll(commuteBoardData.getYear(), commuteBoardData.getMonth()));
+        }
     }
 
-    // 월별 출퇴근 조회 - 전체
-    @Transactional(readOnly = true)
-    public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteAll(CommuteDTO.CommuteDateInfo commuteDateInfo) {
-        List<CommuteDTO.CommuteListBoard> commuteListBoardList = commuteCustomRepository.readCommute(null,
-                Integer.valueOf(commuteDateInfo.getYear()),
-                Integer.valueOf((commuteDateInfo.getMonth()))
-        );
+    // - 본인
+    private List<CommuteDTO.CommuteListBoard> commuteMy(AuthenticationDTO authenticationDTO, Integer year, Integer month) {
+        return commuteCustomRepository.readCommute(authenticationDTO.getId(), year, month);
+    }
 
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteListBoardList);
+    //  - 전체
+    private List<CommuteDTO.CommuteListBoard> commuteAll(Integer year, Integer month) {
+        return commuteCustomRepository.readCommute(null, year, month);
     }
 
 
@@ -174,10 +171,98 @@ public class CommuteService {
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
-        
+
         // 전체 페이지 갯수 표시 해줘야 함
         Page<CommuteDTO.CommuteStateData> commuteStateList = commuteCustomRepository.readCommuteState(pageable, queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
 
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new CommuteDTO.CommuteState(commuteStateList.getTotalPages(), commuteStateList.stream().collect(Collectors.toList())));
     }
+
+    // excel
+    @Transactional(readOnly = true)
+    public ResponseData<List<CommuteDTO.CommuteExcelData>> commuteExcel(String startDate, String endDate, String name) {
+        QueryConditionDTO queryConditionDTO = new QueryConditionDTO(startDate, endDate);
+        List<CommuteDTO.CommuteExcelData> commuteExcelDataList = commuteCustomRepository.findCommuteExcel(queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
+        List<EmployeeDTO.EmployeeSimpleInfo> employeeList = employeeCustomRepository.findAllOrderByIdAsc(name);
+
+        // 시작 날짜
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(queryConditionDTO.getStartDate());
+
+        // 끝 날짜
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTime(queryConditionDTO.getEndDate());
+
+        // excel 데이터 추출
+
+
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), getExcelData(commuteExcelDataList, employeeList, startCalendar, endCalendar));
+    }
+
+    // excel 가공
+    // 그 정해진 일자에 모든 사람들을 표시해야줘야 하네..
+    // 1. 사원 별로 정렬함 -> for 마지막에 commuteExcelDataList.size()랑 index랑 비교해서 아직 모자라면 calendar =startCalendar(다른 사람이 있음)
+    //  2. 한 사원의 for 돌아가는 동안 데이터가 있는 날짜와 비교해서 주말이면 -, 평일이면 0 표시
+    //  3. 마지막인데 끝 날짜가 덜 됐으면 while 문으로 빈 데이터 넣어야 함.
+    private List<CommuteDTO.CommuteExcelData> getExcelData(List<CommuteDTO.CommuteExcelData> commuteExcelDataList, List<EmployeeDTO.EmployeeSimpleInfo> employeeList, Calendar startCalendar, Calendar endCalendar) {
+        List<CommuteDTO.CommuteExcelData> newCommuteExcelDataList  = new ArrayList<>();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+
+        int index = 0;
+
+        for (int i = 0; i<employeeList.size(); i++) {
+            // 날짜 초기화
+            calendar.clear();
+            calendar.setTimeInMillis(startCalendar.getTimeInMillis());
+
+            for (; calendar.compareTo(endCalendar) < 1; calendar.add(Calendar.DATE, 1)) {
+                int numDayOfTheWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+                if (index < commuteExcelDataList.size() &&
+                    Objects.equals(employeeList.get(i).getEmployeeId(), commuteExcelDataList.get(index).getEmployeeId()) &&
+                    formatter.format(calendar.getTime()).equals(commuteExcelDataList.get(index).getRegisterDate()) )
+                {
+                        newCommuteExcelDataList.add(commuteExcelDataBuilder(employeeList.get(i), commuteExcelDataList.get(index).getCommuteId(), numDayOfTheWeek, commuteExcelDataList.get(index).getRegisterDate(), commuteExcelDataList.get(index).getStartDate(), commuteExcelDataList.get(index).getEndDate()));
+                        index++;
+                } else {
+                    if (numDayOfTheWeek == 1 || numDayOfTheWeek == 7) {    // 주말 : "-"
+                        newCommuteExcelDataList.add(commuteExcelDataBuilder(employeeList.get(i), null, numDayOfTheWeek, formatter.format(calendar.getTime()), "-", "-"));
+                    } else {    // 평일 : "0"
+                        newCommuteExcelDataList.add(commuteExcelDataBuilder(employeeList.get(i), null, numDayOfTheWeek, formatter.format(calendar.getTime()), "0", "0"));
+                    }
+                }
+            }
+        }
+
+        return newCommuteExcelDataList;
+    }
+
+    private CommuteDTO.CommuteExcelData commuteExcelDataBuilder(EmployeeDTO.EmployeeSimpleInfo employeeInfo, Long commuteId, int numDayOfTheWeek, String registerDate, String startDate, String endDate) {
+
+        return CommuteDTO.CommuteExcelData.builder()
+                .commuteId(commuteId)
+                .employeeId(employeeInfo.getEmployeeId())
+                .employeeNo(employeeInfo.getEmployeeNo())
+                .nameKr(employeeInfo.getNameKr())
+                .rank(employeeInfo.getRank())
+                .affiliation(employeeInfo.getAffiliation())
+                .department(employeeInfo.getDepartment())
+
+                .registerDate(registerDate)
+                .dayOfTheWeek(getDayOfTheWeek(numDayOfTheWeek))
+                .startDate(startDate)
+                .endDate(endDate)
+
+                .build();
+    }
+
+    // 요일 반환
+    private String getDayOfTheWeek(int numDayOfTheWeek) {
+        String[] week = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};
+
+        return week[--numDayOfTheWeek];
+    }
+
 }

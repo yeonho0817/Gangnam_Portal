@@ -73,8 +73,8 @@ public class AuthService {
         }
 
         // jwt 토큰 생성
-        String accessToken = jwtTokenProvider.generateAccessToken(isExists.getEmployee().getId(), isExists.getEmail(), isExists.getProvider().toString());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(isExists.getEmployee().getId(), isExists.getEmail(), isExists.getProvider().toString());
+        String accessToken = jwtTokenProvider.generateAccessToken(isExists.getEmployee().getId(), isExists.getEmail(), isExists.getProvider().toString(), isExists.getEmployee().getAuthority().getName().name());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(isExists.getEmployee().getId(), isExists.getEmail(), isExists.getProvider().toString(), isExists.getEmployee().getAuthority().getName().name());
 
         // refresh -> redis에 저장
         saveRedis("RT:" + isExists.getEmail() + "-" + isExists.getProvider().name(), refreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
@@ -95,10 +95,10 @@ public class AuthService {
         if(!refreshToken.equals(findRefreshToken)) throw new CustomException(ErrorStatus.TOKEN_NOT_COINCIDE);
 
         // 새로운 jwt
-        String issueAccessToken = jwtTokenProvider.generateAccessToken(authenticationDTO.getId(), authenticationDTO.getEmail(), authenticationDTO.getProvider());
+        String issueAccessToken = jwtTokenProvider.generateAccessToken(authenticationDTO.getId(), authenticationDTO.getEmail(), authenticationDTO.getProvider(), authenticationDTO.getRole());
 
         // refresh token 지우고 재생성
-        String issueRefreshToken = jwtTokenProvider.generateRefreshToken(authenticationDTO.getId(), authenticationDTO.getEmail(), authenticationDTO.getProvider());
+        String issueRefreshToken = jwtTokenProvider.generateRefreshToken(authenticationDTO.getId(), authenticationDTO.getEmail(), authenticationDTO.getProvider(), authenticationDTO.getRole());
 
         deleteRedis("RT:" + email + "-" + provider);
         saveRedis("RT:" + authenticationDTO.getEmail() + "-" + authenticationDTO.getProvider(), issueRefreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());

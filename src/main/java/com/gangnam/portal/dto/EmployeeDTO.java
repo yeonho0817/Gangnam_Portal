@@ -2,8 +2,10 @@ package com.gangnam.portal.dto;
 
 import com.gangnam.portal.domain.AffiliationName;
 import com.gangnam.portal.domain.DepartmentName;
+import com.gangnam.portal.domain.EmployeeEmail;
 import com.gangnam.portal.domain.RankName;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -58,20 +60,33 @@ public class EmployeeDTO {
     @AllArgsConstructor
     public static class HRInfo {
         private Integer totalPage;
-        List<HRInfoData> hrInfoData;
+        List<HRInfoDataList> hrInfoDataLists;
     }
 
     @Data
-    @RequiredArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class HRInfoData {
         private Long employeeId;
         private String nameKr;
         private String rank;
         private String affiliation;
         private String department;
-        private String email;
         private String phone;
+        private List<EmployeeEmail> email;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @Builder
+    public static class HRInfoDataList {
+        private Long employeeId;
+        private String nameKr;
+        private String rank;
+        private String affiliation;
+        private String department;
+        private String phone;
+        private String email;
     }
 
     @Data
@@ -79,18 +94,21 @@ public class EmployeeDTO {
     @AllArgsConstructor
     public static class HRDepartmentInfo {
         private Integer totalPage;
-        private List<HRDepartmentInfoData> hrDepartmentInfoDataList;
+        private List<EmployeeSimpleInfo> hrDepartmentInfoDataList;
     }
 
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
-    public static class HRDepartmentInfoData {
+    public static class EmployeeSimpleInfo {
         private Long employeeId;
+        private Long employeeNo;
         private String nameKr;
         private String rank;
         private String affiliation;
         private String department;
     }
+
+
 
 }

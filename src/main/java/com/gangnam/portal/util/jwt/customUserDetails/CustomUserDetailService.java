@@ -18,7 +18,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     public CustomUserDetails loadUserByUsername(String email, String provider) throws UsernameNotFoundException {
         EmployeeEmail findEmployeeEmail = employeeEmailCustomRepository.isExists(email, provider)
-                .orElseThrow(() -> new NoSuchElementException("없는 회원입니다."));
+                .orElseThrow(NoSuchElementException::new);
 
         return CustomUserDetails.of(findEmployeeEmail);
     }

@@ -34,15 +34,15 @@ public class ExceptionController {
 
         ResponseEntity<ErrorResponse> errorResponseEntity = ErrorResponse.of(e.getErrorStatus());
 
-        if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_EMAIL) {
-            response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + errorResponseEntity.getBody().getStatus());
-            response.setHeader("ErrorStatus", errorResponseEntity.getBody().getStatus().toString());
-            response.setHeader("ErrorCode", errorResponseEntity.getBody().getError());
-            response.setHeader("ErrorMessage", errorResponseEntity.getBody().getMessage());
-            response.setStatus(302);
-
-            return null;
-        }
+//        if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_EMAIL) {
+//            response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + errorResponseEntity.getBody().getStatus());
+//            response.setHeader("ErrorStatus", errorResponseEntity.getBody().getStatus().toString());
+//            response.setHeader("ErrorCode", errorResponseEntity.getBody().getError());
+//            response.setHeader("ErrorMessage", errorResponseEntity.getBody().getMessage());
+//            response.setStatus(302);
+//
+//            return null;
+//        }
 
 
         return ErrorResponse.of(e.getErrorStatus());

@@ -22,8 +22,6 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 
     @Bean
     public Docket api(TypeResolver typeResolver) {
-        final String securitySchemeName = "Authentication";
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .additionalModels(typeResolver.resolve(ErrorResponse.class))
                 .useDefaultResponseMessages(false)
@@ -43,7 +41,7 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/swagger-ui.html")
+        registry.addResourceHandler("/swagger-ui/**")
                 .addResourceLocations("classpath:/META-INF/resources/");
 
         registry.addResourceHandler("/webjars/**")

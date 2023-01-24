@@ -48,8 +48,8 @@ public class HumanResourceController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<EmployeeDTO.HRInfo> findHumanResource(
-                                                            @Parameter(description = "정렬 기준") @RequestParam(defaultValue = "date") String sort,
-                                                            @Parameter(description = "정렬 방식(ASC, DESC)") @RequestParam(defaultValue = "DESC") String orderBy,
+                                                            @Parameter(description = "정렬 기준") @RequestParam(defaultValue = "rank") String sort,
+                                                            @Parameter(description = "정렬 방식(ASC, DESC)") @RequestParam(defaultValue = "ASC") String orderBy,
                                                             @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "1") String pageNumber,
                                                             @Parameter(description = "페이지 양") @RequestParam(defaultValue = "10") String pageSize ,
                                                             @Parameter(description = "검색 기준") @RequestParam(required = false) String selectValue,

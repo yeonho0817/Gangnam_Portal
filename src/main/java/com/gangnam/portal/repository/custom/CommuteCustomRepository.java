@@ -16,6 +16,10 @@ public interface CommuteCustomRepository {
 
     Page<CommuteDTO.CommuteStateData> readCommuteState(Pageable pageable, Date startDate, Date endDate, String name);
 
+    List<CommuteDTO.CommuteExcelData> findCommuteExcel(Date startDate, Date endDate, String name);
+
     Optional<Commute> findCommute(Long employeeId, Date registerDate);
+
+
 
 }

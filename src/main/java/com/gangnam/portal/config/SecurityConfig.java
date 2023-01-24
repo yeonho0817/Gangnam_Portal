@@ -5,7 +5,6 @@ import com.gangnam.portal.util.jwt.JwtAuthenticationEntryPoint;
 import com.gangnam.portal.util.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -15,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -25,22 +24,18 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer(){
         return (web) -> web.ignoring()
                 .antMatchers(  "/css/**", "/images/**", "/js/**"
-                        // -- Swagger UI v2
-                        , "/v2/api-docs", "/swagger-resources/**"
-                        , "/swagger-ui.html", "/webjars/**", "/swagger/**"
-                        // -- Swagger UI v3 (Open API)
+                        , "/v2/api-docs/**", "/swagger-resources/**"
+                        , "/swagger-ui/**", "/webjars/**", "/swagger/**"
                         , "/v3/api-docs/**", "/swagger-ui/**"
+                        , "/auth/google/login", "/auth/google/callback"
+                        , "/auth/kakao/login", "/auth/kakao/callback"
+                        , "/auth/logout"
                 );
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable()
-
-                .logout()
-                .logoutUrl("/auth/logout")
-
-                .and()
 
                 /**401, 403 Exception 핸들링 */
                 .exceptionHandling()

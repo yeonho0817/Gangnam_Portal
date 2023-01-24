@@ -1,8 +1,6 @@
 package com.gangnam.portal.repository.custom;
 
-import com.gangnam.portal.domain.Commute;
-import com.gangnam.portal.domain.QCommute;
-import com.gangnam.portal.domain.QEmployee;
+import com.gangnam.portal.domain.*;
 import com.gangnam.portal.dto.CommuteDTO;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Order;
@@ -31,6 +29,9 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
     private final QCommute qCommute = QCommute.commute;
     private final QEmployee qEmployee = QEmployee.employee;
+    private final QAffiliation qAffiliation = QAffiliation.affiliation;
+    private final QDepartment qDepartment = QDepartment.department;
+    private final QRanks qRanks = QRanks.ranks;
 
 
     @Override
@@ -119,6 +120,43 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 ;
 
         return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, name));
+    }
+
+    @Override
+    public List<CommuteDTO.CommuteExcelData> findCommuteExcel(Date startDate, Date endDate, String name) {
+        List<CommuteDTO.CommuteExcelData> commuteExcelDataList = jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteExcelData.class,
+                        qCommute.id.as("commuteId"),
+                        qEmployee.id.as("employeeId"),
+                        qEmployee.employeeNo.as("employeeNo"),
+                        qEmployee.nameKr.as("nameKr"),
+                        qRanks.name.stringValue().as("rank"),
+                        qAffiliation.name.stringValue().as("affiliation"),
+                        qDepartment.name.stringValue().as("department"),
+                        getRegisterDateStringTemplate().as("registerDate"),
+                        getStartDateStringTemplate().as("startDate"),
+                        getEndDateStringTemplate().as("endDate")
+                ))
+                .from(qCommute)
+
+                .leftJoin(qCommute.employee, qEmployee).on(qCommute.employee.id.eq(qEmployee.id))
+                .leftJoin(qEmployee.affiliation, qAffiliation).on(qEmployee.affiliation.id.eq(qAffiliation.id))
+                .leftJoin(qEmployee.department, qDepartment).on(qEmployee.department.id.eq(qDepartment.id))
+                .leftJoin(qEmployee.ranks, qRanks).on(qEmployee.ranks.id.eq(qRanks.id))
+
+                .where(
+                        qCommute.registerDate.goe(startDate),
+                        qCommute.registerDate.loe(endDate),
+                        containsName(name)
+                )
+
+                .orderBy(
+                        qEmployee.id.asc(),
+                        qCommute.registerDate.asc()
+                )
+
+                .fetch();
+
+        return commuteExcelDataList;
     }
 
     @Override

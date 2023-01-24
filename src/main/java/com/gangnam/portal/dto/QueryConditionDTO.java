@@ -17,8 +17,27 @@ public class QueryConditionDTO {
     private Date startDate;
     private Date endDate;
 
+    public QueryConditionDTO(String startDate, String endDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        if (endDate == null) endDate = simpleDateFormat.format(new Date());
+        if (startDate == null) startDate = simpleDateFormat.format(new Date());
+
+        try {
+            this.startDate = simpleDateFormat.parse(startDate);
+            this.endDate = simpleDateFormat.parse(endDate);
+        } catch (IllegalArgumentException | ParseException e) {
+            this.startDate = new Date();
+            this.endDate = new Date();
+        }
+
+        if (this.startDate.compareTo(this.endDate) == 1) {
+            this.endDate = this.startDate;
+        }
+    }
+
     public QueryConditionDTO(String sort, String orderBy, String pageNumber, String pageSize) {
-        if (! sort.equals("name") && ! sort.equals("rank")) sort = "name";
+        if (! sort.equals("name") && ! sort.equals("rank")) sort = "rank";
         if (! orderBy.equals("ASC") && ! orderBy.equals("DESC")) orderBy = "ASC";
 
         try {
