@@ -19,6 +19,9 @@ public enum Status {
     COMMUTE_CREATE_SUCCESS(200, HttpStatus.OK, "출퇴근 등록을 완료했습니다"),
     COMMUTE_UPDATE_SUCCESS(200, HttpStatus.OK, "출퇴근 수정을 완료했습니다"),
 
+    // 토큰 재발급
+    TOKEN_REISSUE_SUCCESS(200, HttpStatus.OK, "토큰 재발급을 완료했습니다."),
+
     // 인사조회
     HUMAN_RESOURCE_SUCCESS(200, HttpStatus.OK, "인력 조회에 성공했습니다."),
     HUMAN_RESOURCE_DEPARTMENT_SUCCESS(200, HttpStatus.OK, "소속/부서 조회에 성공했습니다."),

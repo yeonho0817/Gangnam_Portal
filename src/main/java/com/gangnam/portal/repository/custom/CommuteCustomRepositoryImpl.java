@@ -103,7 +103,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 ))
                 .from(qCommute)
 
-                .leftJoin(qCommute.employee, qEmployee)
+                .leftJoin(qCommute.employee, qEmployee).on(qCommute.employee.id.eq(qEmployee.id))
 
                 .where(
                         qCommute.registerDate.goe(startDate),

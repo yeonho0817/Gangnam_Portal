@@ -103,7 +103,7 @@ public class AuthService {
         deleteRedis("RT:" + email + "-" + provider);
         saveRedis("RT:" + authenticationDTO.getEmail() + "-" + authenticationDTO.getProvider(), issueRefreshToken,jwtTokenProvider.getExpiration(jwtTokenProvider.getResolveToken(refreshToken)) - new Date().getTime());
 
-        return new ResponseData<>(Status.LOGIN_SUCCESS, Status.LOGIN_SUCCESS.getDescription(), new AuthDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
+        return new ResponseData<>(Status.TOKEN_REISSUE_SUCCESS, Status.TOKEN_REISSUE_SUCCESS.getDescription(), new AuthDTO.TokenDTO(issueAccessToken, issueRefreshToken, authenticationDTO.getRole()));
     }
 
 

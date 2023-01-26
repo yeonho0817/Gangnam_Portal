@@ -24,4 +24,6 @@ public interface EmployeeCustomRepository {
 
     List<EmployeeDTO.EmployeeSimpleInfo> findByNameOrderByIdAsc(String name);
 
+    Page<EmployeeDTO.Test> test(Pageable pageable, String selectValue, String searchText);
+
 }

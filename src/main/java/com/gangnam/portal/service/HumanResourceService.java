@@ -64,6 +64,27 @@ public class HumanResourceService {
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoDataLists));
     }
 
+//    @Transactional(readOnly = true)
+//    public ResponseData<EmployeeDTO.Test> Test(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
+//        QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
+//
+//        Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
+//                Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
+//
+//        Page<EmployeeDTO.Test> hrInfoList = employeeCustomRepository.test(pageable, selectValue, searchText);
+//
+//        List<EmployeeDTO.Test> hrInfoDataLists = hrInfoList.stream()
+//                .map(employee -> EmployeeDTO.HRInfoDataList.builder()
+//                        .employeeId(employee.getEmployeeId())
+//                        .nameKr(employee.getNameKr())
+//                        .rank(employee.getRank())
+////                        .email(employee.getEmail())
+//                        .build())
+//                .collect(Collectors.toList());
+//
+//        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoDataLists));
+//    }
+
     // 소속/부서 조회
     @Transactional(readOnly = true)
     public ResponseData<EmployeeDTO.HRDepartmentInfo> findHumanResourceDept(String sort, String orderBy, String pageSize, String pageNumber, String name, String affiliation, String department) {

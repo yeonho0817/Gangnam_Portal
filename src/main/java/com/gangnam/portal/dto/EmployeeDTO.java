@@ -80,6 +80,23 @@ public class EmployeeDTO {
     @Data
     @AllArgsConstructor
     @Builder
+    public static class Test {
+        private Long employeeId;
+        private String nameKr;
+        private String rank;
+        private List<EmailInfo> email;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @Builder
+    public static class EmailInfo {
+        private String email;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @Builder
     public static class HRInfoDataList {
         private Long employeeId;
         private String nameKr;

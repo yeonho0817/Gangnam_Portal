@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -77,6 +78,7 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private List<Commute> commuteList;
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "employee")
     private List<EmployeeEmail> employeeEmailList;
 

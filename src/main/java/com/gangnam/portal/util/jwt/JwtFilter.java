@@ -3,10 +3,7 @@ package com.gangnam.portal.util.jwt;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetailService;
 import com.gangnam.portal.util.jwt.customUserDetails.CustomUserDetails;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +54,9 @@ public class JwtFilter extends OncePerRequestFilter {
         String refreshToken = jwtTokenProvider.getResolveToken(request.getHeader(REFRESH_TOKEN_HEADER));
 
         try {
-            if (! request.getRequestURI().equals("/auth/reissue")) { //access 만
+            if (! request.getRequestURI().equals("/auth/reissue") && getAuthentication(request, accessToken)) { //access 만
                 // 토큰 걸러냄
-                getAuthentication(request, accessToken);
+//                getAuthentication(request, accessToken);
 
                 // 로그아웃인지 확인
                 String isLogout = (String)redisTemplate.opsForValue().get("Bearer " + accessToken);
@@ -68,8 +65,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 saveUserInfo(request, accessToken);
 
-            } else {  // (재발급)
-                getAuthentication(request, refreshToken);
+            } else if (request.getRequestURI().equals("/auth/reissue") && getAuthentication(request, refreshToken)) {  // (재발급)
+//                getAuthentication(request, refreshToken);
                 saveUserInfo(request, refreshToken);
             }
         } catch (NoSuchElementException e) {
@@ -94,11 +91,13 @@ public class JwtFilter extends OncePerRequestFilter {
         processSecurity(request, userDetails);
     }
 
-    private void getAuthentication(HttpServletRequest request, String token) {
+    private boolean getAuthentication(HttpServletRequest request, String token) {
         try {
             if (token==null) throw new NullPointerException();
 
-            jwtTokenProvider.extractAllClaims(token);
+            Claims claims = jwtTokenProvider.extractAllClaims(token);
+
+            return true;
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
             request.setAttribute("exception", ErrorStatus.TOKEN_INVALID);
         } catch (ExpiredJwtException e) {
@@ -108,6 +107,7 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (NullPointerException e) {
             request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
         }
+        return false;
     }
 
     // 검증 과정에 예외가 발생하지 않았다면, 해당 유저의 정보를 SecurityContext에 넣음

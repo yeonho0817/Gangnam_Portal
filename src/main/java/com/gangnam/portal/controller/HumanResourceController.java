@@ -27,6 +27,7 @@ public class HumanResourceController {
 
     // 소속/부서 이름 조회      -  O
     @GetMapping("/teamList")
+//    @GetMapping("/teams")
     @Operation(operationId = "teamList", summary = "소속/부서 이름 조회", description = "모든 소속/부서의 이름을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "소속/부서 이름 조회",
@@ -54,6 +55,17 @@ public class HumanResourceController {
                                                             @Parameter(description = "페이지 양") @RequestParam(defaultValue = "10") String pageSize ,
                                                             @Parameter(description = "검색 기준") @RequestParam(required = false) String selectValue,
                                                             @Parameter(description = "검색할 데이터") @RequestParam(required = false) String searchText) {
+        return humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
+    }
+
+    @GetMapping("/test")
+    public ResponseData<EmployeeDTO.HRInfo> test(
+            @Parameter(description = "정렬 기준") @RequestParam(defaultValue = "rank") String sort,
+            @Parameter(description = "정렬 방식(ASC, DESC)") @RequestParam(defaultValue = "ASC") String orderBy,
+            @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "1") String pageNumber,
+            @Parameter(description = "페이지 양") @RequestParam(defaultValue = "10") String pageSize ,
+            @Parameter(description = "검색 기준") @RequestParam(required = false) String selectValue,
+            @Parameter(description = "검색할 데이터") @RequestParam(required = false) String searchText) {
         return humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
     }
 

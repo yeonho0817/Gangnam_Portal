@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
@@ -171,6 +172,36 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         return new PageImpl<>(hrInfoDataList, pageable, getHRTotalPage(selectValue, searchText));
     }
 
+    @Override
+    public Page<EmployeeDTO.Test> test(Pageable pageable, String selectValue, String searchText) {
+        List<EmployeeDTO.Test> hrInfoDataList = jpaQueryFactory.selectFrom(qEmployee)
+                .join(qEmployee.ranks, qRanks)
+                .leftJoin(qEmployee.employeeEmailList, qEmployeeEmail)
+
+                .distinct()
+
+                .orderBy(humanResourceSort(pageable))
+
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+
+                .transform(
+                        groupBy(qEmployeeEmail.id)
+                                .list(
+                                        Projections.constructor(EmployeeDTO.Test.class,
+                                            list(Projections.constructor(EmployeeDTO.EmailInfo.class, qEmployeeEmail.email)),
+                                                qEmployee.id.as("employeeId"),
+                                                qEmployee.nameKr.as("nameKr"),
+                                                qRanks.name.stringValue().as("rank")
+                                        )
+                                )
+                )
+
+                ;
+
+        return new PageImpl<>(hrInfoDataList, pageable, getHRTotalPage(selectValue, searchText));
+    }
+
     private Long getHRTotalPage(String selectValue, String searchText) {
         return jpaQueryFactory.selectDistinct(qEmployee.id.count())
                 .from(qEmployee)
@@ -182,7 +213,6 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 ;
 
     }
-
 
     private OrderSpecifier<String> humanResourceSort(Pageable pageable) {
         //서비스에서 보내준 Pageable 객체에 정렬조건 null 값 체크
@@ -294,6 +324,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .fetch()
                 ;
     }
+
 
     private Long getTeamTotalPage(String name, String affiliation, String department) {
         return jpaQueryFactory.select(qEmployee.count())

@@ -50,7 +50,7 @@ public class EmployeeController {
     }
 
     // 출퇴근 수정 시 직원 목록       O
-    @GetMapping("/hr/nameList")
+    @GetMapping("/hr/names")
     @Operation(operationId = "hrNameList", summary = "전체 사원 이름 조회", description = "모든 사원의 이름을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "전체 사원 이름 조회",
