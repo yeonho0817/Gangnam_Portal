@@ -47,7 +47,6 @@ public class AuthController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public void redirectInfoOfGoogle(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
-
         AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.google);
 
         response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());

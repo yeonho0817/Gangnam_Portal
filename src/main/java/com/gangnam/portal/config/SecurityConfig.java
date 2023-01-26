@@ -51,7 +51,7 @@ public class SecurityConfig {
 
                 // swagger
                 .antMatchers(
-                        "/css/**", "/images/**", "/js/**"
+                        "/css/**", "/images/**", "/js/**", "/favicon.ico"
                         // -- Swagger UI v2
                         , "/v2/api-docs", "/swagger-resources/**"
                         , "/swagger-ui.html", "/webjars/**", "/swagger/**"

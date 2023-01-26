@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Objects;
 
 @RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
@@ -29,20 +31,19 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(value = { CustomException.class })
-    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletResponse response) {
+    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletResponse response) throws UnsupportedEncodingException {
         printLog(e.getErrorStatus().getHttpStatus().value(), e.getErrorStatus().getHttpStatus().name(), e.getErrorStatus().getDescription());
 
         ResponseEntity<ErrorResponse> errorResponseEntity = ErrorResponse.of(e.getErrorStatus());
 
-//        if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_EMAIL) {
-//            response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + errorResponseEntity.getBody().getStatus());
-//            response.setHeader("ErrorStatus", errorResponseEntity.getBody().getStatus().toString());
-//            response.setHeader("ErrorCode", errorResponseEntity.getBody().getError());
-//            response.setHeader("ErrorMessage", errorResponseEntity.getBody().getMessage());
-//            response.setStatus(302);
-//
-//            return null;
-//        }
+        if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_LOGIN_EMAIL) {
+            String encodeMessage = URLEncoder.encode(errorResponseEntity.getBody().getMessage(), "UTF-8");
+
+            response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + errorResponseEntity.getBody().getStatus() + "&code=" + errorResponseEntity.getBody().getError() + "&message=" + encodeMessage);
+            response.setStatus(302);
+
+            return null;
+        }
 
 
         return ErrorResponse.of(e.getErrorStatus());

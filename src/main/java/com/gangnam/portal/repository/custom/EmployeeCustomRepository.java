@@ -22,6 +22,6 @@ public interface EmployeeCustomRepository {
     // 소속/부서 조회
     Page<EmployeeDTO.EmployeeSimpleInfo> readHumanResourceDepartment(Pageable pageable, String name, String affiliation, String department);
 
-    List<EmployeeDTO.EmployeeSimpleInfo> findAllOrderByIdAsc(String name);
+    List<EmployeeDTO.EmployeeSimpleInfo> findByNameOrderByIdAsc(String name);
 
 }

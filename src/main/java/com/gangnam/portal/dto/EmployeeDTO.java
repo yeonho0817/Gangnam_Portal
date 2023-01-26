@@ -60,6 +60,7 @@ public class EmployeeDTO {
     @AllArgsConstructor
     public static class HRInfo {
         private Integer totalPage;
+        private Integer totalCount;
         List<HRInfoDataList> hrInfoDataLists;
     }
 
@@ -94,6 +95,7 @@ public class EmployeeDTO {
     @AllArgsConstructor
     public static class HRDepartmentInfo {
         private Integer totalPage;
+        private Integer totalCount;
         private List<EmployeeSimpleInfo> hrDepartmentInfoDataList;
     }
 

@@ -15,7 +15,6 @@ public class AuthenticationDTO {
         this.id = ((CustomUserDetails) authenticationToken.getPrincipal()).getId();
         this.email = ((CustomUserDetails) authenticationToken.getPrincipal()).getUsername();
         this.provider = ((CustomUserDetails) authenticationToken.getPrincipal()).getProvider();
-
         this.role = authenticationToken.getAuthorities().toString().substring(6, authenticationToken.getAuthorities().toString().length()-1);
     }
 

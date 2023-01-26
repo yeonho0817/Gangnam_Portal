@@ -61,7 +61,7 @@ public class AuthService {
             email = googleLoginInfo.getGoogleUserInfo(googleAccessToken);
 
             isExists = employeeEmailCustomRepository.isExists(email, Provider.google.name())
-                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMAIL));
+                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_LOGIN_EMAIL));
 
         } else if (provider == Provider.kakao) {
             String kakaoAccessToken = kaKaoLoginInfo.getKaKaoAccessToken(authCode);
@@ -69,7 +69,7 @@ public class AuthService {
             email = kaKaoLoginInfo.getKakaoUserInfo(kakaoAccessToken);
 
             isExists = employeeEmailCustomRepository.isExists(email, Provider.kakao.name())
-                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMAIL));
+                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_LOGIN_EMAIL));
         }
 
         // jwt 토큰 생성

@@ -3,7 +3,10 @@ package com.gangnam.portal.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -63,8 +66,9 @@ public class CommuteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommuteBoardData {
-        @Parameter(description = "구분(all or my) : default Value(my)")
-        private String range = "my";
+        @Parameter(description = "구분(all or my) : default Value(all)")
+
+        private String range;
 
         @Parameter(description = "년도", required = true)
         @NotNull(message = "필수 값이 없습니다.")
@@ -94,6 +98,7 @@ public class CommuteDTO {
     @AllArgsConstructor
     public static class CommuteState {
         private Integer totalPages;
+        private Integer totalCount;
         private List<CommuteStateData> commuteStateDataList;
     }
 
@@ -113,13 +118,13 @@ public class CommuteDTO {
     @AllArgsConstructor
     @Builder
     public static class CommuteExcelData {
-        private Long commuteId;
-        private Long employeeId;
+//        private Long commuteId;
+//        private Long employeeId;
         private Long employeeNo;
         private String nameKr;
-        private String rank;
-        private String affiliation;
-        private String department;
+//        private String rank;
+//        private String affiliation;
+//        private String department;
         private String registerDate;
         private String dayOfTheWeek;
         private String startDate;

@@ -78,7 +78,6 @@ public class JwtFilter extends OncePerRequestFilter {
             request.setAttribute("exception", ErrorStatus.TOKEN_EMPTY);
         } catch (IllegalArgumentException e) {
             request.setAttribute("exception", ErrorStatus.LOGOUT_ALREADY);
-            e.printStackTrace();
         }
 
         System.out.println(request.getRequestURI());
@@ -98,8 +97,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private void getAuthentication(HttpServletRequest request, String token) {
         try {
             if (token==null) throw new NullPointerException();
-            
-            System.out.println("검증");
 
             jwtTokenProvider.extractAllClaims(token);
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {

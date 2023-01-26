@@ -67,7 +67,7 @@ public class HumanResourceController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<EmployeeDTO.HRDepartmentInfo> findHumanResourceDept(
-                                                            @RequestParam(defaultValue = "name") String sort,
+                                                            @RequestParam(defaultValue = "rank") String sort,
                                                             @RequestParam(defaultValue = "ASC") String orderBy,
                                                             @RequestParam(required = false, defaultValue = "1") String pageNumber,
                                                             @RequestParam(required = false, defaultValue = "10") String pageSize,

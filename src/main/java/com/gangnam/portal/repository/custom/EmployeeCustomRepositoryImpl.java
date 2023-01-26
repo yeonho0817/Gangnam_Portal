@@ -141,6 +141,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         List<Employee> hrInfoList = jpaQueryFactory.selectFrom(qEmployee)
 
                 .leftJoin(qEmployee.ranks, qRanks).fetchJoin()
+                .leftJoin(qEmployee.employeeEmailList, qEmployeeEmail).fetchJoin()
                 .leftJoin(qEmployee.affiliation, qAffiliation).fetchJoin()
                 .leftJoin(qEmployee.department, qDepartment).fetchJoin()
 
@@ -148,8 +149,6 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                         qEmployee.state.eq(false))
 
                 .orderBy(humanResourceSort(pageable))
-
-                .groupBy(qEmployee.id)
 
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -166,9 +165,8 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                         .phone(employee.getPhone())
                         .email(employee.getEmployeeEmailList())
 
-                        .build()
-
-                ).collect(Collectors.toList());
+                        .build())
+                .collect(Collectors.toList());
 
         return new PageImpl<>(hrInfoDataList, pageable, getHRTotalPage(selectValue, searchText));
     }
@@ -264,7 +262,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     }
 
     @Override
-    public List<EmployeeDTO.EmployeeSimpleInfo> findAllOrderByIdAsc(String name) {
+    public List<EmployeeDTO.EmployeeSimpleInfo> findByNameOrderByIdAsc(String name) {
 //        OrderSpecifier orderSpecifier = new OrderSpecifier(Order.ASC, qEmployee.id);
 
         return jpaQueryFactory.select(Projections.fields(EmployeeDTO.EmployeeSimpleInfo.class,
@@ -290,7 +288,8 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                         qEmployee.state.eq(false)
                 )
 
-                .orderBy(new OrderSpecifier(Order.ASC, qEmployee.id))
+//                .orderBy(new OrderSpecifier(Order.ASC, qEmployee.id))
+                .orderBy(qEmployee.id.asc())
 
                 .fetch()
                 ;

@@ -82,9 +82,9 @@ public class CommuteController {
 
     // 월별 출퇴근 조회        O
     @GetMapping("/board")
-    @Operation(operationId = "myCommute", summary = "월별 출퇴근 조회 - 본인", description = "자신의 월별 출퇴근 현황을 조회합니다.")
+    @Operation(operationId = "commuteBoard", summary = "월별 출퇴근 조회", description = "월별 출퇴근 현황을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "월별 출퇴근 - 본인",
+            @ApiResponse(responseCode = "200", description = "월별 출퇴근",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "4XX", description = "월별 출퇴근 조회 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))

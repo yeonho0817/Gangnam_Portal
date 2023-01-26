@@ -57,12 +57,11 @@ public class HumanResourceService {
                         .email(
                                 employee.getEmail().stream()
                                         .map(EmployeeEmail::getEmail)
-                                        .collect(Collectors.joining(","))
-                        )
+                                        .collect(Collectors.joining(",")))
                         .build())
                 .collect(Collectors.toList());
 
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), hrInfoDataLists));
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoDataLists));
     }
 
     // 소속/부서 조회
@@ -76,6 +75,6 @@ public class HumanResourceService {
 
         Page<EmployeeDTO.EmployeeSimpleInfo> hrDepartmentInfoList = employeeCustomRepository.readHumanResourceDepartment(pageable, name, affiliation, department);
 
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRDepartmentInfo(hrDepartmentInfoList.getTotalPages(), hrDepartmentInfoList.stream().collect(Collectors.toList())));
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRDepartmentInfo(hrDepartmentInfoList.getTotalPages(), (int) hrDepartmentInfoList.getTotalElements(), hrDepartmentInfoList.stream().collect(Collectors.toList())));
     }
 }
