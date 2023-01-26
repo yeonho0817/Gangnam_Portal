@@ -53,6 +53,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = jwtTokenProvider.getResolveToken(request.getHeader(AUTHORIZATION_HEADER));
         String refreshToken = jwtTokenProvider.getResolveToken(request.getHeader(REFRESH_TOKEN_HEADER));
 
+        System.out.println(accessToken);
+
         try {
             if (! request.getRequestURI().equals("/auth/reissue") && getAuthentication(request, accessToken)) { //access 만
                 // 토큰 걸러냄
