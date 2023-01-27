@@ -1,6 +1,5 @@
 package com.gangnam.portal.service;
 
-import com.gangnam.portal.domain.EmployeeEmail;
 import com.gangnam.portal.dto.EmployeeDTO;
 import com.gangnam.portal.dto.QueryConditionDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
@@ -46,22 +45,7 @@ public class HumanResourceService {
 
         Page<EmployeeDTO.HRInfoData> hrInfoList = employeeCustomRepository.readHumanResource(pageable, selectValue, searchText);
 
-        List<EmployeeDTO.HRInfoDataList> hrInfoDataLists = hrInfoList.stream()
-                .map(employee -> EmployeeDTO.HRInfoDataList.builder()
-                        .employeeId(employee.getEmployeeId())
-                        .nameKr(employee.getNameKr())
-                        .rank(employee.getRank())
-                        .affiliation(employee.getAffiliation())
-                        .department(employee.getDepartment())
-                        .phone(employee.getPhone())
-                        .email(
-                                employee.getEmail().stream()
-                                        .map(EmployeeEmail::getEmail)
-                                        .collect(Collectors.joining(",")))
-                        .build())
-                .collect(Collectors.toList());
-
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoDataLists));
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoList.stream().collect(Collectors.toList())));
     }
 
 //    @Transactional(readOnly = true)

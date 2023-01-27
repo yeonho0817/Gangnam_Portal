@@ -63,7 +63,7 @@ public class Employee {
     private String profileImg;
 
     @Column(name = "state", nullable = false, columnDefinition = "TINYINT(1)")
-    private boolean state;      // 0 : 재직, 1 : 퇴직
+    private Boolean state;      // 0 : 재직, 1 : 퇴직
 
     @Temporal(TemporalType.DATE)
     @Column(name = "birthday", nullable = false, columnDefinition = "DATE")

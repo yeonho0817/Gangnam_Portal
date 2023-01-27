@@ -26,9 +26,9 @@ public class HumanResourceController {
     private final HumanResourceService humanResourceService;
 
     // 소속/부서 이름 조회      -  O
-    @GetMapping("/teamList")
+    @GetMapping("/teams")
 //    @GetMapping("/teams")
-    @Operation(operationId = "teamList", summary = "소속/부서 이름 조회", description = "모든 소속/부서의 이름을 조회합니다.")
+    @Operation(operationId = "teams", summary = "소속/부서 이름 조회", description = "모든 소속/부서의 이름을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "소속/부서 이름 조회",
                     content = {@Content(mediaType = "application/json")}),

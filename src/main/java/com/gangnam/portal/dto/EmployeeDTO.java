@@ -1,9 +1,5 @@
 package com.gangnam.portal.dto;
 
-import com.gangnam.portal.domain.AffiliationName;
-import com.gangnam.portal.domain.DepartmentName;
-import com.gangnam.portal.domain.EmployeeEmail;
-import com.gangnam.portal.domain.RankName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,29 +18,56 @@ public class EmployeeDTO {
         private String address;
     }
 
+//    @Data
+//    @RequiredArgsConstructor
+//    @AllArgsConstructor
+//    public static class EmployeeInfoDTO {
+//        private Long employeeId;
+//        private Long employeeNo;
+//        private String nameKr;
+//        private String nameEn;
+//        private String birthday;
+//        private RankName rank;
+//        private AffiliationName affiliation;
+//        private DepartmentName department;
+//
+//        private String profileImg;
+//        private Integer gen;
+//        private String gender;
+//        private String phone;
+//        private String address;
+//        private String joinDate;
+//        private String state;
+//
+//        private String email;
+//
+//        private String role;
+//    }
+
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class EmployeeInfoDTO {
         private Long employeeId;
         private Long employeeNo;
+        private String role;
         private String nameKr;
         private String nameEn;
         private String birthday;
-        private RankName rank;
-        private AffiliationName affiliation;
-        private DepartmentName department;
-        private String email;
+        private String rank;
+        private String affiliation;
+        private String department;
+
         private String profileImg;
-        private Integer gen;
         private String gender;
         private String phone;
         private String address;
         private String joinDate;
         private String state;
 
+        private String email;
 
-        private String role;
     }
 
     @Data
@@ -61,7 +84,7 @@ public class EmployeeDTO {
     public static class HRInfo {
         private Integer totalPage;
         private Integer totalCount;
-        List<HRInfoDataList> hrInfoDataLists;
+        List<HRInfoData> hrInfoDataLists;
     }
 
     @Data
@@ -74,7 +97,7 @@ public class EmployeeDTO {
         private String affiliation;
         private String department;
         private String phone;
-        private List<EmployeeEmail> email;
+        private String email;
     }
 
     @Data
@@ -91,19 +114,6 @@ public class EmployeeDTO {
     @AllArgsConstructor
     @Builder
     public static class EmailInfo {
-        private String email;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @Builder
-    public static class HRInfoDataList {
-        private Long employeeId;
-        private String nameKr;
-        private String rank;
-        private String affiliation;
-        private String department;
-        private String phone;
         private String email;
     }
 

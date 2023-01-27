@@ -31,11 +31,6 @@ public class EmployeeService {
         EmployeeDTO.EmployeeInfoDTO findEmployeeInfo = employeeCustomRepository.findEmployeeInfo(authenticationDTO.getId())
                 .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));
 
-        findEmployeeInfo.setEmail(authenticationDTO.getEmail());
-        findEmployeeInfo.setRole(authenticationDTO.getRole());
-        findEmployeeInfo.setGender( (findEmployeeInfo.getGen()%2 == 0 ? "여자" : "남자") );
-        findEmployeeInfo.setState(findEmployeeInfo.getState().equals("0") ? "재직" : "퇴직" );
-
         return new ResponseData<>(Status.FIND_EMPLOYEE_SUCCESS, Status.FIND_EMPLOYEE_SUCCESS.getDescription(), findEmployeeInfo);
     }
 

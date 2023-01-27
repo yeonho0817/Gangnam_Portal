@@ -37,6 +37,7 @@ public class GoogleConfigUtils {
         params.put("redirect_uri", getGoogleRedirectUrl());
         params.put("response_type", "code");
         params.put("scope", getScopeUrl());
+        params.put("prompt", "select_account");
 
         String paramStr = params.entrySet().stream()
                 .map(param -> param.getKey() + "=" + param.getValue())

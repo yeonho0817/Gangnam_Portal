@@ -2,13 +2,10 @@ package com.gangnam.portal.repository.custom;
 
 import com.gangnam.portal.domain.*;
 import com.gangnam.portal.dto.EmployeeDTO;
-import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +27,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     private final QEmployee qEmployee = QEmployee.employee;
+    private final QAuthority qAuthority = QAuthority.authority;
     private final QEmployeeEmail qEmployeeEmail = QEmployeeEmail.employeeEmail;
     private final QDepartment qDepartment = QDepartment.department;
     private final QRanks qRanks = QRanks.ranks;
@@ -38,44 +36,39 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     @Override
     public Optional<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(Long id) {
 
-        // 입사일 포맷
-        StringTemplate formatJoinDate = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qEmployee.joinDate
-                , ConstantImpl.create("%Y-%m-%d"));
+        Employee employee = jpaQueryFactory.selectFrom(qEmployee)
 
-        // 생일 포맷
-        StringTemplate formatBirthday = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qEmployee.birthday
-                , ConstantImpl.create("%Y-%m-%d"));
-
-
-        EmployeeDTO.EmployeeInfoDTO employeeInfoDTO = jpaQueryFactory.select(Projections.fields(EmployeeDTO.EmployeeInfoDTO.class,
-                    qEmployee.id.as("employeeId"),
-                    qEmployee.employeeNo.as("employeeNo"),
-                    qEmployee.nameKr.as("nameKr"),
-                    qEmployee.nameEn.as("nameEn"),
-                    formatBirthday.as("birthday"),
-                    qEmployee.profileImg.as("profileImg"),
-                    qEmployee.gender.as("gen"),
-                    qEmployee.phone.as("phone"),
-                    qEmployee.address.as("address"),
-                    formatJoinDate.as("joinDate"),
-                    qRanks.name.as("rank"),
-                    qAffiliation.name.as("affiliation"),
-                    qDepartment.name.as("department"),
-                    qEmployee.state.stringValue().as("state")
-                ))
-                .from(qEmployee)
-
-                .leftJoin(qEmployee.department, qDepartment)
-                .leftJoin(qEmployee.ranks, qRanks)
-                .leftJoin(qEmployee.affiliation, qAffiliation)
+                .join(qEmployee.authority, qAuthority).fetchJoin()
+                .join(qEmployee.ranks, qRanks).fetchJoin()
+                .leftJoin(qEmployee.employeeEmailList, qEmployeeEmail).fetchJoin()
+                .join(qEmployee.affiliation, qAffiliation).fetchJoin()
+                .join(qEmployee.department, qDepartment).fetchJoin()
 
                 .where(qEmployee.id.eq(id))
 
                 .fetchOne();
+
+        EmployeeDTO.EmployeeInfoDTO employeeInfoDTO = EmployeeDTO.EmployeeInfoDTO.builder()
+                    .employeeId(employee.getId())
+                    .employeeNo(employee.getEmployeeNo())
+                    .role(employee.getAuthority().getName().toString().substring(5))
+                    .nameKr(employee.getNameKr())
+                    .nameEn(employee.getNameEn())
+                    .birthday(employee.getBirthday().toString())
+                    .rank(employee.getRanks().getName().name())
+                    .affiliation(employee.getAffiliation().getName().name())
+                    .department(employee.getDepartment().getName().name())
+                    .profileImg(employee.getProfileImg())
+                    .gender(employee.getGender() % 2 == 0 ? "여자" : "남자")
+                    .phone(employee.getPhone())
+                    .address(employee.getAddress())
+                    .joinDate(employee.getJoinDate().toString())
+                    .state(employee.getState() ? "퇴직" : "재직")
+                    .email(employee.getEmployeeEmailList().stream()
+                            .map(EmployeeEmail::getEmail)
+                            .collect(Collectors.joining(",")))
+
+                .build();
 
         return Optional.ofNullable(employeeInfoDTO);
     }
@@ -92,47 +85,6 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .fetch()
                 ;
     }
-
-//    @Override
-//    public Page<EmployeeDTO.HRInfoData> readHumanResource(Pageable pageable, String selectValue, String searchText) {
-//        // selectValue = 이름, 직급, 소속
-//        // searchText = 검색어
-//
-//        Map<Long, EmployeeDTO.HRInfoData> hrInfoList = jpaQueryFactory.selectFrom(qEmployee)
-//
-//                .leftJoin(qEmployee.ranks, qRanks).on(qEmployee.ranks.id.eq(qRanks.id))
-//                .leftJoin(qEmployee.affiliation, qAffiliation).on(qEmployee.affiliation.id.eq(qAffiliation.id))
-//                .leftJoin(qEmployee.department, qDepartment).on(qEmployee.department.id.eq(qDepartment.id))
-//                .leftJoin(qEmployee.employeeEmailList, qEmployeeEmail).on(qEmployee.id.eq(qEmployeeEmail.employee.id))
-//
-//                .where(containsSearchText(selectValue, searchText),
-//                        qEmployee.state.eq(false))
-//
-//                .orderBy(humanResourceSort(pageable))
-//
-//                .offset(pageable.getOffset())
-//                .limit(pageable.getPageSize())
-//
-//                .transform(
-//                        groupBy(qEmployee.id).as(
-//                                new EmployeeDTO.HRInfoData(
-//
-//                                        qEmployee.id.as("employeeId"),
-//                                        qEmployee.nameKr.as("nameKr"),
-//                                        qRanks.name.stringValue().as("rank"),
-//                                        qAffiliation.name.stringValue().as("affiliation"),
-//                                        qDepartment.name.stringValue().as("department"),
-//                                        qEmployee.phone.as("phone"),
-//
-//                                        set( qEmployeeEmail.email.toString())
-//                                ))
-//                        )
-//                ))
-//                ;
-//
-//
-//        return new PageImpl<>(hrInfoList.keySet().stream().map(hrInfoList::get).collect(Collectors.toList()), pageable, getHRTotalPage(selectValue, searchText));
-//    }
 
     @Override
     public Page<EmployeeDTO.HRInfoData> readHumanResource(Pageable pageable, String selectValue, String searchText) {
@@ -164,7 +116,9 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                         .affiliation(employee.getAffiliation().getName().name())
                         .department(employee.getDepartment().getName().name())
                         .phone(employee.getPhone())
-                        .email(employee.getEmployeeEmailList())
+                        .email(employee.getEmployeeEmailList().stream()
+                                .map(EmployeeEmail::getEmail)
+                                .collect(Collectors.joining(",")))
 
                         .build())
                 .collect(Collectors.toList());
