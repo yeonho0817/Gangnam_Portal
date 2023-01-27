@@ -118,17 +118,13 @@ public class CommuteDTO {
     @AllArgsConstructor
     @Builder
     public static class CommuteExcelData {
-//        private Long commuteId;
-//        private Long employeeId;
         private Long employeeNo;
         private String nameKr;
-//        private String rank;
-//        private String affiliation;
-//        private String department;
         private String registerDate;
         private String dayOfTheWeek;
         private String startDate;
         private String endDate;
+        private Double totalCommuteTime;
     }
 
 

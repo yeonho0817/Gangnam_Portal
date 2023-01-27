@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -227,21 +228,27 @@ public class CommuteService {
     }
 
     private CommuteDTO.CommuteExcelData commuteExcelDataBuilder(EmployeeDTO.EmployeeSimpleInfo employeeInfo, int numDayOfTheWeek, String registerDate, String startDate, String endDate) {
-        return CommuteDTO.CommuteExcelData.builder()
-//                .commuteId(commuteId)
-//                .employeeId(employeeInfo.getEmployeeId())
-                .employeeNo(employeeInfo.getEmployeeNo())
-                .nameKr(employeeInfo.getNameKr())
-//                .rank(employeeInfo.getRank())
-//                .affiliation(employeeInfo.getAffiliation())
-//                .department(employeeInfo.getDepartment())
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return CommuteDTO.CommuteExcelData.builder()
+                    .employeeNo(employeeInfo.getEmployeeNo())
+                    .nameKr(employeeInfo.getNameKr())
+                    .registerDate(registerDate)
+                    .dayOfTheWeek(getDayOfTheWeek(numDayOfTheWeek))
+                    .startDate(startDate)
+                    .endDate(endDate)
 
-                .registerDate(registerDate)
-                .dayOfTheWeek(getDayOfTheWeek(numDayOfTheWeek))
-                .startDate(startDate)
-                .endDate(endDate)
+                    .totalCommuteTime(
+                            startDate.equals("0") || endDate.equals("0") || startDate.equals("-") || endDate.equals("-") ?
+                                     0.0d :
+                                    Math.round(
+                                            ((float)(formatter.parse(endDate).getTime() - formatter.parse(startDate).getTime()) / 1000 / 60 / 60) * 10 ) / 10.0
+                    )
 
-                .build();
+                    .build();
+        } catch (ParseException ignored) { }
+        return null;
+
     }
 
     // 요일 반환
