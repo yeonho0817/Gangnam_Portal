@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +54,9 @@ public class EmployeeService {
     // 출퇴근 수정 -> 직원 목록
     @Transactional(readOnly = true)
     public ResponseData<List<EmployeeDTO.EmployeeNameList>> readEmployeeNameList() {
-        List<EmployeeDTO.EmployeeNameList> employeeNameList = employeeCustomRepository.readEmployeeNameList();
+        List<EmployeeDTO.EmployeeNameList> employeeNameList = employeeCustomRepository.readEmployeeNameList().stream()
+                .peek(employee -> employee.setName(employee.getName() + " (사번 : " + employee.getEmployeeNo() + ")"))
+                .collect(Collectors.toList());
 
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), employeeNameList);
     }

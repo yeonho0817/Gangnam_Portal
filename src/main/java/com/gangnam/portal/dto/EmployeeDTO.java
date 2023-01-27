@@ -73,9 +73,11 @@ public class EmployeeDTO {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class EmployeeNameList {
         private Long employeeId;
-        private String nameKr;
+        private Long employeeNo;
+        private String name;
     }
 
     @Data
@@ -97,7 +99,7 @@ public class EmployeeDTO {
         private String affiliation;
         private String department;
         private String phone;
-        private String email;
+        private List<String> email;
     }
 
     @Data

@@ -77,7 +77,8 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     public List<EmployeeDTO.EmployeeNameList> readEmployeeNameList() {
         return jpaQueryFactory.select(Projections.fields(EmployeeDTO.EmployeeNameList.class,
                     qEmployee.id.as("employeeId"),
-                    qEmployee.nameKr.as("nameKr")
+                    qEmployee.employeeNo.as("employeeNo"),
+                    qEmployee.nameKr.as("name")
                 ))
                 .from(qEmployee)
                 
@@ -118,7 +119,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                         .phone(employee.getPhone())
                         .email(employee.getEmployeeEmailList().stream()
                                 .map(EmployeeEmail::getEmail)
-                                .collect(Collectors.joining(",")))
+                                .collect(Collectors.toList()))
 
                         .build())
                 .collect(Collectors.toList());
