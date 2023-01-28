@@ -122,6 +122,14 @@ public class CommuteService {
     // 출퇴근 등록 - 관리자
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData commuteCreateAdmin(CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
+        Optional<Commute> latestCommute = commuteCustomRepository.findLatestCommute(commuteRegisterDTO.getEmployeeId());
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String today = formatter.format(new Date());
+
+        // 이미 오늘날짜랑 employeeId가 있으면 error
+        if (latestCommute.isPresent() && formatter.format(latestCommute.get().getRegisterDate()).equals(today)) throw new CustomException(ErrorStatus.COMMUTE_ALREADY_EXISTS);
+
         // 등록일이 오늘 넘어가면, 퇴근이 출근보다 빠르면 error
         if (commuteRegisterDTO.getRegisterDate().compareTo(new Date()) > 0) throw new CustomException(ErrorStatus.COMMUTE_REGISTER_DATE_ERROR);
         if (commuteRegisterDTO.getStartDate().after(commuteRegisterDTO.getEndDate())) throw new CustomException(ErrorStatus.COMMUTE_END_DATE_ERROR);
