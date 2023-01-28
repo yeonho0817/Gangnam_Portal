@@ -30,6 +30,7 @@ public enum ErrorStatus {
     COMMUTE_REGISTER_DATE_ERROR(409, HttpStatus.CONFLICT, "등록일이 오늘을 넘을 수 없습니다."),
     COMMUTE_END_DATE_ERROR(409, HttpStatus.CONFLICT, "퇴근 시간이 출근 시간보다 빠를 수 없습니다."),
 
+    WEATHER_INFO_FAIL(404, HttpStatus.CONFLICT, "날씨 정보를 가져올 수 없습니다."),
 
     // Valid Error Message
     BLANK_ESSENTIAL_VALUE(400, HttpStatus.BAD_REQUEST, "필수 값이 없습니다."),
