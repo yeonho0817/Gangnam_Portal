@@ -1,6 +1,6 @@
 package com.gangnam.portal.util.wheaterApi;
 
-import com.gangnam.portal.dto.WeatherDTO;
+import com.gangnam.portal.dto.EtcDTO;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -30,7 +30,7 @@ public class Weather {
     @Value("${spring.etc.weather.secretKey}")
     private  String secretKey;
 
-    public WeatherDTO.WeatherInfo lookUpWeather(WeatherDTO.RegionCodeDTO regionCodeDTO) throws IOException, NullPointerException {
+    public EtcDTO.WeatherInfo lookUpWeather(EtcDTO.RegionCodeDTO regionCodeDTO) throws IOException, NullPointerException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");
 
@@ -61,7 +61,7 @@ public class Weather {
             if (baseTime == null) baseTime = BASE_TIME_STRING[7];
         }
 
-        System.out.println("baseTime " + baseDate + " " + baseTime);
+        System.out.println(baseDate + " " + baseTime);
 
         String urlBuilder = apiUri + "?" + URLEncoder.encode("ServiceKey", StandardCharsets.UTF_8) + "=" + secretKey +
                 "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(pageNo, StandardCharsets.UTF_8) + //페이지번호
@@ -101,7 +101,7 @@ public class Weather {
 
         JsonElement weather = jsonArray.get(0);
 
-        WeatherDTO.WeatherInfo weatherInfo = null;
+        EtcDTO.WeatherInfo weatherInfo = null;
 
         for (int i=0; i<jsonArray.size(); i+=12, weather = jsonArray.get(i)) {
             if (weather.getAsJsonObject().get("category").getAsString().equals("TMN") || weather.getAsJsonObject().get("category").getAsString().equals("TMX")) {
@@ -112,7 +112,7 @@ public class Weather {
                 String sky = String.valueOf(jsonArray.get(i+5).getAsJsonObject().get("fcstValue").getAsString());
                 String pty = String.valueOf(jsonArray.get(i+6).getAsJsonObject().get("fcstValue").getAsString());
 
-                weatherInfo = WeatherDTO.WeatherInfo.builder()
+                weatherInfo = EtcDTO.WeatherInfo.builder()
                             .date(baseDate.toString().substring(0,4) + "-" + baseDate.toString().substring(4,6) + "-" + baseDate.toString().substring(6,8))
                             .time(baseTime.substring(0, 2))
                             .isNight((Integer.parseInt(baseTime.substring(0, 2)) > 19 && Integer.parseInt(baseTime.substring(0, 2)) < 24) || (Integer.parseInt(baseTime.substring(0, 2))>=0 && Integer.parseInt(baseTime.substring(0, 2)) < 6) )
@@ -131,7 +131,7 @@ public class Weather {
     }
 
     // 위도,경도 -> 기상청 좌표
-    public WeatherDTO.RegionCodeDTO regionCodeInfo(WeatherDTO.RegionCoordinateDTO regionCoordinateDTO)  throws IOException {
+    public EtcDTO.RegionCodeDTO regionCodeInfo(EtcDTO.RegionCoordinateDTO regionCoordinateDTO)  throws IOException {
         double RE = 6371.00877; // 지구 반경(km)
         double GRID = 5.0; // 격자 간격(km)
         double SLAT1 = 30.0; // 투영 위도1(degree)
@@ -155,7 +155,7 @@ public class Weather {
         sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
         double ro = Math.tan(Math.PI* 0.25 + olat * 0.5);
         ro = re * sf / Math.pow(ro, sn);
-        WeatherDTO.RegionCodeDTO rs = new WeatherDTO.RegionCodeDTO();
+        EtcDTO.RegionCodeDTO rs = new EtcDTO.RegionCodeDTO();
 
         double ra = Math.tan(Math.PI* 0.25 + (regionCoordinateDTO.getLatitude()) * DEGRAD * 0.5);
         ra = re * sf / Math.pow(ra, sn);

@@ -35,6 +35,7 @@ public class EmployeeEmailCustomRepositoryImpl implements EmployeeEmailCustomRep
 
                 .where(qEmployeeEmail.email.eq(email)
                         .and(qEmployeeEmail.provider.eq(enumProvider))
+                        .and(qEmployee.state.eq(false))
                 )
                 .fetchOne();
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -58,6 +59,7 @@ public class HumanResourceController {
         return humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
     }
 
+    @ApiIgnore
     @GetMapping("/test")
     public ResponseData<EmployeeDTO.HRInfo> test(
             @Parameter(description = "정렬 기준") @RequestParam(defaultValue = "rank") String sort,

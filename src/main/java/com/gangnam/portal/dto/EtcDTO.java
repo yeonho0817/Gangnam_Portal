@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-public class WeatherDTO {
+public class EtcDTO {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
@@ -51,4 +51,13 @@ public class WeatherDTO {
         @Parameter(description = "신적설(cm)")
         private String sno;
     }
+
+    @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
+    public static class FortuneDTO {
+        private Boolean isOpened = true;
+        private String message;
+    }
+
 }

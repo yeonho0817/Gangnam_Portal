@@ -3,7 +3,7 @@ package com.gangnam.portal.repository.custom;
 import com.gangnam.portal.domain.QEmployee;
 import com.gangnam.portal.domain.QFortune;
 import com.gangnam.portal.domain.QFortuneEmployee;
-import com.gangnam.portal.dto.FortuneDTO;
+import com.gangnam.portal.dto.EtcDTO;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class FortuneEmployeeCustomRepositoryImpl implements FortuneEmployeeCusto
     private final QFortuneEmployee qFortuneEmployee = QFortuneEmployee.fortuneEmployee;
 
     @Override
-    public Optional<FortuneDTO> findByEmployeeId(Long employeeId) {
-        FortuneDTO findFortuneMessage = jpaQueryFactory.select(Projections.fields(FortuneDTO.class,
+    public Optional<EtcDTO.FortuneDTO> findByEmployeeId(Long employeeId) {
+        EtcDTO.FortuneDTO findFortuneMessage = jpaQueryFactory.select(Projections.fields(EtcDTO.FortuneDTO.class,
                     qFortune.message.as("message")
                 ))
                 .from(qFortuneEmployee)

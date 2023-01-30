@@ -38,6 +38,7 @@ public class KakaoConfigUtils {
         params.put("redirect_uri", getKakaoRedirectUrl());
         params.put("response_type", "code");
         params.put("scope", getScopes());
+        params.put("prompt", "login");
 
         String paramStr = params.entrySet().stream()
                 .map(param -> param.getKey() + "=" + param.getValue())

@@ -4,11 +4,10 @@ import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.domain.Fortune;
 import com.gangnam.portal.domain.FortuneEmployee;
 import com.gangnam.portal.dto.AuthenticationDTO;
-import com.gangnam.portal.dto.FortuneDTO;
+import com.gangnam.portal.dto.EtcDTO;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
-import com.gangnam.portal.dto.WeatherDTO;
 import com.gangnam.portal.exception.CustomException;
 import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.FortuneEmployeeRepository;
@@ -36,11 +35,11 @@ public class EtcService {
 
     // 날씨 api
     @Transactional(readOnly = true)
-    public ResponseData<WeatherDTO.WeatherInfo> weatherInfo(WeatherDTO.RegionCoordinateDTO regionCoordinate) {
-        WeatherDTO.WeatherInfo weatherInfo = null;
+    public ResponseData<EtcDTO.WeatherInfo> weatherInfo(EtcDTO.RegionCoordinateDTO regionCoordinate) {
+        EtcDTO.WeatherInfo weatherInfo = null;
 
         try {
-            WeatherDTO.RegionCodeDTO regionCodeDTO = weather.regionCodeInfo(regionCoordinate);
+            EtcDTO.RegionCodeDTO regionCodeDTO = weather.regionCodeInfo(regionCoordinate);
 
             weatherInfo = weather.lookUpWeather(regionCodeDTO);
         } catch(IOException | NullPointerException e) {
@@ -52,14 +51,14 @@ public class EtcService {
 
     // 운세 api
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseData<FortuneDTO> fortuneInfo(UsernamePasswordAuthenticationToken authentication) {
+    public ResponseData<EtcDTO.FortuneDTO> fortuneInfo(UsernamePasswordAuthenticationToken authentication) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authentication);
 
         Employee findEmployee = employeeRepository.findById(authenticationDTO.getId())
                 .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));
 
         // 이미 있는지 검사
-        Optional<FortuneDTO> findFortuneMessage = fortuneEmployeeCustomRepository.findByEmployeeId(findEmployee.getId());
+        Optional<EtcDTO.FortuneDTO> findFortuneMessage = fortuneEmployeeCustomRepository.findByEmployeeId(findEmployee.getId());
         if (findFortuneMessage.isPresent()) return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), findFortuneMessage.get());
 
         // radom 숫자
@@ -76,7 +75,7 @@ public class EtcService {
 
         fortuneEmployeeRepository.save(newFortuneEmployee);
 
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new FortuneDTO(false, findFortune.getMessage()));
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.FortuneDTO(false, findFortune.getMessage()));
     }
     
     // fortune employee 삭제 - 스케쥴러
