@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 public class EtcDTO {
     @Data
     @RequiredArgsConstructor
@@ -56,8 +58,26 @@ public class EtcDTO {
     @AllArgsConstructor
     @RequiredArgsConstructor
     public static class FortuneDTO {
-        private Boolean isOpened = true;
         private String message;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
+    @Builder
+    public static class SubwayInfoData {
+        private String direction;
+        private String time;
+        private String currentPosition;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
+    @Builder
+    public static class SubwayInfo {
+        private String baseDateTime;
+        private List<SubwayInfoData> subwayInfo;
     }
 
 }

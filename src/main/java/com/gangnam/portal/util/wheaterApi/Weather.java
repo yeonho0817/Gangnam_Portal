@@ -45,14 +45,18 @@ public class Weather {
         String type = "JSON";	//타입 xml, json 등등 ..
 
         Integer baseDate = Integer.parseInt(dateFormat.format(today));
+//        Integer baseDate = 20230130;
         String baseTime = null;
 
-        if (Integer.parseInt(hourFormat.format(new Date())) < BASE_TIME[0]) {
+        Integer currentHour = Integer.parseInt(hourFormat.format(new Date()));
+//        Integer currentHour = 0;
+
+        if (currentHour <= BASE_TIME[0]) {
             baseDate--;
             baseTime = BASE_TIME_STRING[7];
         } else {
             for (int i=1; i<BASE_TIME.length; i++) {
-                if (Integer.parseInt(hourFormat.format(new Date())) < BASE_TIME[i]) {
+                if (currentHour <= BASE_TIME[i]) {
                     baseTime = BASE_TIME_STRING[i-1];
                     break;
                 }
@@ -115,7 +119,7 @@ public class Weather {
                 weatherInfo = EtcDTO.WeatherInfo.builder()
                             .date(baseDate.toString().substring(0,4) + "-" + baseDate.toString().substring(4,6) + "-" + baseDate.toString().substring(6,8))
                             .time(baseTime.substring(0, 2))
-                            .isNight((Integer.parseInt(baseTime.substring(0, 2)) > 19 && Integer.parseInt(baseTime.substring(0, 2)) < 24) || (Integer.parseInt(baseTime.substring(0, 2))>=0 && Integer.parseInt(baseTime.substring(0, 2)) < 6) )
+                            .isNight((Integer.parseInt(hourFormat.format(new Date())) > 19 && Integer.parseInt(hourFormat.format(new Date())) < 24) || (Integer.parseInt(hourFormat.format(new Date()))>=0 && Integer.parseInt(hourFormat.format(new Date())) < 6) )
                             .tmp(jsonArray.get(i).getAsJsonObject().get("fcstValue").getAsString())
                             .wsd(jsonArray.get(i+4).getAsJsonObject().get("fcstValue").getAsString())
                             .sky(sky.equals("1") ? "맑음" : sky.equals("2") ? "비" : sky.equals("3") ? "구름 많음" : sky.equals("4") ? "흐림" : null)
@@ -124,6 +128,7 @@ public class Weather {
                             .pop(String.valueOf(jsonArray.get(i+7).getAsJsonObject().get("fcstValue").getAsString()))
                             .sno(String.valueOf(jsonArray.get(i+11).getAsJsonObject().get("fcstValue").getAsString()))
                         .build();
+
                 break;
             }
         }
