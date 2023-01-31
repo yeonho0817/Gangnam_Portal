@@ -25,10 +25,11 @@ public enum ErrorStatus {
     COMMUTE_ALREADY_START(409, HttpStatus.CONFLICT, "이미 출근한 상태입니다."),
     COMMUTE_END_FORBIDDEN(409, HttpStatus.CONFLICT, "아직 출근을 하지 않았습니다."),
     COMMUTE_ALREADY_END(409, HttpStatus.CONFLICT, "이미 퇴근한 상태입니다."),
-    COMMUTE_ALREADY_EXISTS(409, HttpStatus.CONFLICT, "이미 오늘 출퇴근 정보가 존재합니다."),
+    COMMUTE_ALREADY_EXISTS(409, HttpStatus.CONFLICT, "이미 해당 날짜의 출퇴근 정보가 존재합니다."),
 
     COMMUTE_REGISTER_DATE_ERROR(409, HttpStatus.CONFLICT, "등록일이 오늘을 넘을 수 없습니다."),
     COMMUTE_END_DATE_ERROR(409, HttpStatus.CONFLICT, "퇴근 시간이 출근 시간보다 빠를 수 없습니다."),
+    COMMUTE_DATE_ERROR(409, HttpStatus.CONFLICT, "출근이나 퇴근 시간이 현재 시간을 넘을 수 없습니다."),
 
     WEATHER_INFO_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "날씨 정보를 가져올 수 없습니다."),
     FORTUNE_INFO_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "운세 정보를 가져올 수 없습니다."),

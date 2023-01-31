@@ -2,6 +2,7 @@ package com.gangnam.portal.util.jwt;
 
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -34,10 +35,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         } else if (exception == ErrorStatus.TOKEN_EMPTY) {
             setResponse(response, ErrorStatus.TOKEN_EMPTY);
         }
+
     }
 
     private void setResponse(HttpServletResponse response, ErrorStatus errorStatus) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(errorStatus.getHttpStatus().value());
 
         printLog(errorStatus.getHttpStatus().value(), errorStatus.getHttpStatus().name(), errorStatus.getDescription());

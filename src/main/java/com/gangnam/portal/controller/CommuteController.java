@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CommuteController {
             @ApiResponse(responseCode = "4XX", description = "출근 등록 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData commuteStart(@Parameter(hidden = true) UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
+    public ResponseData commuteStart(@ApiIgnore @Parameter(hidden = true) UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
                                      @Parameter(description = "출근 시간 정보") @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         return commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteStartEndDTO);
     }
@@ -47,7 +48,7 @@ public class CommuteController {
             @ApiResponse(responseCode = "4XX", description = "퇴근 등록 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken,
+    public ResponseData commuteEnd(@ApiIgnore UsernamePasswordAuthenticationToken authenticationToken,
                                    @Parameter(description = "퇴근 시간 정보") @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
         return commuteService.commuteEnd(authenticationToken, commuteStartEndDTO);
     }
@@ -90,7 +91,7 @@ public class CommuteController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData<List<CommuteDTO.CommuteListBoard>> commuteMy(@Parameter(description = "월별 출퇴근 정보") @ModelAttribute @Valid CommuteDTO.CommuteBoardData commuteBoardData,
-                                                                     @Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken) {
+                                                                     @ApiIgnore @Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken) {
         return commuteService.commuteBoard(authenticationToken, commuteBoardData);
     }
 

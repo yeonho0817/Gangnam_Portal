@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 public class EmployeeDTO {
@@ -13,8 +15,12 @@ public class EmployeeDTO {
     @RequiredArgsConstructor
     @AllArgsConstructor
     public static class UpdateInfoDTO {
+        @NotBlank(message = "영어 이름이 빈칸입니다.")
         private String nameEn;
+        @NotBlank(message = "휴대폰 번호가 빈칸입니다.")
+        @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$",message = "핸드폰 번호의 양식과 맞지 않습니다. 01x-xxx(x)-xxxx")
         private String phone;
+        @NotBlank(message = "주소가 빈칸입니다.")
         private String address;
     }
 

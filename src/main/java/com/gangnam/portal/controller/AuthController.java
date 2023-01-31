@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -93,8 +94,8 @@ public class AuthController {
             @ApiResponse(responseCode = "4XX", description = "토큰 재발급 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData<AuthDTO.TokenDTO> reissueToken(@Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken,
-                                                       @Parameter(hidden = true) @RequestHeader("RefreshToken") String refreshToken) {
+    public ResponseData<AuthDTO.TokenDTO> reissueToken(@ApiIgnore @Parameter(hidden = true) UsernamePasswordAuthenticationToken authenticationToken,
+                                                       @ApiIgnore @Parameter(hidden = true) @RequestHeader("RefreshToken") String refreshToken) {
         return authService.reissueToken(authenticationToken, refreshToken);
     }
 
@@ -107,7 +108,7 @@ public class AuthController {
             @ApiResponse(responseCode = "4XX", description = "로그아웃 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData logout(@Parameter(hidden = true) @RequestHeader("Authorization") String accessToken) {
+    public ResponseData logout(@ApiIgnore @RequestHeader("Authorization") String accessToken) {
        return authService.logout(accessToken);
     }
 

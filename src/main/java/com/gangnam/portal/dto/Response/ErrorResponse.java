@@ -20,14 +20,14 @@ public class ErrorResponse {
     @Schema(description = "Error Message")
     private final String message;
 
-    public static ResponseEntity<ErrorResponse> of(ErrorStatus errorStatus) {
+    public static ResponseEntity<ErrorResponse> of(ErrorStatus errorStatus, String message) {
         return  ResponseEntity
                 .status(errorStatus.getHttpStatus())
                 .body(
                         ErrorResponse.builder()
                                 .status(errorStatus.getHttpStatus().value())
                                 .error(errorStatus.getHttpStatus().name())
-                                .message(errorStatus.getDescription())
+                                .message(message)
                         .build()
                 );
     }

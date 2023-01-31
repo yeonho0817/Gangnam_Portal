@@ -59,7 +59,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.TEST_LONG_ACCESS_TOKEN_EXPIRATION_TIME.getValue()))
+                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.TEST_SHORT_ACCESS_TOKEN_EXPIRATION_TIME.getValue()))
                 .signWith(getSigningKey(SECRET_KEY), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -76,7 +76,7 @@ public class JwtTokenProvider {
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.REFRESH_TOKEN_EXPIRATION_TIME.getValue()))
+                .setExpiration(new Date(System.currentTimeMillis() + JwtExpirationEnums.TEST_SHORT_REFRESH_TOKEN_EXPIRATION_TIME.getValue()))
                 .signWith(getSigningKey(SECRET_KEY), SignatureAlgorithm.HS256)
                 .compact();
 

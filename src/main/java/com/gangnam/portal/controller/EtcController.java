@@ -55,7 +55,7 @@ public class EtcController {
             @ApiResponse(responseCode = "5XX", description = "운세 정보 조회 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData<EtcDTO.FortuneDTO> fortuneInfo(UsernamePasswordAuthenticationToken authentication) {
+    public ResponseData<EtcDTO.FortuneDTO> fortuneInfo(@ApiIgnore UsernamePasswordAuthenticationToken authentication) {
         return etcService.fortuneInfo(authentication);
     }
 

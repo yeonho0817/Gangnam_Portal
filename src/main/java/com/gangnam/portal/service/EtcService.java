@@ -101,7 +101,7 @@ public class EtcService {
             throw new CustomException(ErrorStatus.SUBWAY_INFO_FAIL);
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.SubwayInfo(formatter.format(new Date()), subwayInfoList));
     }

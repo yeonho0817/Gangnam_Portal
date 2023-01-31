@@ -34,7 +34,7 @@ public class ExceptionController {
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletResponse response) throws UnsupportedEncodingException {
         printLog(e.getErrorStatus().getHttpStatus().value(), e.getErrorStatus().getHttpStatus().name(), e.getErrorStatus().getDescription());
 
-        ResponseEntity<ErrorResponse> errorResponseEntity = ErrorResponse.of(e.getErrorStatus());
+        ResponseEntity<ErrorResponse> errorResponseEntity = ErrorResponse.of(e.getErrorStatus(), e.getErrorStatus().getDescription());
 
         if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_LOGIN_EMAIL) {
             String encodeMessage = URLEncoder.encode(errorResponseEntity.getBody().getMessage(), "UTF-8");
@@ -45,16 +45,13 @@ public class ExceptionController {
             return null;
         }
 
-
-        return ErrorResponse.of(e.getErrorStatus());
+        return ErrorResponse.of(e.getErrorStatus(), e.getErrorStatus().getDescription());
     }
 
 
     private ResponseEntity<ErrorResponse> bindingError(BindingResult bindingResult) {
         ErrorStatus errorStatus = null;
         String message = null;
-
-
 
         if (bindingResult.hasErrors()) {
             //DTO에 설정한 message값을 가져온다.
@@ -78,7 +75,7 @@ public class ExceptionController {
         printLog(errorStatus.getHttpStatus().value(), errorStatus.getHttpStatus().name(), message);
 
 
-        return ErrorResponse.of(errorStatus);
+        return ErrorResponse.of(errorStatus, message);
     }
 
     private void printLog(Integer errorStatus, String errorCode, String errorMessage) {

@@ -19,7 +19,7 @@ public class CommuteDTO {
     @AllArgsConstructor
     public static class CommuteStartEndDTO {
         @Schema(description = "출퇴근 시간")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "출퇴근 시간이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date date; // start, end
     }
@@ -29,14 +29,14 @@ public class CommuteDTO {
     @AllArgsConstructor
     public static class CommuteUpdateDTO {
         @Schema(description = "출퇴근 ID")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "출퇴근 ID가 없습니다.")
         private Long commuteId;
         @Schema(description = "출근 날짜 + 시간")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "출근 시간이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date startDate;
         @Schema(description = "퇴근 날짜 + 시간")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "퇴근 시간이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date endDate;
     }
@@ -46,18 +46,18 @@ public class CommuteDTO {
     @AllArgsConstructor
     public static class CommuteRegisterDTO {
         @Schema(description = "사원 ID")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "사원 ID가 없습니다.")
         private Long employeeId;
         @Schema(description = "등록 날짜")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "등록일이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
         private Date registerDate;
         @Schema(description = "출근 날짜 + 시간")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "출근 시간이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date startDate;
         @Schema(description = "퇴근 날짜 + 시간")
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "퇴근 시간이 없습니다.")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Date endDate;
     }
@@ -67,16 +67,15 @@ public class CommuteDTO {
     @AllArgsConstructor
     public static class CommuteBoardData {
         @Parameter(description = "구분(all or my) : default Value(all)")
-
         private String range;
 
         @Parameter(description = "년도", required = true)
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "년도가 없습니다.")
 //        @Pattern(regexp = "^\\d{4}$", message = "올바른 형식이 아닙니다.")
         private Integer year;
 
         @Parameter(description = "월", required = true)
-        @NotNull(message = "필수 값이 없습니다.")
+        @NotNull(message = "월이 없습니다.")
 //        @Pattern(regexp = "^(0?[1-9]|1[012])$", message = "올바른 형식이 아닙니다.")
         private Integer month;
     }

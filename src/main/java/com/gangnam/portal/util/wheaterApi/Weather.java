@@ -65,7 +65,7 @@ public class Weather {
             if (baseTime == null) baseTime = BASE_TIME_STRING[7];
         }
 
-        System.out.println(baseDate + " " + baseTime);
+        System.out.println(nx + " " + ny + " " + baseDate + " " + baseTime + " " + timeFormat.format(new Date()));
 
         String urlBuilder = apiUri + "?" + URLEncoder.encode("ServiceKey", StandardCharsets.UTF_8) + "=" + secretKey +
                 "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(pageNo, StandardCharsets.UTF_8) + //페이지번호
@@ -119,7 +119,7 @@ public class Weather {
                 weatherInfo = EtcDTO.WeatherInfo.builder()
                             .date(baseDate.toString().substring(0,4) + "-" + baseDate.toString().substring(4,6) + "-" + baseDate.toString().substring(6,8))
                             .time(baseTime.substring(0, 2))
-                            .isNight((Integer.parseInt(hourFormat.format(new Date())) > 19 && Integer.parseInt(hourFormat.format(new Date())) < 24) || (Integer.parseInt(hourFormat.format(new Date()))>=0 && Integer.parseInt(hourFormat.format(new Date())) < 6) )
+                            .isNight((Integer.parseInt(hourFormat.format(new Date())) >= 19 && Integer.parseInt(hourFormat.format(new Date())) <= 24) || (Integer.parseInt(hourFormat.format(new Date()))>=0 && Integer.parseInt(hourFormat.format(new Date())) < 6) )
                             .tmp(jsonArray.get(i).getAsJsonObject().get("fcstValue").getAsString())
                             .wsd(jsonArray.get(i+4).getAsJsonObject().get("fcstValue").getAsString())
                             .sky(sky.equals("1") ? "맑음" : sky.equals("2") ? "비" : sky.equals("3") ? "구름 많음" : sky.equals("4") ? "흐림" : null)

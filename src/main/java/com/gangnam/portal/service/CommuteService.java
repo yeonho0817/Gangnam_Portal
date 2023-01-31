@@ -108,8 +108,9 @@ public class CommuteService {
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData commuteUpdateAdmin(CommuteDTO.CommuteUpdateDTO commuteUpdateDTO) {
         if (commuteUpdateDTO.getStartDate().after(commuteUpdateDTO.getEndDate())) throw new CustomException(ErrorStatus.COMMUTE_END_DATE_ERROR);
+        if (commuteUpdateDTO.getStartDate().after(new Date())) throw new CustomException(ErrorStatus.COMMUTE_DATE_ERROR);
+        if (commuteUpdateDTO.getEndDate().after(new Date())) throw new CustomException(ErrorStatus.COMMUTE_DATE_ERROR);
 
-        // 등록일 + employee id 로 이미 있는 건지 조사
         Commute findCommuteInfo =  commuteRepository.findById(commuteUpdateDTO.getCommuteId())
                 .orElseThrow(() -> new CustomException(ErrorStatus.COMMUTE_READ_FAILED));
 
@@ -122,13 +123,11 @@ public class CommuteService {
     // 출퇴근 등록 - 관리자
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData commuteCreateAdmin(CommuteDTO.CommuteRegisterDTO commuteRegisterDTO) {
-        Optional<Commute> latestCommute = commuteCustomRepository.findLatestCommute(commuteRegisterDTO.getEmployeeId());
+        if (commuteRegisterDTO.getStartDate().after(new Date())) throw new CustomException(ErrorStatus.COMMUTE_DATE_ERROR);
+        if (commuteRegisterDTO.getEndDate().after(new Date())) throw new CustomException(ErrorStatus.COMMUTE_DATE_ERROR);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String today = formatter.format(new Date());
-
-        // 이미 오늘날짜랑 employeeId가 있으면 error
-        if (latestCommute.isPresent() && formatter.format(latestCommute.get().getRegisterDate()).equals(today)) throw new CustomException(ErrorStatus.COMMUTE_ALREADY_EXISTS);
 
         // 등록일이 오늘 넘어가면, 퇴근이 출근보다 빠르면 error
         if (commuteRegisterDTO.getRegisterDate().compareTo(new Date()) > 0) throw new CustomException(ErrorStatus.COMMUTE_REGISTER_DATE_ERROR);
@@ -161,6 +160,7 @@ public class CommuteService {
         if (StringUtils.hasText(commuteBoardData.getRange()) && commuteBoardData.getRange().equals("my") ) {
             return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteCustomRepository.readCommute(authenticationDTO.getId(), commuteBoardData.getYear(), commuteBoardData.getMonth()));
         } else {
+//            return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteCustomRepository.readCommute(null, commuteBoardData.getYear(), commuteBoardData.getMonth()).stream().sorted(Comparator.comparing(CommuteDTO.CommuteListBoard::getStartDate)).collect(Collectors.toList()));
             return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), commuteCustomRepository.readCommute(null, commuteBoardData.getYear(), commuteBoardData.getMonth()));
         }
     }
@@ -247,10 +247,12 @@ public class CommuteService {
                     .endDate(endDate)
 
                     .totalCommuteTime(
-                            startDate.equals("0") || endDate.equals("0") || startDate.equals("-") || endDate.equals("-") ?
-                                     0.0d :
-                                    Math.round(
-                                            ((float)(formatter.parse(endDate).getTime() - formatter.parse(startDate).getTime()) / 1000 / 60 / 60) * 10 ) / 10.0
+                            startDate == null || endDate == null ?
+                                    0.0d :
+                                    startDate.equals("0") || endDate.equals("0") || startDate.equals("-") || endDate.equals("-") ?
+                                             0.0d :
+                                            Math.round(
+                                                    ((float)(formatter.parse(endDate).getTime() - formatter.parse(startDate).getTime()) / 1000 / 60 / 60) * 10 ) / 10.0
                     )
 
                     .build();

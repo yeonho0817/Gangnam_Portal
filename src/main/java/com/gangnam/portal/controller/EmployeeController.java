@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -31,7 +33,7 @@ public class EmployeeController {
             @ApiResponse(responseCode = "4XX", description = "사원 정보 조회 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(UsernamePasswordAuthenticationToken authentication) {
+    public ResponseData<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(@ApiIgnore UsernamePasswordAuthenticationToken authentication) {
         return employeeService.findEmployeeInfo(authentication);
     }
     
@@ -44,8 +46,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "4XX", description = "사원 정보 수정 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData updateEmployeeInfo(UsernamePasswordAuthenticationToken authenticationToken,
-                                           @Parameter(description = "사원 정보") @RequestBody EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
+    public ResponseData updateEmployeeInfo(@ApiIgnore UsernamePasswordAuthenticationToken authenticationToken,
+                                           @Parameter(description = "사원 정보") @Valid @RequestBody EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
         return employeeService.updateEmployeeInfo(authenticationToken, updateInfoDTO);
     }
 

@@ -86,6 +86,8 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                         qCommute.registerDate.loe(endDate)
                 )
 
+                .orderBy(qCommute.startDate.asc())
+
                 .fetch()
                 ;
     }
@@ -163,14 +165,14 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     public Optional<Commute> findCommute(Long employeeId, Date registerDate) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-
         Commute commute = jpaQueryFactory.selectFrom(qCommute)
 
                 .leftJoin(qCommute.employee, qEmployee).fetchJoin()
 
                 .where(
-                        qEmployee.id.eq(employeeId),
-                        getRegisterDateStringTemplate().eq(formatter.format(registerDate))
+                        qCommute.employee.id.eq(employeeId)
+                                        .and(
+                        getRegisterDateStringTemplate().eq(formatter.format(registerDate)))
                 )
 
                 .fetchOne();
