@@ -61,7 +61,6 @@ public class EtcController {
 
     // 지하철 api
     @GetMapping("/subway")
-    @ApiIgnore
     @Operation(operationId = "weather", summary = "운세 정보 조회", description = "오늘 운세 정보를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "운세 정보 조회",
