@@ -50,6 +50,7 @@ public class AuthController {
     public void redirectInfoOfGoogle(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
         AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.google);
 
+//        response.setHeader("Location", "http://tlc.gangnam-portal.kro.kr:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
         response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
 
         response.setStatus(302);
@@ -81,6 +82,7 @@ public class AuthController {
         AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.kakao);
 
         response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
+//        response.setHeader("Location", "http://tlc.gangnam-portal.kro.kr:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
 
         response.setStatus(302);
     }

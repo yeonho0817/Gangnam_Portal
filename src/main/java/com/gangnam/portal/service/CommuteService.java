@@ -14,6 +14,7 @@ import com.gangnam.portal.repository.CommuteRepository;
 import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.custom.CommuteCustomRepository;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
+import com.gangnam.portal.util.holidayApi.HolidayApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ public class CommuteService {
     private final CommuteRepository commuteRepository;
     private final CommuteCustomRepository commuteCustomRepository;
     private final EmployeeCustomRepository employeeCustomRepository;
+    private final HolidayApi holidayApi;
 
     // 출근 등록
     @Transactional(rollbackFor = {Exception.class})
@@ -167,16 +169,27 @@ public class CommuteService {
 
     // 출퇴근 현황 조회
     @Transactional(readOnly = true)
-    public ResponseData<CommuteDTO.CommuteState> commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, String name) {
-        QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize, startDate, endDate);
+    public ResponseData<CommuteDTO.CommuteState> commuteStateList(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate, Long employeeId) {
+        try {
+            QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize, startDate, endDate);
 
-        Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
-                Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
+            Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
+                    Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
 
-        // 전체 페이지 갯수 표시 해줘야 함
-        Page<CommuteDTO.CommuteStateData> commuteStateList = commuteCustomRepository.readCommuteState(pageable, queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
+            if (employeeId == 0) employeeId = null;
 
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new CommuteDTO.CommuteState(commuteStateList.getTotalPages(), (int) commuteStateList.getTotalElements(), commuteStateList.stream().collect(Collectors.toList())));
+
+            // 전체 페이지 갯수 표시 해줘야 함
+            Page<CommuteDTO.CommuteStateData> commuteStateList = commuteCustomRepository.readCommuteState(pageable, queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), employeeId);
+
+
+            List<CommuteDTO.CommuteStateData> commuteStateDataList = getStateData(commuteStateList.toList());
+
+
+            return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new CommuteDTO.CommuteState(commuteStateList.getTotalPages(), (int) commuteStateList.getTotalElements(), commuteStateDataList));
+        } catch (Exception e) {
+            throw new CustomException(ErrorStatus.HOLIDAY_INFO_FAIL);
+        }
     }
 
     // excel
@@ -195,9 +208,34 @@ public class CommuteService {
         endCalendar.setTime(queryConditionDTO.getEndDate());
 
         // excel 데이터 추출
-
-
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), getExcelData(commuteExcelDataList, employeeList, startCalendar, endCalendar));
+    }
+
+    // 휴일 + 요일 가공
+    private List<CommuteDTO.CommuteStateData> getStateData(List<CommuteDTO.CommuteStateData> commuteStateDataList) throws Exception {
+
+
+        Calendar calendar = Calendar.getInstance();
+        return commuteStateDataList.stream()
+                .peek(commuteStateData -> {
+                    try {
+                        calendar.clear();
+                        calendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(commuteStateData.getRegisterDate()));
+
+                        // 요일 설정
+                        commuteStateData.setRegisterDate(commuteStateData.getRegisterDate() + " (" + getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK)).charAt(0) + ")");
+
+//                         휴일 설정
+                        if (commuteStateData.getHolidayName() == null ) {
+                            if (getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK)).equals("일요일")) commuteStateData.setHolidayName("일요일");
+                            else if (getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK)).equals("토요일")) commuteStateData.setHolidayName("토요일");
+                        }
+
+                    } catch (ParseException e) {
+                        throw new CustomException(ErrorStatus.HOLIDAY_INFO_FAIL);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     // excel 가공
@@ -218,7 +256,6 @@ public class CommuteService {
                 int numDayOfTheWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
                 if (index < commuteExcelDataList.size() &&
-//                    Objects.equals(employeeList.get(i).getEmployeeId(), commuteExcelDataList.get(index).getEmployeeId()) &&
                     formatter.format(calendar.getTime()).equals(commuteExcelDataList.get(index).getRegisterDate()) ) {
                         newCommuteExcelDataList.add(commuteExcelDataBuilder(employeeList.get(i), numDayOfTheWeek, commuteExcelDataList.get(index).getRegisterDate(), commuteExcelDataList.get(index).getStartDate(), commuteExcelDataList.get(index).getEndDate()));
                         index++;

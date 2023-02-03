@@ -2,6 +2,7 @@ package com.gangnam.portal.service;
 
 import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.domain.Fortune;
+import com.gangnam.portal.domain.Holiday;
 import com.gangnam.portal.dto.AuthenticationDTO;
 import com.gangnam.portal.dto.EtcDTO;
 import com.gangnam.portal.dto.Response.ErrorStatus;
@@ -10,9 +11,12 @@ import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.exception.CustomException;
 import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.FortuneRepository;
+import com.gangnam.portal.repository.HolidayRepository;
+import com.gangnam.portal.util.holidayApi.HolidayApi;
 import com.gangnam.portal.util.subwayApi.Subway;
 import com.gangnam.portal.util.wheaterApi.Weather;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +32,11 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EtcService {
     private final EmployeeRepository employeeRepository;
-//    private final FortuneEmployeeCustomRepository fortuneEmployeeCustomRepository;
+    private final HolidayRepository holidayRepository;
     private final FortuneRepository fortuneRepository;
-//    private final FortuneEmployeeRepository fortuneEmployeeRepository;
     private final Weather weather;
     private final Subway subway;
+    private final HolidayApi holidayApi;
 
     // 날씨 api
     @Transactional(readOnly = true)
@@ -85,13 +89,6 @@ public class EtcService {
 
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.FortuneDTO(findFortune.getMessage()));
     }
-    
-    // fortune employee 삭제 - 스케쥴러
-//    @Transactional(rollbackFor = {Exception.class})
-//    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-//    public void deleteTodayFortune() {
-//        fortuneEmployeeRepository.truncate();
-//    }
 
     public ResponseData<EtcDTO.SubwayInfo> subwayInfo() {
         List<EtcDTO.SubwayInfoData> subwayInfoList = null;
@@ -104,5 +101,31 @@ public class EtcService {
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.SubwayInfo(formatter.format(new Date()), subwayInfoList));
+    }
+
+    @Transactional(rollbackFor = {Exception.class})
+    @Scheduled(cron = "00 00 23 31 12 *", zone = "Asia/Seoul")
+    public void holidayInfo() {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+
+            List<EtcDTO.HolidayData> holidayDataList = holidayApi.holidayInfo(calendar.get(Calendar.YEAR)+1);
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+            for (EtcDTO.HolidayData holidayData : holidayDataList) {
+                Holiday newHoliday = Holiday.builder()
+                        .dateName(holidayData.getDateName())
+                        .holidayDate(formatter.parse(holidayData.getHolidayDate()))
+
+                        .build();
+
+                holidayRepository.save(newHoliday);
+            }
+
+        } catch (Exception e) {
+            throw new CustomException(ErrorStatus.HOLIDAY_INFO_FAIL);
+        }
     }
 }

@@ -68,8 +68,9 @@ public class CommuteController {
     }
 
     // 출퇴근 등록 - 관리자 기능      O
+
     @PostMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")       // -> 얘 동작안함.
     @Operation(operationId = "commuteCreate", summary = "출근 등록 API(관리자 권한)", description = "사원이 등록하지 못한 출퇴근 정보를 추가합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 등록",
@@ -110,8 +111,8 @@ public class CommuteController {
                                                                   @Parameter(description = "페이지 양") @RequestParam(defaultValue = "10") String pageSize,
                                                                   @Parameter(description = "시작 날짜") @RequestParam(required = false) String startDate,
                                                                   @Parameter(description = "끝 날짜") @RequestParam(required = false) String endDate,
-                                                                  @Parameter(description = "이름") @RequestParam(required = false) String name) {
-        return commuteService.commuteStateList(sort.toLowerCase(), orderBy.toUpperCase(), pageNumber, pageSize, startDate, endDate, name);
+                                                                  @Parameter(description = "사원 ID(전체는 0)") @RequestParam(defaultValue = "0", required = false) Long employeeId) {
+        return commuteService.commuteStateList(sort.toLowerCase(), orderBy.toUpperCase(), pageNumber, pageSize, startDate, endDate, employeeId);
     }
 
     // 출퇴근 엑셀 API

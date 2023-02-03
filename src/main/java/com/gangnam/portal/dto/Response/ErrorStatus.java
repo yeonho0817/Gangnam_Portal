@@ -34,6 +34,7 @@ public enum ErrorStatus {
     WEATHER_INFO_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "날씨 정보를 가져올 수 없습니다."),
     FORTUNE_INFO_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "운세 정보를 가져올 수 없습니다."),
     SUBWAY_INFO_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "지하철 정보를 가져올 수 없습니다."),
+    HOLIDAY_INFO_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "휴일 정보를 가져올 수 없습니다."),
 
     // Valid Error Message
     BLANK_ESSENTIAL_VALUE(400, HttpStatus.BAD_REQUEST, "필수 값이 없습니다."),

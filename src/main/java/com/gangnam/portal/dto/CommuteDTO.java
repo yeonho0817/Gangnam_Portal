@@ -107,10 +107,12 @@ public class CommuteDTO {
     @Builder
     public static class CommuteStateData {
         private Long commuteId;
+        private String day;
         private String registerDate;
         private String startDate;
         private String endDate;
         private String nameKr;
+        private String holidayName;
     }
     @Data
     @NoArgsConstructor
@@ -125,7 +127,6 @@ public class CommuteDTO {
         private String endDate;
         private Double totalCommuteTime;
     }
-
 
     @Data
     @NoArgsConstructor

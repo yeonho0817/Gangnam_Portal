@@ -37,8 +37,10 @@ public class QueryConditionDTO {
     }
 
     public QueryConditionDTO(String sort, String orderBy, String pageNumber, String pageSize) {
-        if (! sort.equals("name") && ! sort.equals("rank")) sort = "rank";
+        if (! sort.equals("namekr") && ! sort.equals("rank") && ! sort.equals("affiliation")) sort = "rank";
         if (! orderBy.equals("ASC") && ! orderBy.equals("DESC")) orderBy = "ASC";
+
+        System.out.println(sort);
 
         try {
             Integer.parseInt(pageNumber);
@@ -59,7 +61,7 @@ public class QueryConditionDTO {
     }
 
     public QueryConditionDTO(String sort, String orderBy, String pageNumber, String pageSize, String startDate, String endDate) {
-        if (! sort.equals("name") && ! sort.equals("rank") && ! sort.equals("date")) sort = "name";
+        if (! sort.equals("namekr") && ! sort.equals("rank") && ! sort.equals("date")) sort = "rank";
         if (! orderBy.equals("ASC") && ! orderBy.equals("DESC")) orderBy = "ASC";
 
         try {

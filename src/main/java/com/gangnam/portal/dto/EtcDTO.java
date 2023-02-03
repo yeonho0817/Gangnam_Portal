@@ -80,4 +80,15 @@ public class EtcDTO {
         private List<SubwayInfoData> subwayInfo;
     }
 
+    @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
+    @Builder
+    public static class HolidayData {
+        private Long holidayId;
+        private String holidayDate;
+        private String dateName;
+        private Boolean isHoliday;
+    }
+
 }

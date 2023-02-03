@@ -65,8 +65,6 @@ public class Subway {
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(result);
 
-        System.out.println(result);
-
         JsonArray jsonArray = (JsonArray) element.getAsJsonObject().get("realtimeArrivalList");
 
         List<EtcDTO.SubwayInfoData> subwayInfoList = new ArrayList<>();
@@ -74,8 +72,8 @@ public class Subway {
         for (int i=0; i<jsonArray.size(); i++) {
             String direction = jsonArray.get(i).getAsJsonObject().get("trainLineNm").getAsString().split(" - ")[1];
 
-            if (subwayInfoList.stream()
-                    .anyMatch(subwayInfo -> subwayInfo.getDirection().equals(direction))) continue;
+//            if (subwayInfoList.stream()
+//                    .anyMatch(subwayInfo -> subwayInfo.getDirection().equals(direction))) continue;
 
             String currentPosition = jsonArray.get(i).getAsJsonObject().get("arvlMsg3").getAsString();
             String time = jsonArray.get(i).getAsJsonObject().get("arvlMsg2").getAsString();
@@ -87,7 +85,6 @@ public class Subway {
                         .time(time)
                         .currentPosition(currentPosition)
                     .build();
-
 
             subwayInfoList.add(subwayInfo);
         }

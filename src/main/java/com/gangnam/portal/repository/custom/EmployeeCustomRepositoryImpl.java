@@ -180,10 +180,12 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
 
                 // 서비스에서 넣어준 정렬 조건을 스위치 케이스 문을 활용하여 셋팅하여 준다.
                 switch (order.getProperty()){
-                    case "name":
+                    case "namekr":
                         return new OrderSpecifier(direction, qEmployee.nameKr);
                     case "rank":
                         return new OrderSpecifier(direction, qEmployee.ranks.id);
+                    case "affiliation":
+                        return new OrderSpecifier(direction, qEmployee.affiliation.name);
                 }
             }
         }

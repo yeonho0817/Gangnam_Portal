@@ -38,8 +38,10 @@ public class HumanResourceService {
     // 인력 조회
     @Transactional(readOnly = true)
     public ResponseData<EmployeeDTO.HRInfo> findHumanResource(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
+        System.out.println(sort + " " + orderBy);
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
 
+        System.out.println(queryConditionDTO.getSort() + " " + queryConditionDTO.getOrderBy());
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
 

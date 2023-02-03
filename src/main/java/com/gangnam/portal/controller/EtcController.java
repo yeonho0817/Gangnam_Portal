@@ -3,7 +3,6 @@ package com.gangnam.portal.controller;
 import com.gangnam.portal.dto.EtcDTO;
 import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ResponseData;
-import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.service.EtcService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,12 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping("/etc")
@@ -96,7 +89,7 @@ public class EtcController {
 
         System.out.println(random.nextInt(507));*/
 
-        List<EtcDTO.SubwayInfoData> subwayInfoList = new ArrayList<>();
+        /*List<EtcDTO.SubwayInfoData> subwayInfoList = new ArrayList<>();
 
         EtcDTO.SubwayInfoData subwayInfo1 = EtcDTO.SubwayInfoData.builder()
                     .direction("신논현방면")
@@ -130,10 +123,12 @@ public class EtcController {
 
         subwayInfoList.sort(Comparator.comparing(EtcDTO.SubwayInfoData::getDirection));
 
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");*/
 
-        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.SubwayInfo(formatter.format(new Date()), subwayInfoList));
+        etcService.holidayInfo();
 
+//        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.SubwayInfo(formatter.format(new Date()), subwayInfoList));
+        return null;
     }
 
 }

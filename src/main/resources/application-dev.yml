@@ -1,0 +1,116 @@
+
+
+server:
+  port: 8081
+
+spring:
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://host.docker.internal:3306/gangnam_portal?useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 1234
+
+  output:
+    ansi:
+      enabled: always
+
+  properties:
+    hibernate:
+      default_batch_fetch_size: 50
+
+  logging:
+    level: # 각 package 별로 로깅 레벨을 지정할 수 있다.
+      ROOT: info
+      org:
+        springframework:
+          web: error
+
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      use-new-id-generator-mappings: false
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+    jackson:
+      serialization:
+        fail-on-empty-beans: false
+
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enable: true
+
+  jwt:
+    headar: Authorization
+    secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+    token-validity-in-seconds: 86400
+
+  redis:
+    host: localhost
+    port: 6379
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: "424375373540-j04m9bjbvrdgt7tc9gb8cnp5kkf9vncn.apps.googleusercontent.com"
+            clientSecret: "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"
+            redirectUri: "http://gangnamServer.com:8080/auth/google/callback"
+            #            redirectUri: "http://localhost:8080/auth/google/callback"
+            loginUri: "https://accounts.google.com/o/oauth2/v2/auth"
+            tokenUri: "https://oauth2.googleapis.com/token"
+            userInfoUri: "https://oauth2.googleapis.com/tokeninfo"
+
+            scope: profile,email
+
+          kakao:
+            clientId: "69e7393f6c34dddc9aa82459c13aae25"
+            clientSecret: "SMvjKEtBHsC8ADS1hxd7yOcKzJvY19Xb"
+            GrantType: authorization_code
+            clientAuthenticationMethod: POST
+            clientName: Kakao
+            scope: account_email
+        provider:
+          kakao:
+            redirectUri: "http://gangnamServer.com:8080/auth/kakao/callback"
+            loginUri : "https://kauth.kakao.com/oauth/authorize"
+            tokenUri: "https://kauth.kakao.com/oauth/token"
+            userInfoUri: "https://kapi.kakao.com/v2/user/me"
+
+            userNameAttribute: id
+  etc:
+    weather:
+      apiUri: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
+      secretKey: "aLsQzQMHjr7pGgjsqPrCAN09ZS%2FxRdjV2yB1%2FF%2FxkrBZsXUhUzUB%2FPRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA%3D%3D"
+    subway:
+      apiUri: "http://swopenAPI.seoul.go.kr/api/subway"
+      #      secretKey: "747967775364757338377456677458"
+      secretKey: "5361664e5064757339387276447346"
+    holiday:
+      apiUri: "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getAnniversaryInfo"
+      secretKey: "aLsQzQMHjr7pGgjsqPrCAN09ZS%2FxRdjV2yB1%2FF%2FxkrBZsXUhUzUB%2FPRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA%3D%3D"
+      secretKeyDecoding: "aLsQzQMHjr7pGgjsqPrCAN09ZS/xRdjV2yB1/F/xkrBZsXUhUzUB/PRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA=="
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+    enabled: true
+    resolve-schema-properties: true
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match:
+    - /v1/**

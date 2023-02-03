@@ -2,13 +2,11 @@ package com.gangnam.portal.repository.custom;
 
 import com.gangnam.portal.domain.*;
 import com.gangnam.portal.dto.CommuteDTO;
-import com.querydsl.core.types.ConstantImpl;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +30,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     private final QAffiliation qAffiliation = QAffiliation.affiliation;
     private final QDepartment qDepartment = QDepartment.department;
     private final QRanks qRanks = QRanks.ranks;
+    private final QHoliday qHoliday = QHoliday.holiday;
 
 
     @Override
@@ -53,13 +52,8 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     @Override
     public List<CommuteDTO.CommuteListBoard> readCommute(Long employeeId, Integer year, Integer month) {
 
-        StringTemplate formatDay = Expressions.stringTemplate(
-                "DATE_FORMAT({0}, {1})"
-                , qCommute.registerDate
-                , ConstantImpl.create("%d"));
-
         Calendar calendar= Calendar.getInstance();
-        calendar.set(year, month-1,1, 0, 0, 0);
+        calendar.set(year, month-1,0, 0, 0, 0);
 
         Date startDate = new Date(calendar.getTimeInMillis());
 
@@ -68,11 +62,13 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
 
         Date endDate = new Date(calendar.getTimeInMillis());
 
+        System.out.println(startDate + " " + endDate);
+
         return jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteListBoard.class,
                             qCommute.id.as("commuteId"),
                             qEmployee.nameKr.as("nameKr"),
                             getRegisterDateStringTemplate().as("registerDate"),
-                            formatDay.as("day"),
+                            getRegisterDayStringTemplate().as("day"),
                             getStartDateStringTemplate().as("startDate"),
                             getEndDateStringTemplate().as("endDate")
                         ))
@@ -82,8 +78,8 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 .on(qCommute.employee.id.eq(qEmployee.id))
 
                 .where(eqEmployeeId(employeeId),
-                        qCommute.registerDate.goe(startDate),
-                        qCommute.registerDate.loe(endDate)
+                        (qCommute.registerDate.goe(startDate)
+                        .and(qCommute.registerDate.loe(endDate)))
                 )
 
                 .orderBy(qCommute.startDate.asc())
@@ -94,23 +90,35 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
 
     @Override
     public Page<CommuteDTO.CommuteStateData> readCommuteState(Pageable pageable,
-                                                              Date startDate, Date endDate, String name) {
+                                                              Date startDate, Date endDate, Long employeeId) {
 
         List<CommuteDTO.CommuteStateData> commuteStateDataList = jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteStateData.class,
                         qCommute.id.as("commuteId"),
                         qEmployee.nameKr.as("nameKr"),
                         getRegisterDateStringTemplate().as("registerDate"),
                         getStartDateStringTemplate().as("startDate"),
-                        getEndDateStringTemplate().as("endDate")
+                        getEndDateStringTemplate().as("endDate"),
+                        getRegisterDayStringTemplate().as("day"),
+
+                        ExpressionUtils.as(
+                                JPAExpressions.select(qHoliday.dateName)
+                                        .from(qHoliday)
+                                        .where(qHoliday.holidayDate.eq(qCommute.registerDate))
+                        ,"holidayName")
+
+
                 ))
                 .from(qCommute)
 
-                .leftJoin(qCommute.employee, qEmployee).on(qCommute.employee.id.eq(qEmployee.id))
+                .leftJoin(qCommute.employee, qEmployee)
+                .on(qCommute.employee.id.eq(qEmployee.id))
+
+
 
                 .where(
                         qCommute.registerDate.goe(startDate),
                         qCommute.registerDate.loe(endDate),
-                        containsName(name)
+                        eqEmployeeId(employeeId)
                 )
 
                 .orderBy(commuteSort(pageable))
@@ -121,12 +129,12 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 .fetch()
                 ;
 
-        return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, name));
+        return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, employeeId));
     }
 
     @Override
     public List<CommuteDTO.CommuteExcelData> findCommuteExcel(Date startDate, Date endDate, String name) {
-        List<CommuteDTO.CommuteExcelData> commuteExcelDataList = jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteExcelData.class,
+        return jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteExcelData.class,
                         qCommute.id.as("commuteId"),
                         qEmployee.id.as("employeeId"),
                         qEmployee.employeeNo.as("employeeNo"),
@@ -158,7 +166,6 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
 
                 .fetch();
 
-        return commuteExcelDataList;
     }
 
     @Override
@@ -189,7 +196,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     }
 
 
-    public Long getTotalPage(Date startDate, Date endDate, String name) {
+    public Long getTotalPage(Date startDate, Date endDate, Long employeeId) {
         return jpaQueryFactory.select(qCommute.count())
                 .from(qCommute)
 
@@ -198,7 +205,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 .where(
                         qCommute.registerDate.goe(startDate),
                         qCommute.registerDate.loe(endDate),
-                        containsName(name)
+                        eqEmployeeId(employeeId)
                 )
 
                 .fetchOne()
@@ -215,6 +222,13 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 "DATE_FORMAT({0}, {1})"
                 , qCommute.registerDate
                 , ConstantImpl.create("%Y-%m-%d"));
+    }
+
+    private StringTemplate getRegisterDayStringTemplate() {
+        return Expressions.stringTemplate(
+                "DATE_FORMAT({0}, {1})"
+                , qCommute.registerDate
+                , ConstantImpl.create("%d"));
     }
 
     private StringTemplate getStartDateStringTemplate() {
@@ -248,7 +262,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
                 // 서비스에서 넣어준 정렬 조건을 스위치 케이스 문을 활용하여 셋팅하여 준다.
                 switch (order.getProperty()){
-                    case "name":
+                    case "namekr":
                         return new OrderSpecifier(direction, qEmployee.nameKr);
                     case "date":
                         return new OrderSpecifier(direction, qCommute.registerDate);

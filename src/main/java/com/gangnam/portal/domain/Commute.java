@@ -24,8 +24,8 @@ public class Commute {
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "register_date", nullable = false, columnDefinition = "DATETIME")
+    @Temporal(TemporalType.DATE)
+    @Column(name = "register_date", nullable = false, columnDefinition = "DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date registerDate;
 
