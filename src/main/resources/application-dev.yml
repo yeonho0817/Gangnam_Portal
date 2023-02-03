@@ -1,13 +1,17 @@
 
 
 server:
-  port: 8081
+  port: 8080
 
 spring:
+  config:
+    activate:
+      on-profile: dev
+
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://host.docker.internal:3306/gangnam_portal?useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://host.docker.internal:host-gateway/gangnam_portal?autoReconnect=true&useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: 1234
 
@@ -27,6 +31,7 @@ spring:
           web: error
 
   jpa:
+    database: MYSQL
     open-in-view: true
     hibernate:
       ddl-auto: update
@@ -52,7 +57,8 @@ spring:
     token-validity-in-seconds: 86400
 
   redis:
-    host: localhost
+#    host: redis
+    host: 10.1.0.23
     port: 6379
 
   security:
