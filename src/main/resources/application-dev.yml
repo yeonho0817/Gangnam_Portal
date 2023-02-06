@@ -11,9 +11,11 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://host.docker.internal:host-gateway/gangnam_portal?autoReconnect=true&useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://mysql:3306/gangnam_portal?autoReconnect=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: 1234
+#    username: admin
+#    password: s2cur1ty!
 
   output:
     ansi:
@@ -31,7 +33,7 @@ spring:
           web: error
 
   jpa:
-    database: MYSQL
+    database: mysql
     open-in-view: true
     hibernate:
       ddl-auto: update
@@ -40,7 +42,9 @@ spring:
       use-new-id-generator-mappings: false
     show-sql: true
     properties:
-      hibernate.format_sql: true
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     jackson:
       serialization:
         fail-on-empty-beans: false
@@ -57,8 +61,7 @@ spring:
     token-validity-in-seconds: 86400
 
   redis:
-#    host: redis
-    host: 10.1.0.23
+    host: redis
     port: 6379
 
   security:
@@ -68,8 +71,8 @@ spring:
           google:
             clientId: "424375373540-j04m9bjbvrdgt7tc9gb8cnp5kkf9vncn.apps.googleusercontent.com"
             clientSecret: "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"
-            redirectUri: "http://gangnamServer.com:8080/auth/google/callback"
-            #            redirectUri: "http://localhost:8080/auth/google/callback"
+#            redirectUri: "http://gangnamServer.com:8080/auth/google/callback"
+            redirectUri: "http://localhost:8080/auth/google/callback"
             loginUri: "https://accounts.google.com/o/oauth2/v2/auth"
             tokenUri: "https://oauth2.googleapis.com/token"
             userInfoUri: "https://oauth2.googleapis.com/tokeninfo"
@@ -85,6 +88,7 @@ spring:
             scope: account_email
         provider:
           kakao:
+#            redirectUri: "http://gangnamServer.com:8080/auth/kakao/callback"
             redirectUri: "http://gangnamServer.com:8080/auth/kakao/callback"
             loginUri : "https://kauth.kakao.com/oauth/authorize"
             tokenUri: "https://kauth.kakao.com/oauth/token"

@@ -1,7 +1,6 @@
 # build 
 # maven을 사용하기 위해 미리 설정된 이미지 파일을 불러오는 것
 FROM maven:3.8.6-jdk-11 AS build
-ARG PROFILE=dev
 
 RUN mkdir gnpt-api
 WORKDIR gnpt-api

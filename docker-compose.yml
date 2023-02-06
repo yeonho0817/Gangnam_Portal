@@ -1,24 +1,40 @@
 version: "3"
 services:
-#  mysql:
-#    image: mysql
-#    environment:
-#      MYSQL_DATABASE: gangnam_portal
-#      MYSQL_ROOT_PASSWORD: 1234
-#      MYSQL_ROOT_HOST: '%'
-#    ports:
-#      - 3307:3307
-#
-#  redis:
-#    image: redis
-#    ports:
-#      - 6379:6379
-
   gangnam_portal:
+    image: tlcyh/gangnam_portal
     build: .
+    links:
+      - mysql
+      - redis
     ports:
       - 8080:8080
-#    depends_on:
-#      - mysql
-#      - redis
+    environment:
+      - TZ=Asia/Seoul
+    depends_on:
+      - mysql
+      - redis
+
+
+  mysql:
+    image: tlcyh/mysql
+    environment:
+      MYSQL_DATABASE: gangnam_portal
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_HOST: '%'
+
+    command:
+      - --character-set-server=utf8
+      - --collation-server=utf8_general_ci
+    ports:
+      - 3306:3306
+
+
+
+  redis:
+    image: redis:alpine
+    container_name: redis_service
+    command: redis-server --port 6379
+    ports:
+      - 6379:6379
+
 
