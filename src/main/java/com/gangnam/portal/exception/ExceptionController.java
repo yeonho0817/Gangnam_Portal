@@ -3,6 +3,7 @@ package com.gangnam.portal.exception;
 import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -18,6 +19,9 @@ import java.util.Objects;
 @RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
 @Slf4j
 public class ExceptionController {
+
+    @Value("${frontRedirect}")
+    private String frontRedirect;
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e) {
@@ -39,7 +43,7 @@ public class ExceptionController {
         if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_LOGIN_EMAIL) {
             String encodeMessage = URLEncoder.encode(errorResponseEntity.getBody().getMessage(), "UTF-8");
 
-            response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + errorResponseEntity.getBody().getStatus() + "&code=" + errorResponseEntity.getBody().getError() + "&message=" + encodeMessage);
+            response.setHeader("Location", frontRedirect + "/beforeEnter?status=" + errorResponseEntity.getBody().getStatus() + "&code=" + errorResponseEntity.getBody().getError() + "&message=" + encodeMessage);
             response.setStatus(302);
 
             return null;

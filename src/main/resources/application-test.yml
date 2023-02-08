@@ -1,18 +1,22 @@
 
-frontRedirect: "http://portal.gn.com"
+frontRedirect: "http://localhost:3000"
 
 server:
-  port: 8080
+  port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
 
 
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: test
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql:3306/gangnam_portal?autoReconnect=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3307/gangnam_portal?useSSL=false&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: 1234
 
@@ -41,9 +45,7 @@ spring:
       use-new-id-generator-mappings: false
     show-sql: true
     properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+      hibernate.format_sql: true
     jackson:
       serialization:
         fail-on-empty-beans: false
@@ -60,7 +62,7 @@ spring:
     token-validity-in-seconds: 86400
 
   redis:
-    host: redis
+    host: localhost
     port: 6379
 
   security:
@@ -70,7 +72,8 @@ spring:
           google:
             clientId: "424375373540-j04m9bjbvrdgt7tc9gb8cnp5kkf9vncn.apps.googleusercontent.com"
             clientSecret: "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"
-            redirectUri: "http://10.220.230.27.nip.io:8080/auth/google/callback"
+            redirectUri: "http://gangnamserver.com:8081/auth/google/callback"
+#            redirectUri: "http://localhost:8080/auth/google/callback"
             loginUri: "https://accounts.google.com/o/oauth2/v2/auth"
             tokenUri: "https://oauth2.googleapis.com/token"
             userInfoUri: "https://oauth2.googleapis.com/tokeninfo"
@@ -86,7 +89,7 @@ spring:
             scope: account_email
         provider:
           kakao:
-            redirectUri: "http://portal.gn.com:8080/auth/kakao/callback"
+            redirectUri: "http://gangnamserver.com:8081/auth/kakao/callback"
             loginUri : "https://kauth.kakao.com/oauth/authorize"
             tokenUri: "https://kauth.kakao.com/oauth/token"
             userInfoUri: "https://kapi.kakao.com/v2/user/me"
@@ -98,7 +101,7 @@ spring:
       secretKey: "aLsQzQMHjr7pGgjsqPrCAN09ZS%2FxRdjV2yB1%2FF%2FxkrBZsXUhUzUB%2FPRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA%3D%3D"
     subway:
       apiUri: "http://swopenAPI.seoul.go.kr/api/subway"
-      #      secretKey: "747967775364757338377456677458"
+#      secretKey: "747967775364757338377456677458"
       secretKey: "5361664e5064757339387276447346"
     holiday:
       apiUri: "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getAnniversaryInfo"

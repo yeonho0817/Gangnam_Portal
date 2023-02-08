@@ -41,7 +41,6 @@ public class HumanResourceService {
         System.out.println(sort + " " + orderBy);
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
 
-        System.out.println(queryConditionDTO.getSort() + " " + queryConditionDTO.getOrderBy());
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
                 Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
 

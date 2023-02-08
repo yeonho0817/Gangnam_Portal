@@ -19,10 +19,11 @@ RUN mkdir gnpt-api
 WORKDIR gnpt-api
 COPY --from=build /gnpt-api/target/portal-0.0.1-SNAPSHOT.jar .
 
-CMD ["java","-jar", "-Dspring.profiles.active=dev", "/gnpt-api/portal-0.0.1-SNAPSHOT.jar"]
+CMD ["java","-jar", "-Dspring.profiles.active=ip", "/gnpt-api/portal-0.0.1-SNAPSHOT.jar"]
+# CMD ["java","-jar", "/gnpt-api/portal-0.0.1-SNAPSHOT.jar"]
 
 
 
-# COPY --from=build /usr/src/app/target/helloworld-1.0.0-SNAPSHOT.jar /usr/app/helloworld-1.0.0-SNAPSHOT.jar  
-# EXPOSE 8080  
+# COPY --from=build /usr/src/app/target/helloworld-1.0.0-SNAPSHOT.jar /usr/app/helloworld-1.0.0-SNAPSHOT.jar
+# EXPOSE 8080
 # ENTRYPOINT ["java","-jar","/usr/app/helloworld-1.0.0-SNAPSHOT.jar"]

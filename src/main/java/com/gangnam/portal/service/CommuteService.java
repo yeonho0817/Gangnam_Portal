@@ -194,10 +194,11 @@ public class CommuteService {
 
     // excel
     @Transactional(readOnly = true)
-    public ResponseData<List<CommuteDTO.CommuteExcelData>> commuteExcel(String startDate, String endDate, String name) {
+    public ResponseData<List<CommuteDTO.CommuteExcelData>> commuteExcel(String startDate, String endDate, Long employeeId) {
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(startDate, endDate);
-        List<CommuteDTO.CommuteExcelData> commuteExcelDataList = commuteCustomRepository.findCommuteExcel(queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), name);
-        List<EmployeeDTO.EmployeeSimpleInfo> employeeList = employeeCustomRepository.findByNameOrderByIdAsc(name);
+        if (employeeId == 0) employeeId = null;
+        List<CommuteDTO.CommuteExcelData> commuteExcelDataList = commuteCustomRepository.findCommuteExcel(queryConditionDTO.getStartDate(), queryConditionDTO.getEndDate(), employeeId);
+        List<EmployeeDTO.EmployeeSimpleInfo> employeeList = employeeCustomRepository.findByEmployeeIdOrderByIdAsc(employeeId);
 
         // 시작 날짜
         Calendar startCalendar = Calendar.getInstance();
@@ -213,8 +214,6 @@ public class CommuteService {
 
     // 휴일 + 요일 가공
     private List<CommuteDTO.CommuteStateData> getStateData(List<CommuteDTO.CommuteStateData> commuteStateDataList) throws Exception {
-
-
         Calendar calendar = Calendar.getInstance();
         return commuteStateDataList.stream()
                 .peek(commuteStateData -> {
@@ -225,7 +224,7 @@ public class CommuteService {
                         // 요일 설정
                         commuteStateData.setRegisterDate(commuteStateData.getRegisterDate() + " (" + getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK)).charAt(0) + ")");
 
-//                         휴일 설정
+                        // 휴일 설정
                         if (commuteStateData.getHolidayName() == null ) {
                             if (getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK)).equals("일요일")) commuteStateData.setHolidayName("일요일");
                             else if (getDayOfTheWeek(calendar.get(Calendar.DAY_OF_WEEK)).equals("토요일")) commuteStateData.setHolidayName("토요일");
@@ -256,6 +255,7 @@ public class CommuteService {
                 int numDayOfTheWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
                 if (index < commuteExcelDataList.size() &&
+                    Objects.equals(employeeList.get(i).getEmployeeNo(), commuteExcelDataList.get(index).getEmployeeNo()) &&
                     formatter.format(calendar.getTime()).equals(commuteExcelDataList.get(index).getRegisterDate()) ) {
                         newCommuteExcelDataList.add(commuteExcelDataBuilder(employeeList.get(i), numDayOfTheWeek, commuteExcelDataList.get(index).getRegisterDate(), commuteExcelDataList.get(index).getStartDate(), commuteExcelDataList.get(index).getEndDate()));
                         index++;

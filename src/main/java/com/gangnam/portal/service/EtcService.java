@@ -44,6 +44,9 @@ public class EtcService {
         EtcDTO.WeatherInfo weatherInfo = null;
 
         try {
+            regionCoordinate.setLatitude(37.4964091);
+            regionCoordinate.setLongitude(127.029695);
+
             EtcDTO.RegionCodeDTO regionCodeDTO = weather.regionCodeInfo(regionCoordinate);
 
             weatherInfo = weather.lookUpWeather(regionCodeDTO);

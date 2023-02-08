@@ -126,8 +126,8 @@ public class CommuteController {
     })
     public ResponseData<List<CommuteDTO.CommuteExcelData>> excelData(@Parameter(description = "시작 날짜") @RequestParam(required = false) String startDate,
                                                                      @Parameter(description = "끝 날짜") @RequestParam(required = false) String endDate,
-                                                                     @Parameter(description = "이름") @RequestParam(required = false) String name) {
+                                                                     @Parameter(description = "이름") @RequestParam(required = false) Long employeeId) {
 
-        return commuteService.commuteExcel(startDate, endDate, name);
+        return commuteService.commuteExcel(startDate, endDate, employeeId);
     }
 }

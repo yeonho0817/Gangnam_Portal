@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -24,6 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 //@Tag(name = "authorization")
 public class AuthController {
     private final AuthService authService;
+
+    @Value("${frontRedirect}")
+    private String frontRedirect;
 
     //구글 - 로그인 API 주소 넘기는 것
     @GetMapping("/google/login")
@@ -51,7 +55,7 @@ public class AuthController {
         AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.google);
 
 //        response.setHeader("Location", "http://tlc.gangnam-portal.kro.kr:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
-        response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
+        response.setHeader("Location", frontRedirect + "/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
 
         response.setStatus(302);
     }
@@ -81,7 +85,7 @@ public class AuthController {
     public void redirectInfoOfKakao(HttpServletResponse response, @RequestParam(value = "code") String authCode) {
         AuthDTO.TokenDTO tokenDto = authService.redirectLogin(authCode, Provider.kakao);
 
-        response.setHeader("Location", "http://localhost:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
+        response.setHeader("Location", frontRedirect + "/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
 //        response.setHeader("Location", "http://tlc.gangnam-portal.kro.kr:3000/beforeEnter?status=" + 200 + "&accessToken=" + tokenDto.getAccessToken() + "&refreshToken=" + tokenDto.getRefreshToken() + "&role=" + tokenDto.getRole());
 
         response.setStatus(302);

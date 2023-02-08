@@ -249,7 +249,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     }
 
     @Override
-    public List<EmployeeDTO.EmployeeSimpleInfo> findByNameOrderByIdAsc(String name) {
+    public List<EmployeeDTO.EmployeeSimpleInfo> findByEmployeeIdOrderByIdAsc(Long employeeId) {
 //        OrderSpecifier orderSpecifier = new OrderSpecifier(Order.ASC, qEmployee.id);
 
         return jpaQueryFactory.select(Projections.fields(EmployeeDTO.EmployeeSimpleInfo.class,
@@ -271,7 +271,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .join(qEmployee.department, qDepartment)
                 .on(qEmployee.department.id.eq(qDepartment.id))
 
-                .where(containsName(name),
+                .where(eqEmployeeId(employeeId),
                         qEmployee.state.eq(false)
                 )
 
@@ -304,6 +304,12 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                 .fetchOne()
                 ;
 
+    }
+
+    private BooleanExpression eqEmployeeId(Long employeeId) {
+        if (employeeId == null) return null;
+
+        return qEmployee.id.eq(employeeId);
     }
 
     private BooleanExpression containsName(String name) {

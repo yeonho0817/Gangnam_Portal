@@ -1,5 +1,5 @@
 
-frontRedirect: "http://portal.gn.com"
+frontRedirect: "http://10.220.230.27"
 
 server:
   port: 8080
@@ -8,7 +8,7 @@ server:
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: ip
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -86,7 +86,7 @@ spring:
             scope: account_email
         provider:
           kakao:
-            redirectUri: "http://portal.gn.com:8080/auth/kakao/callback"
+            redirectUri: "http://10.220.230.27.nip.io:8080/auth/kakao/callback"
             loginUri : "https://kauth.kakao.com/oauth/authorize"
             tokenUri: "https://kauth.kakao.com/oauth/token"
             userInfoUri: "https://kapi.kakao.com/v2/user/me"

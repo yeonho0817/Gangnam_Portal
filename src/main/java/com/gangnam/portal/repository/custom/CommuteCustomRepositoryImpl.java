@@ -133,7 +133,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
     }
 
     @Override
-    public List<CommuteDTO.CommuteExcelData> findCommuteExcel(Date startDate, Date endDate, String name) {
+    public List<CommuteDTO.CommuteExcelData> findCommuteExcel(Date startDate, Date endDate, Long employeeId) {
         return jpaQueryFactory.select(Projections.fields(CommuteDTO.CommuteExcelData.class,
                         qCommute.id.as("commuteId"),
                         qEmployee.id.as("employeeId"),
@@ -156,7 +156,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 .where(
                         qCommute.registerDate.goe(startDate),
                         qCommute.registerDate.loe(endDate),
-                        containsName(name)
+                        eqEmployeeId(employeeId)
                 )
 
                 .orderBy(
