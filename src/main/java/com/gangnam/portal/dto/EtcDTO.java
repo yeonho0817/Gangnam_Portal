@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 public class EtcDTO {
+
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
@@ -79,16 +80,4 @@ public class EtcDTO {
         private String baseDateTime;
         private List<SubwayInfoData> subwayInfo;
     }
-
-    @Data
-    @AllArgsConstructor
-    @RequiredArgsConstructor
-    @Builder
-    public static class HolidayData {
-        private Long holidayId;
-        private String holidayDate;
-        private String dateName;
-        private Boolean isHoliday;
-    }
-
 }

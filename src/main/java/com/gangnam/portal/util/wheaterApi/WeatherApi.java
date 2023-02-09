@@ -1,12 +1,21 @@
 package com.gangnam.portal.util.wheaterApi;
 
 import com.gangnam.portal.dto.EtcDTO;
+import com.gangnam.portal.dto.Response.ErrorStatus;
+import com.gangnam.portal.dto.WeatherDTO;
+import com.gangnam.portal.exception.CustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,13 +25,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class Weather {
-    private final Integer[] BASE_TIME = {2, 5, 8, 11, 14, 17, 20, 23};
-    private final String[] BASE_TIME_STRING = {"0200", "0500", "0800", "1100", "1400", "1700", "2000", "2300"};
+public class WeatherApi {
+    private final RestTemplate restTemplate;
 
     @Value("${spring.etc.weather.apiUri}")
     private  String apiUri;
@@ -30,13 +40,103 @@ public class Weather {
     @Value("${spring.etc.weather.secretKey}")
     private  String secretKey;
 
-    public EtcDTO.WeatherInfo lookUpWeather(EtcDTO.RegionCodeDTO regionCodeDTO) throws IOException, NullPointerException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");
+    @Value("${spring.etc.weather.secretKeyDecode}")
+    private  String secretKeyDecode;
 
+
+    private final Integer[] BASE_TIME = {2, 5, 8, 11, 14, 17, 20, 23};
+    private final String[] BASE_TIME_STRING = {"0200", "0500", "0800", "1100", "1400", "1700", "2000", "2300"};
+
+    private String baseDate = null;
+    private String baseTime = null;
+    private final Date today = new Date();
+
+    public List<WeatherDTO.Item> test(EtcDTO.RegionCoordinateDTO regionCoordinate) {
+        try {
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");
+
+            setBaseDateTime();
+            EtcDTO.RegionCodeDTO regionCodeDTO = regionCodeInfo(regionCoordinate);
+
+            String nx = regionCodeDTO.getX().toString();	//위도
+            String ny = regionCodeDTO.getY().toString();	//경도
+            String pageNo = "1";
+            String numberOfRows = "300";
+            String type = "json";	//타입 xml, json 등등 ..
+
+            System.out.println(this.baseDate + " " + this.baseTime + " " + timeFormat.format(new Date()));
+
+            UriComponents uri = UriComponentsBuilder
+                        .fromHttpUrl(apiUri)
+                        .queryParam("ServiceKey", URLEncoder.encode(secretKeyDecode, StandardCharsets.UTF_8))
+                        .queryParam("pageNo", URLEncoder.encode(pageNo, StandardCharsets.UTF_8))
+                        .queryParam("numOfRows", URLEncoder.encode(numberOfRows, StandardCharsets.UTF_8))
+                        .queryParam("nx", URLEncoder.encode(nx, StandardCharsets.UTF_8))
+                        .queryParam("ny", URLEncoder.encode(ny, StandardCharsets.UTF_8))
+                        .queryParam("base_date", URLEncoder.encode(this.baseDate, StandardCharsets.UTF_8))
+                        .queryParam("base_time", URLEncoder.encode(this.baseTime, StandardCharsets.UTF_8))
+                        .queryParam("dataType", URLEncoder.encode(type, StandardCharsets.UTF_8))
+                    .build();
+
+            System.out.println(uri);
+
+            HttpMessageConverter<String> stringHttpMessageConverter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
+            List<HttpMessageConverter<?>> httpMessageConverter = new ArrayList<>();
+            httpMessageConverter.add(stringHttpMessageConverter);
+            restTemplate.setMessageConverters(httpMessageConverter);
+
+
+            HttpHeaders header = new HttpHeaders();
+            header.set("content-type", "application/json");
+            header.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<?> entity = new HttpEntity<>(header);
+
+            ResponseEntity<WeatherDTO> response = this.restTemplate.exchange(
+                    uri.toUriString(),
+                    HttpMethod.GET,
+                    entity,
+                    WeatherDTO.class);
+
+            System.out.println(response);
+
+            return null;
+//            return Objects.requireNonNull(response.getBody()).getResponse().getBody().getItems().getItem();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CustomException(ErrorStatus.WEATHER_INFO_FAIL);
+        }
+    }
+
+    private void setBaseDateTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
 
-        Date today = new Date();
+        int intBaseDate = Integer.parseInt(dateFormat.format(today));
+
+        int currentHour = Integer.parseInt(hourFormat.format(new Date()));
+
+        if (currentHour <= BASE_TIME[0]) {
+            this.baseDate = String.valueOf(--intBaseDate);
+
+            this.baseTime = BASE_TIME_STRING[7];
+        } else {
+            for (int i=1; i<BASE_TIME.length; i++) {
+                if (currentHour <= BASE_TIME[i]) {
+                    this.baseDate = dateFormat.format(today);
+                    this.baseTime = BASE_TIME_STRING[i-1];
+                    break;
+                }
+            }
+            if (this.baseTime == null) this.baseTime = BASE_TIME_STRING[7];
+        }
+    }
+
+
+    public EtcDTO.WeatherInfo lookUpWeather(EtcDTO.RegionCodeDTO regionCodeDTO) throws IOException, NullPointerException {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");
+        SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
+
+        setBaseDateTime();
 
         String nx = regionCodeDTO.getX().toString();	//위도
         String ny = regionCodeDTO.getY().toString();	//경도
@@ -44,39 +144,20 @@ public class Weather {
         String numberOfRows = "300";
         String type = "JSON";	//타입 xml, json 등등 ..
 
-        Integer baseDate = Integer.parseInt(dateFormat.format(today));
-//        Integer baseDate = 20230130;
-        String baseTime = null;
-
-        Integer currentHour = Integer.parseInt(hourFormat.format(new Date()));
-//        Integer currentHour = 0;
-
-        if (currentHour <= BASE_TIME[0]) {
-            baseDate--;
-            baseTime = BASE_TIME_STRING[7];
-        } else {
-            for (int i=1; i<BASE_TIME.length; i++) {
-                if (currentHour <= BASE_TIME[i]) {
-                    baseTime = BASE_TIME_STRING[i-1];
-                    break;
-                }
-            }
-
-            if (baseTime == null) baseTime = BASE_TIME_STRING[7];
-        }
-
-        System.out.println(nx + " " + ny + " " + baseDate + " " + baseTime + " " + timeFormat.format(new Date()));
+        System.out.println(this.baseDate + " " + this.baseTime + " " + timeFormat.format(new Date()));
 
         String urlBuilder = apiUri + "?" + URLEncoder.encode("ServiceKey", StandardCharsets.UTF_8) + "=" + secretKey +
                 "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(pageNo, StandardCharsets.UTF_8) + //페이지번호
                 "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(numberOfRows, StandardCharsets.UTF_8) + //한페이지 표시할 갯수
                 "&" + URLEncoder.encode("nx", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(nx, StandardCharsets.UTF_8) + //경도
                 "&" + URLEncoder.encode("ny", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(ny, StandardCharsets.UTF_8) + //위도
-                "&" + URLEncoder.encode("base_date", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(String.valueOf(baseDate), StandardCharsets.UTF_8) + /* 조회하고싶은 날짜*/
-                "&" + URLEncoder.encode("base_time", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(baseTime, StandardCharsets.UTF_8) + /* 조회하고싶은 시간 AM 02시부터 3시간 단위 */
+                "&" + URLEncoder.encode("base_date", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(this.baseDate, StandardCharsets.UTF_8) + /* 조회하고싶은 날짜*/
+                "&" + URLEncoder.encode("base_time", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(this.baseTime, StandardCharsets.UTF_8) + /* 조회하고싶은 시간 AM 02시부터 3시간 단위 */
                 "&" + URLEncoder.encode("dataType", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(type, StandardCharsets.UTF_8);    /* 타입 */
 
+
         URL url = new URL(urlBuilder);
+        System.out.println(url);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
@@ -94,6 +175,8 @@ public class Weather {
         rd.close();
         conn.disconnect();
         String result= sb.toString();
+
+        System.out.println(result);
 
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(result);

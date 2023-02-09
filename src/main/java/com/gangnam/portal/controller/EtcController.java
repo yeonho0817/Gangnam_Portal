@@ -67,7 +67,7 @@ public class EtcController {
 
     @GetMapping("/test")
     @ApiIgnore
-    public ResponseData<EtcDTO.SubwayInfo> test(@Parameter Long id) {
+    public void test(@Parameter Long id) {
         /*Random random = new Random();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
@@ -125,10 +125,10 @@ public class EtcController {
 
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");*/
 
-        etcService.holidayInfo();
+        etcService.test();
 
 //        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.SubwayInfo(formatter.format(new Date()), subwayInfoList));
-        return null;
+//        return null;
     }
 
 }

@@ -3,8 +3,7 @@ package com.gangnam.portal.service;
 import com.gangnam.portal.domain.Employee;
 import com.gangnam.portal.domain.Fortune;
 import com.gangnam.portal.domain.Holiday;
-import com.gangnam.portal.dto.AuthenticationDTO;
-import com.gangnam.portal.dto.EtcDTO;
+import com.gangnam.portal.dto.*;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
@@ -13,8 +12,8 @@ import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.FortuneRepository;
 import com.gangnam.portal.repository.HolidayRepository;
 import com.gangnam.portal.util.holidayApi.HolidayApi;
-import com.gangnam.portal.util.subwayApi.Subway;
-import com.gangnam.portal.util.wheaterApi.Weather;
+import com.gangnam.portal.util.subwayApi.SubwayApi;
+import com.gangnam.portal.util.wheaterApi.WeatherApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +30,8 @@ public class EtcService {
     private final EmployeeRepository employeeRepository;
     private final HolidayRepository holidayRepository;
     private final FortuneRepository fortuneRepository;
-    private final Weather weather;
-    private final Subway subway;
+    private final WeatherApi weatherApi;
+    private final SubwayApi subwayApi;
     private final HolidayApi holidayApi;
 
     // 날씨 api
@@ -47,9 +43,9 @@ public class EtcService {
             regionCoordinate.setLatitude(37.4964091);
             regionCoordinate.setLongitude(127.029695);
 
-            EtcDTO.RegionCodeDTO regionCodeDTO = weather.regionCodeInfo(regionCoordinate);
+            EtcDTO.RegionCodeDTO regionCodeDTO = weatherApi.regionCodeInfo(regionCoordinate);
 
-            weatherInfo = weather.lookUpWeather(regionCodeDTO);
+            weatherInfo = weatherApi.lookUpWeather(regionCodeDTO);
         } catch(IOException | NullPointerException e) {
             throw new CustomException(ErrorStatus.WEATHER_INFO_FAIL);
         }
@@ -94,15 +90,30 @@ public class EtcService {
     }
 
     public ResponseData<EtcDTO.SubwayInfo> subwayInfo() {
-        List<EtcDTO.SubwayInfoData> subwayInfoList = null;
-        try {
-            subwayInfoList = subway.subwayInfo();
-        } catch (IOException | NullPointerException e) {
-            throw new CustomException(ErrorStatus.SUBWAY_INFO_FAIL);
+        List<EtcDTO.SubwayInfoData> subwayInfoList = new ArrayList<>();
+
+        List<SubwayDTO.Realtimearrivallist> realtimearrivallistList = subwayApi.subwayInfo();
+
+        for (SubwayDTO.Realtimearrivallist realtimearrivallist: realtimearrivallistList) {
+            String direction = realtimearrivallist.getTrainlinenm().split(" - ")[1];
+
+            String currentPosition = realtimearrivallist.getArvlmsg3();
+            String time = realtimearrivallist.getArvlmsg2();
+
+            if (time.contains("번째 전역")) time = currentPosition + "(" + time.split("]번째 전역")[0].substring(1) + " 전)";
+
+            EtcDTO.SubwayInfoData subwayInfo = EtcDTO.SubwayInfoData.builder()
+                    .direction(direction)
+                    .time(time)
+                    .currentPosition(currentPosition)
+                    .build();
+
+            subwayInfoList.add(subwayInfo);
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        subwayInfoList.sort(Comparator.comparing(EtcDTO.SubwayInfoData::getDirection));
 
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.SubwayInfo(formatter.format(new Date()), subwayInfoList));
     }
 
@@ -113,14 +124,14 @@ public class EtcService {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
 
-            List<EtcDTO.HolidayData> holidayDataList = holidayApi.holidayInfo(calendar.get(Calendar.YEAR)+1);
+            List<HolidayDTO.HolidayItem> holidayItemList = holidayApi.holidayInfo(calendar.get(Calendar.YEAR)+1);
 
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-            for (EtcDTO.HolidayData holidayData : holidayDataList) {
+            for (HolidayDTO.HolidayItem holidayItem : holidayItemList) {
                 Holiday newHoliday = Holiday.builder()
-                        .dateName(holidayData.getDateName())
-                        .holidayDate(formatter.parse(holidayData.getHolidayDate()))
+                        .dateName(holidayItem.getDatename())
+                        .holidayDate(formatter.parse(holidayItem.getLocdate().substring(0, 4) + "-" + holidayItem.getLocdate().substring(4, 6) + "-" + holidayItem.getLocdate().substring(6, 8)))
 
                         .build();
 
@@ -129,6 +140,19 @@ public class EtcService {
 
         } catch (Exception e) {
             throw new CustomException(ErrorStatus.HOLIDAY_INFO_FAIL);
+        }
+    }
+
+    public void test() {
+        try{
+            EtcDTO.RegionCoordinateDTO regionCoordinateDTO = new EtcDTO.RegionCoordinateDTO(37.4964091, 127.029695);
+
+            List<WeatherDTO.Item> itemList = weatherApi.test(regionCoordinateDTO);
+
+            System.out.println(itemList);
+
+        } catch (Exception e) {
+            throw new CustomException(ErrorStatus.WEATHER_INFO_FAIL);
         }
     }
 }

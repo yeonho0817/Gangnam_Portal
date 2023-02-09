@@ -19,7 +19,7 @@ RUN mkdir gnpt-api
 WORKDIR gnpt-api
 COPY --from=build /gnpt-api/target/portal-0.0.1-SNAPSHOT.jar .
 
-CMD ["java","-jar", "-Dspring.profiles.active=ip", "/gnpt-api/portal-0.0.1-SNAPSHOT.jar"]
+CMD ["java","-jar", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "/gnpt-api/portal-0.0.1-SNAPSHOT.jar"]
 # CMD ["java","-jar", "/gnpt-api/portal-0.0.1-SNAPSHOT.jar"]
 
 

@@ -101,9 +101,10 @@ spring:
       #      secretKey: "747967775364757338377456677458"
       secretKey: "5361664e5064757339387276447346"
     holiday:
-      apiUri: "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getAnniversaryInfo"
+      apiUri: "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
       secretKey: "aLsQzQMHjr7pGgjsqPrCAN09ZS%2FxRdjV2yB1%2FF%2FxkrBZsXUhUzUB%2FPRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA%3D%3D"
       secretKeyDecoding: "aLsQzQMHjr7pGgjsqPrCAN09ZS/xRdjV2yB1/F/xkrBZsXUhUzUB/PRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA=="
+      numberOfRows: 100
 
 springdoc:
   swagger-ui:
