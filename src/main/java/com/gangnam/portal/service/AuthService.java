@@ -64,7 +64,7 @@ public class AuthService {
                     .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_LOGIN_EMAIL));
 
         } else if (provider == Provider.kakao) {
-            String kakaoAccessToken = kaKaoLoginInfo.getKaKaoAccessToken(authCode);
+            String kakaoAccessToken = kaKaoLoginInfo.getKaKaoAccessTokenTest(authCode);
 
             email = kaKaoLoginInfo.getKakaoUserInfo(kakaoAccessToken);
 

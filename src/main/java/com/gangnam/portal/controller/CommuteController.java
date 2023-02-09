@@ -70,7 +70,7 @@ public class CommuteController {
     // 출퇴근 등록 - 관리자 기능      O
 
     @PostMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")       // -> 얘 동작안함.
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "commuteCreate", summary = "출근 등록 API(관리자 권한)", description = "사원이 등록하지 못한 출퇴근 정보를 추가합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "출퇴근 등록",
