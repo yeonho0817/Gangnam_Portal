@@ -2,6 +2,8 @@ package com.gangnam.portal.util.jwt;
 
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -14,6 +16,7 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void commence(HttpServletRequest request,
@@ -52,6 +55,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     }
 
     private void printLog(Integer errorStatus, String errorCode, String errorMessage) {
+        logger.error("Exception JWT\n\tError Status - {}\n\tError Code - {}\n\tError Message - {}", errorStatus, errorCode, errorMessage);
         log.error("Exception JWT\n\tError Status - {}\n\tError Code - {}\n\tError Message - {}", errorStatus, errorCode, errorMessage);
     }
 }

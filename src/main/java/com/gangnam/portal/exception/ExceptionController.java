@@ -2,7 +2,10 @@ package com.gangnam.portal.exception;
 
 import com.gangnam.portal.dto.Response.ErrorResponse;
 import com.gangnam.portal.dto.Response.ErrorStatus;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -18,7 +21,9 @@ import java.util.Objects;
 
 @RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
 @Slf4j
+@RequiredArgsConstructor
 public class ExceptionController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value("${frontRedirect}")
     private String frontRedirect;
@@ -83,6 +88,7 @@ public class ExceptionController {
     }
 
     private void printLog(Integer errorStatus, String errorCode, String errorMessage) {
+        logger.error("Exception Handler\n\tError Status - {}\n\tError Code - {}\n\tError Message - {}", errorStatus, errorCode, errorMessage);
         log.error("Exception Handler\n\tError Status - {}\n\tError Code - {}\n\tError Message - {}", errorStatus, errorCode, errorMessage);
     }
 }

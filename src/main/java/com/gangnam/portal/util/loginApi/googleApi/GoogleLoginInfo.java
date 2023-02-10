@@ -3,6 +3,7 @@ package com.gangnam.portal.util.loginApi.googleApi;
 import com.gangnam.portal.dto.LoginApiDTO;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.exception.CustomException;
+import com.gangnam.portal.util.loginApi.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,18 +16,41 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class GoogleLoginInfo {
+public class GoogleLoginInfo implements LoginInfo {
     @Autowired
     private final RestTemplate restTemplate;
 
     private final GoogleConfigUtils googleConfigUtils;
 
-    public ResponseEntity<Object> googleLoginUri() {
-        String authUrl = googleConfigUtils.googleInitUrl();
+    @Override
+    public String getInitUrl() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("client_id", googleConfigUtils.getGoogleClientId());
+        params.put("redirect_uri", googleConfigUtils.getGoogleRedirectUrl());
+        params.put("response_type", "code");
+        params.put("scope", googleConfigUtils.getScopeUrl());
+        params.put("prompt", "select_account");
+
+        String paramStr = params.entrySet().stream()
+                .map(param -> param.getKey() + "=" + param.getValue())
+                .collect(Collectors.joining("&"));
+
+        return googleConfigUtils.getGoogleLoginUrl()
+                + "?"
+                + paramStr;
+    }
+
+
+    @Override
+    public ResponseEntity<Object> getLoginUri() {
+        String authUrl = getInitUrl();
 
         URI redirectUri = null;
         try {
@@ -42,7 +66,8 @@ public class GoogleLoginInfo {
         return null;
     }
 
-    public String getGoogleAccessToken(String authCode ) {
+    @Override
+    public String getAccessToken(String authCode ) {
         try {
             UriComponents uri = UriComponentsBuilder
                     .fromHttpUrl(googleConfigUtils.getGoogleTokenUrl())
@@ -69,7 +94,8 @@ public class GoogleLoginInfo {
         }
     }
 
-    public String getGoogleUserInfo(String accessToken) {
+    @Override
+    public String getUserInfo(String accessToken) {
         try {
             UriComponents uri = UriComponentsBuilder
                     .fromHttpUrl(googleConfigUtils.getGoogleUserInfoUrl())

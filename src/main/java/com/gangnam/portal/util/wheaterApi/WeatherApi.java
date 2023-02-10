@@ -100,7 +100,6 @@ public class WeatherApi {
             System.out.println(response);
 
             return null;
-//            return Objects.requireNonNull(response.getBody()).getResponse().getBody().getItems().getItem();
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(ErrorStatus.WEATHER_INFO_FAIL);
@@ -175,8 +174,6 @@ public class WeatherApi {
         rd.close();
         conn.disconnect();
         String result= sb.toString();
-
-        System.out.println(result);
 
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(result);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gangnam.portal.dto.Response.ErrorStatus;
 import com.gangnam.portal.exception.CustomException;
+import com.gangnam.portal.util.loginApi.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -16,18 +17,39 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class KaKaoLoginInfo {
+public class KaKaoLoginInfo implements LoginInfo {
     @Autowired
     private final RestTemplate restTemplate;
 
     private final KakaoConfigUtils kakaoConfigUtils;
 
-    public ResponseEntity<Object> kakaoLoginUri() {
+    @Override
+    public String getInitUrl() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("client_id", kakaoConfigUtils.getKakaoClientId());
+        params.put("redirect_uri", kakaoConfigUtils.getKakaoRedirectUrl());
+        params.put("response_type", "code");
+        params.put("scope", kakaoConfigUtils.getScopes());
+        params.put("prompt", "login");
 
-        String authUrl = kakaoConfigUtils.kakaoInitUrl();
+        String paramStr = params.entrySet().stream()
+                .map(param -> param.getKey() + "=" + param.getValue())
+                .collect(Collectors.joining("&"));
+
+        return kakaoConfigUtils.getKakaoLoginUrl()
+                + "?"
+                + paramStr;
+    }
+    @Override
+    public ResponseEntity<Object> getLoginUri() {
+
+        String authUrl = getInitUrl();
 
         URI redirectUri = null;
         try {
@@ -43,7 +65,8 @@ public class KaKaoLoginInfo {
         return null;
     }
 
-    public String getKaKaoAccessTokenTest(String authCode) {
+    @Override
+    public String getAccessToken(String authCode) {
         try {
             UriComponents uri = UriComponentsBuilder
                     .fromHttpUrl(kakaoConfigUtils.getKakaoTokenUrl())
@@ -78,7 +101,8 @@ public class KaKaoLoginInfo {
         }
     }
 
-    public String getKakaoUserInfo(String accessToken) {
+    @Override
+    public String getUserInfo(String accessToken) {
         try {
             UriComponents uri = UriComponentsBuilder
                     .fromHttpUrl(kakaoConfigUtils.getKakaoUserInfoUrl())

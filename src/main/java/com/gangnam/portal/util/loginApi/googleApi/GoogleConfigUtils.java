@@ -3,10 +3,6 @@ package com.gangnam.portal.util.loginApi.googleApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Component
 public class GoogleConfigUtils {
     @Value("${spring.security.oauth2.client.registration.google.tokenUri}")
@@ -30,31 +26,11 @@ public class GoogleConfigUtils {
     @Value("${spring.security.oauth2.client.registration.google.scope}")
     private String scopes;
 
-    // Google 로그인 URL 생성 로직
-    public String googleInitUrl() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("client_id", getGoogleClientId());
-        params.put("redirect_uri", getGoogleRedirectUrl());
-        params.put("response_type", "code");
-        params.put("scope", getScopeUrl());
-        params.put("prompt", "select_account");
-
-        String paramStr = params.entrySet().stream()
-                .map(param -> param.getKey() + "=" + param.getValue())
-                .collect(Collectors.joining("&"));
-
-        return getGoogleLoginUrl()
-                + "?"
-                + paramStr;
-    }
-
     public String getGoogleTokenUrl() {
         return googleTokenUrl;
     }
 
-    public String getGoogleLoginUrl() {
-        return googleLoginUrl;
-    }
+    public String getGoogleLoginUrl() { return googleLoginUrl; }
 
     public String getGoogleRedirectUrl() {
         return googleRedirectUrl;

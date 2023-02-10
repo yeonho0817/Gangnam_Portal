@@ -53,7 +53,7 @@ public class Employee {
     @Column(name = "gender", nullable = false, columnDefinition = "TINYINT(1)")
     private Integer gender;
 
-    @Column(name = "address", nullable = false, columnDefinition = "VARCHAR(150)")
+    @Column(name = "address", nullable = false, columnDefinition = "VARCHAR(200)")
     private String address;
 
     @Column(name = "phone", nullable = false, columnDefinition = "VARCHAR(15)")

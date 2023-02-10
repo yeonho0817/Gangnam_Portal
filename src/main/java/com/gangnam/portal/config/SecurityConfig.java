@@ -75,7 +75,7 @@ public class SecurityConfig {
                 .antMatchers("/auth/logout").permitAll()
                 
                 //권한 부여
-//                .antMatchers("/commute/admin").hasRole("ADMIN")
+                .antMatchers("/commute/admin").hasRole("ADMIN")
 
                 // 나머지는 다 인증 필요
                 .anyRequest().authenticated()

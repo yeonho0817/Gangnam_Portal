@@ -10,8 +10,7 @@ import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.exception.CustomException;
 import com.gangnam.portal.repository.custom.EmployeeEmailCustomRepository;
 import com.gangnam.portal.util.jwt.JwtTokenProvider;
-import com.gangnam.portal.util.loginApi.googleApi.GoogleLoginInfo;
-import com.gangnam.portal.util.loginApi.kakaoApi.KaKaoLoginInfo;
+import com.gangnam.portal.util.loginApi.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final GoogleLoginInfo googleLoginInfo;
-    private final KaKaoLoginInfo kaKaoLoginInfo;
+    private final LoginInfo googleLoginInfo;
+    private final LoginInfo kaKaoLoginInfo;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
@@ -39,9 +38,9 @@ public class AuthService {
         ResponseEntity<Object> responseEntity = null;
 
         if (provider == Provider.google) {
-            responseEntity = googleLoginInfo.googleLoginUri();
+            responseEntity = googleLoginInfo.getLoginUri();
         } else if (provider == Provider.kakao) {
-            responseEntity = kaKaoLoginInfo.kakaoLoginUri();
+            responseEntity = kaKaoLoginInfo.getLoginUri();
         }
 
         Optional.ofNullable(responseEntity)
@@ -56,17 +55,17 @@ public class AuthService {
         EmployeeEmail isExists = null;
 
         if (provider == Provider.google) {
-            String googleAccessToken = googleLoginInfo.getGoogleAccessToken(authCode);
+            String googleAccessToken = googleLoginInfo.getAccessToken(authCode);
 
-            email = googleLoginInfo.getGoogleUserInfo(googleAccessToken);
+            email = googleLoginInfo.getUserInfo(googleAccessToken);
 
             isExists = employeeEmailCustomRepository.isExists(email, Provider.google.name())
                     .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_LOGIN_EMAIL));
 
         } else if (provider == Provider.kakao) {
-            String kakaoAccessToken = kaKaoLoginInfo.getKaKaoAccessTokenTest(authCode);
+            String kakaoAccessToken = kaKaoLoginInfo.getAccessToken(authCode);
 
-            email = kaKaoLoginInfo.getKakaoUserInfo(kakaoAccessToken);
+            email = kaKaoLoginInfo.getUserInfo(kakaoAccessToken);
 
             isExists = employeeEmailCustomRepository.isExists(email, Provider.kakao.name())
                     .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_LOGIN_EMAIL));
