@@ -5,7 +5,6 @@ import com.gangnam.portal.dto.QueryConditionDTO;
 import com.gangnam.portal.dto.Response.ResponseData;
 import com.gangnam.portal.dto.Response.Status;
 import com.gangnam.portal.dto.TeamDTO;
-import com.gangnam.portal.repository.EmployeeRepository;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
 import com.gangnam.portal.repository.custom.TeamCustomRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 public class HumanResourceService {
     private final EmployeeCustomRepository employeeCustomRepository;
     private final TeamCustomRepository teamCustomRepository;
-    private final EmployeeRepository employeeRepository;
 
     // 소속/부서 이름 조회
     @Transactional(readOnly = true)
@@ -36,9 +34,8 @@ public class HumanResourceService {
     }
 
     // 인력 조회
-    @Transactional(readOnly = true)
+    @Transactional()
     public ResponseData<EmployeeDTO.HRInfo> findHumanResource(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
-        System.out.println(sort + " " + orderBy);
         QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
 
         Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
@@ -49,26 +46,19 @@ public class HumanResourceService {
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoList.stream().collect(Collectors.toList())));
     }
 
-//    @Transactional(readOnly = true)
-//    public ResponseData<EmployeeDTO.Test> Test(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
-//        QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
-//
-//        Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
-//                Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
-//
-//        Page<EmployeeDTO.Test> hrInfoList = employeeCustomRepository.test(pageable, selectValue, searchText);
-//
-//        List<EmployeeDTO.Test> hrInfoDataLists = hrInfoList.stream()
-//                .map(employee -> EmployeeDTO.HRInfoDataList.builder()
-//                        .employeeId(employee.getEmployeeId())
-//                        .nameKr(employee.getNameKr())
-//                        .rank(employee.getRank())
-////                        .email(employee.getEmail())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EmployeeDTO.HRInfo(hrInfoList.getTotalPages(), (int) hrInfoList.getTotalElements(), hrInfoDataLists));
-//    }
+    @Transactional(readOnly = true)
+    public ResponseData<EmployeeDTO.Test> test(String sort, String orderBy, String pageSize, String pageNumber, String selectValue, String searchText) {
+        QueryConditionDTO queryConditionDTO = new QueryConditionDTO(sort, orderBy, pageNumber, pageSize);
+
+        Pageable pageable = PageRequest.of(queryConditionDTO.getPageNumber(), queryConditionDTO.getPageSize(),
+                Sort.by(Sort.Direction.fromString(queryConditionDTO.getOrderBy()), queryConditionDTO.getSort()));
+
+        Page<EmployeeDTO.HRInfoData> hrInfoList = employeeCustomRepository.test(pageable, selectValue, searchText);
+
+
+
+        return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), null);
+    }
 
     // 소속/부서 조회
     @Transactional(readOnly = true)

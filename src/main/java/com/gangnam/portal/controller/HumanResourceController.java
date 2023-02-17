@@ -26,6 +26,8 @@ import java.util.List;
 public class HumanResourceController {
     private final HumanResourceService humanResourceService;
 
+    // 사원 정보 조회
+
     // 소속/부서 이름 조회      -  O
     @GetMapping("/teams")
 //    @GetMapping("/teams")
@@ -61,14 +63,14 @@ public class HumanResourceController {
 
     @ApiIgnore
     @GetMapping("/test")
-    public ResponseData<EmployeeDTO.HRInfo> test(
+    public ResponseData<EmployeeDTO.Test> test(
             @Parameter(description = "정렬 기준") @RequestParam(defaultValue = "rank") String sort,
             @Parameter(description = "정렬 방식(ASC, DESC)") @RequestParam(defaultValue = "ASC") String orderBy,
             @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "1") String pageNumber,
             @Parameter(description = "페이지 양") @RequestParam(defaultValue = "10") String pageSize ,
             @Parameter(description = "검색 기준") @RequestParam(required = false) String selectValue,
             @Parameter(description = "검색할 데이터") @RequestParam(required = false) String searchText) {
-        return humanResourceService.findHumanResource(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
+        return humanResourceService.test(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, selectValue, searchText);
     }
 
     // 소속/부서 조회     O
@@ -90,4 +92,5 @@ public class HumanResourceController {
                                                             @RequestParam(required = false) String department) {
         return humanResourceService.findHumanResourceDept(sort.toLowerCase(), orderBy.toUpperCase(), pageSize, pageNumber, name, affiliation, department);
     }
+
 }

@@ -22,11 +22,16 @@ public enum Status {
     // 토큰 재발급
     TOKEN_REISSUE_SUCCESS(200, HttpStatus.OK, "토큰 재발급을 완료했습니다."),
 
-    // 인사조회
+    // 사원 관리
+    SAVE_EMPLOYEE_SUCCESS(200, HttpStatus.OK, "사원 추가를 완료했습니다."),
+    UPDATE_EMPLOYEE_SUCCESS(200, HttpStatus.OK, "사원 정보 수정을 완료했습니다."),
+
+    // 인사 관리
     HUMAN_RESOURCE_SUCCESS(200, HttpStatus.OK, "인력 조회에 성공했습니다."),
     HUMAN_RESOURCE_DEPARTMENT_SUCCESS(200, HttpStatus.OK, "소속/부서 조회에 성공했습니다."),
     FIND_EMPLOYEE_SUCCESS(200, HttpStatus.OK, "해당 직원 정보를 성공적으로 조회했습니다."),
-    UPDATE_EMPLOYEE_INFO_SUCCESS(200, HttpStatus.OK, "회원 정보 수정을 완료했습니다."),
+    FIND_MY_INFO_SUCCESS(200, HttpStatus.OK, "사원 정보를 성공적으로 조회했습니다."),
+    UPDATE_MY_INFO_SUCCESS(200, HttpStatus.OK, "사원 정보 수정을 완료했습니다."),
     READ_SUCCESS(200, HttpStatus.OK, "정상적으로 조회했습니다."),
 
     ;

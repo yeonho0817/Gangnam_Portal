@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
@@ -51,13 +50,17 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
         EmployeeDTO.EmployeeInfoDTO employeeInfoDTO = EmployeeDTO.EmployeeInfoDTO.builder()
                     .employeeId(employee.getId())
                     .employeeNo(employee.getEmployeeNo())
+                    .roleId(employee.getAuthority().getId())
                     .role(employee.getAuthority().getName().toString().substring(5))
                     .nameKr(employee.getNameKr())
                     .nameEn(employee.getNameEn())
                     .birthday(employee.getBirthday().toString())
+                    .rankId(employee.getRanks().getId())
                     .rank(employee.getRanks().getName().name())
+                    .affiliationId(employee.getAffiliation().getId())
                     .affiliation(employee.getAffiliation().getName().name())
-                    .department(employee.getDepartment().getName().name())
+                    .departmentId(employee.getDepartment().getId())
+                    .department(employee.getDepartment().getName().getName())
                     .profileImg(employee.getProfileImg())
                     .gender(employee.getGender() % 2 == 0 ? "여자" : "남자")
                     .phone(employee.getPhone())
@@ -115,7 +118,7 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                         .nameKr(employee.getNameKr())
                         .rank(employee.getRanks().getName().name())
                         .affiliation(employee.getAffiliation().getName().name())
-                        .department(employee.getDepartment().getName().name())
+                        .department(employee.getDepartment().getName().getName())
                         .phone(employee.getPhone())
                         .email(employee.getEmployeeEmailList().stream()
                                 .map(EmployeeEmail::getEmail)
@@ -128,31 +131,37 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     }
 
     @Override
-    public Page<EmployeeDTO.Test> test(Pageable pageable, String selectValue, String searchText) {
-        List<EmployeeDTO.Test> hrInfoDataList = jpaQueryFactory.selectFrom(qEmployee)
-                .join(qEmployee.ranks, qRanks)
-                .leftJoin(qEmployee.employeeEmailList, qEmployeeEmail)
+    public Page<EmployeeDTO.HRInfoData> test(Pageable pageable, String selectValue, String searchText) {
+        List<EmployeeEmail> hrInfoList = jpaQueryFactory.selectFrom(qEmployeeEmail)
+                .rightJoin(qEmployeeEmail.employee, qEmployee).fetchJoin()
+                .leftJoin(qEmployee.ranks, qRanks).fetchJoin()
+                .leftJoin(qEmployee.affiliation, qAffiliation).fetchJoin()
+                .leftJoin(qEmployee.department, qDepartment).fetchJoin()
 
-                .distinct()
+                .where(containsSearchText(selectValue, searchText),
+                        qEmployee.state.eq(false))
 
                 .orderBy(humanResourceSort(pageable))
 
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
 
-                .transform(
-                        groupBy(qEmployeeEmail.id)
-                                .list(
-                                        Projections.constructor(EmployeeDTO.Test.class,
-                                            list(Projections.constructor(EmployeeDTO.EmailInfo.class, qEmployeeEmail.email)),
-                                                qEmployee.id.as("employeeId"),
-                                                qEmployee.nameKr.as("nameKr"),
-                                                qRanks.name.stringValue().as("rank")
-                                        )
-                                )
-                )
+                .fetch();
 
-                ;
+        List<EmployeeDTO.HRInfoData> hrInfoDataList = hrInfoList.stream()
+                .map(employeeEmail ->  EmployeeDTO.HRInfoData.builder()
+                        .employeeId(employeeEmail.getEmployee().getId())
+                        .nameKr(employeeEmail.getEmployee().getNameKr())
+                        .rank(employeeEmail.getEmployee().getRanks().getName().name())
+                        .affiliation(employeeEmail.getEmployee().getAffiliation().getName().name())
+                        .department(employeeEmail.getEmployee().getDepartment().getName().getName())
+                        .phone(employeeEmail.getEmployee().getPhone())
+                        .email(employeeEmail.getEmployee().getEmployeeEmailList().stream()
+                                .map(EmployeeEmail::getEmail)
+                                .collect(Collectors.toList()))
+
+                        .build())
+                .collect(Collectors.toList());
 
         return new PageImpl<>(hrInfoDataList, pageable, getHRTotalPage(selectValue, searchText));
     }

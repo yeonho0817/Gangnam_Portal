@@ -54,7 +54,7 @@ public class EtcService {
     }
 
     // 운세 api
-    @Transactional(rollbackFor = {Exception.class})
+    @Transactional(readOnly = true)
     public ResponseData<EtcDTO.FortuneDTO> fortuneInfo(UsernamePasswordAuthenticationToken authentication) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authentication);
 
@@ -81,14 +81,13 @@ public class EtcService {
 
         Long fortuneId = (long) random.nextInt(507);
 
-        System.out.println(fortuneId + " " + authenticationDTO.getId());
-
         Fortune findFortune = fortuneRepository.findById(fortuneId)
                 .orElseThrow(() -> new CustomException(ErrorStatus.FORTUNE_INFO_FAIL));
 
         return new ResponseData<>(Status.READ_SUCCESS, Status.READ_SUCCESS.getDescription(), new EtcDTO.FortuneDTO(findFortune.getMessage()));
     }
 
+    @Transactional(readOnly = true)
     public ResponseData<EtcDTO.SubwayInfo> subwayInfo() {
         List<EtcDTO.SubwayInfoData> subwayInfoList = new ArrayList<>();
 

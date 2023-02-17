@@ -9,6 +9,17 @@ public enum ErrorStatus {
     LOGOUT_ALREADY(401, HttpStatus.UNAUTHORIZED, "이미 로그아웃한 정보입니다."),
     PROVIDER_REJECTED(406, HttpStatus.NOT_ACCEPTABLE, "해당 로그인은 정상적인 접속이 아닙니다."),
 
+    DUPLICATED_GOOGLE_EMAIL(409, HttpStatus.CONFLICT, "이미 가입된 회사 이메일입니다."),
+    DUPLICATED_KAKAO_EMAIL(409, HttpStatus.CONFLICT, "이미 가입된 카카오 이메일입니다."),
+    DUPLICATED_EMPLOYEE_NO(409, HttpStatus.CONFLICT, "이미 가입된 사번입니다."),
+    DUPLICATED_PHONE(409, HttpStatus.CONFLICT, "이미 가입된 전화번호입니다."),
+
+    FIND_AUTHORITY_FAILED(404, HttpStatus.NOT_FOUND, "해당 권한 정보가 없습니다."),
+    FIND_RANK_FAILED(404, HttpStatus.NOT_FOUND, "해당 직급 정보가 없습니다."),
+    FIND_DEPARTMENT_FAILED(404, HttpStatus.NOT_FOUND, "해당 소속/부서 정보가 없습니다."),
+
+    SAVE_PROFILE_IMAGE_FAILED(409, HttpStatus.CONFLICT, "프로필 저장에 실패했습니다."),
+
     NOT_FOUND_LOGIN_EMAIL(401, HttpStatus.UNAUTHORIZED, "로그인한 이메일을 찾지 못했습니다."),
     NOT_FOUND_EMAIL(404, HttpStatus.NOT_FOUND, "해당 이메일을 찾지 못했습니다."),
     NOT_FOUND_EMPLOYEE(404, HttpStatus.NOT_FOUND, "해당 직원을 찾지 못했습니다."),

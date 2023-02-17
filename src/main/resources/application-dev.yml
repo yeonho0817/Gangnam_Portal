@@ -1,6 +1,10 @@
 
 frontRedirect: "http://portal.gn.com"
 
+profilePath: "C:\\Users\\dusgh\\OneDrive\\사진\\gangnam-portal"
+
+companyEmail: "@twolinecode.com"
+
 server:
   port: 8080
 

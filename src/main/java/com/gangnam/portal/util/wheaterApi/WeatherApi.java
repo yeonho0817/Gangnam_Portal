@@ -196,6 +196,8 @@ public class WeatherApi {
                 String sky = String.valueOf(jsonArray.get(i+5).getAsJsonObject().get("fcstValue").getAsString());
                 String pty = String.valueOf(jsonArray.get(i+6).getAsJsonObject().get("fcstValue").getAsString());
 
+                System.out.println(jsonArray.get(i+5));
+
                 weatherInfo = EtcDTO.WeatherInfo.builder()
                             .date(baseDate.toString().substring(0,4) + "-" + baseDate.toString().substring(4,6) + "-" + baseDate.toString().substring(6,8))
                             .time(baseTime.substring(0, 2))

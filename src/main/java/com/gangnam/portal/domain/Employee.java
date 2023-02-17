@@ -2,16 +2,19 @@ package com.gangnam.portal.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "employee")
@@ -78,9 +81,14 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private List<Commute> commuteList;
 
-    @BatchSize(size = 50)
-    @OneToMany(mappedBy = "employee")
-    private List<EmployeeEmail> employeeEmailList;
+    @BatchSize(size = 2)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<EmployeeEmail> employeeEmailList = new ArrayList<>();
+
+    public void addEmployeeEmail(EmployeeEmail employeeEmail) {
+        this.employeeEmailList.add(employeeEmail);
+    }
 
     public void updateNameEn(String nameEn){
         if (nameEn == null) return;
@@ -97,4 +105,58 @@ public class Employee {
         this.address = address;
     }
 
+    public void updateEmployeeNo(Long employeeNo) {
+        if (employeeNo == null) return;
+        this.employeeNo = employeeNo;
+    }
+
+    public void updateAffiliation(Affiliation affiliation) {
+        if (affiliation == null) return;
+        this.affiliation = affiliation;
+    }
+
+    public void updateDepartment(Department department) {
+        if (department == null) return;
+        this.department = department;
+    }
+
+    public void updateRanks(Ranks ranks) {
+        if (ranks == null) return;
+        this.ranks = ranks;
+    }
+
+    public void updateAuthority(Authority authority) {
+        if (authority == null) return;
+        this.authority = authority;
+    }
+
+    public void updateNameKr(String nameKr) {
+        if (nameKr == null) return;
+        this.nameKr = nameKr;
+    }
+
+    public void updateGender(Integer gender) {
+        if (gender == null) return;
+        this.gender = gender;
+    }
+
+    public void updateProfileImg(String profileImg) {
+        if (profileImg == null) return;
+        this.profileImg = profileImg;
+    }
+
+    public void updateState(Boolean state) {
+        if (state == null) return;
+        this.state = state;
+    }
+
+    public void updateBirthday(Date birthday) {
+        if (birthday == null) return;
+        this.birthday = birthday;
+    }
+
+    public void updateJoinDate(Date joinDate) {
+        if (joinDate == null) return;
+        this.joinDate = joinDate;
+    }
 }

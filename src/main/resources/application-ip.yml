@@ -1,6 +1,10 @@
 
 frontRedirect: "http://10.220.230.27"
 
+profilePath: "??"
+
+companyEmail: "@twolinecode.com"
+
 server:
   port: 8080
 

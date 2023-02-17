@@ -9,7 +9,7 @@ public enum DepartmentName {
     QA(2, "QA"),
     재무(3, "재무"),
     인사총무(3, "인사총무"),
-    UI(4, "UI/UX"),
+    UIUX(4, "UI/UX"),
     BX(5, "BX")
     ;
 

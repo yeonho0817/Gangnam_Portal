@@ -1,7 +1,7 @@
 package com.gangnam.portal.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "employee_email")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeEmail {
@@ -17,9 +18,8 @@ public class EmployeeEmail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id", nullable = false)
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
     @Column(name = "email", nullable = false)
@@ -28,4 +28,8 @@ public class EmployeeEmail {
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false)
     private Provider provider;
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
 }

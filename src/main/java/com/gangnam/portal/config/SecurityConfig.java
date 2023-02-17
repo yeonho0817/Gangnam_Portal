@@ -73,9 +73,12 @@ public class SecurityConfig {
                 .antMatchers("/auth/google/login", "/auth/google/callback").permitAll()
                 .antMatchers("/auth/kakao/login", "/auth/kakao/callback").permitAll()
                 .antMatchers("/auth/logout").permitAll()
+
+                .antMatchers("/img").permitAll()
                 
                 //권한 부여
                 .antMatchers("/commute/admin").hasRole("ADMIN")
+                .antMatchers("/hr/admin").hasRole("ADMIN")
 
                 // 나머지는 다 인증 필요
                 .anyRequest().authenticated()

@@ -40,8 +40,6 @@ public class QueryConditionDTO {
         if (! sort.equals("namekr") && ! sort.equals("rank") && ! sort.equals("affiliation")) sort = "rank";
         if (! orderBy.equals("ASC") && ! orderBy.equals("DESC")) orderBy = "ASC";
 
-        System.out.println(sort);
-
         try {
             Integer.parseInt(pageNumber);
         } catch (NumberFormatException e) {

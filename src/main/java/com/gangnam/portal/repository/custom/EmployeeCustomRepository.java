@@ -24,6 +24,6 @@ public interface EmployeeCustomRepository {
 
     List<EmployeeDTO.EmployeeSimpleInfo> findByEmployeeIdOrderByIdAsc(Long employeeId);
 
-    Page<EmployeeDTO.Test> test(Pageable pageable, String selectValue, String searchText);
+    Page<EmployeeDTO.HRInfoData> test(Pageable pageable, String selectValue, String searchText);
 
 }
