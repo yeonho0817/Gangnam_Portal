@@ -41,7 +41,7 @@ public class CommuteService {
 
     // 출근 등록
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
+    public ResponseData commuteStart(UsernamePasswordAuthenticationToken authenticationToken) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
         Optional<Commute> latestCommute = commuteCustomRepository.findLatestCommute(authenticationDTO.getId());
@@ -69,7 +69,7 @@ public class CommuteService {
         
         Commute newCommute = Commute.builder()
                 .employee(findEmployee)
-                .startDate(commuteStartEndDTO.getDate())
+                .startDate(new Date())
                 .registerDate(new Date())
                 .build();
 
@@ -80,7 +80,7 @@ public class CommuteService {
 
     // 퇴근 등록  :  무조건 전날껄 등록해야 함 -> 출근이든 퇴근이든
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken, CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
+    public ResponseData commuteEnd(UsernamePasswordAuthenticationToken authenticationToken) {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO(authenticationToken);
 
         /*
@@ -101,7 +101,7 @@ public class CommuteService {
         if (findLatestCommute.getEndDate() != null && ! formatter.format(findLatestCommute.getRegisterDate()).equals(today))
             throw new CustomException(ErrorStatus.COMMUTE_END_FORBIDDEN);
 
-        findLatestCommute.updateEndDate(commuteStartEndDTO.getDate());
+        findLatestCommute.updateEndDate(new Date());
 
         return new ResponseData(Status.COMMUTE_END_SUCCESS, Status.COMMUTE_END_SUCCESS.getDescription());
     }

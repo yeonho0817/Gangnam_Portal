@@ -1,6 +1,7 @@
 package com.gangnam.portal.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gangnam.portal.annotation.KakaoEmail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class EmployeeDTO {
         @NotBlank(message = "영어 이름이 빈칸입니다.")
         private String nameEn;
         @NotBlank(message = "휴대폰 번호가 빈칸입니다.")
-        @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$",message = "핸드폰 번호의 양식과 맞지 않습니다. 01x-xxx(x)-xxxx")
+        @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$",message = "전화번호 형식에 맞지 않습니다.")
         private String phone;
         @NotBlank(message = "주소가 빈칸입니다.")
         private String address;
@@ -67,10 +68,10 @@ public class EmployeeDTO {
         @NotNull(message = "입사 상태가 빈칸입니다.")
         private String state;
 
-        @NotBlank(message = "구글 이메일이 빈칸입니다.")
-//        @Pattern(regexp = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@twolinecode.com$", message = "회사 이메일 형식에 맞지 않습니다.")
+        @NotBlank(message = "회사 이메일이 빈칸입니다.")
+        @Pattern(regexp = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*$", message = "회사 이메일 형식에 맞지 않습니다.")
         private String googleEmail;
-//        @Pattern(regexp = "^(\\s)|([0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3})$" ,message = "이메일 형식이 맞지 않습니다.")
+        @KakaoEmail(message = "카카오 이메일 형식에 맞지 않습니다.")
         private String kakaoEmail;
     }
 

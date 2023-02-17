@@ -121,7 +121,12 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                         eqEmployeeId(employeeId)
                 )
 
-                .orderBy(commuteSort(pageable))
+                .orderBy(
+                        commuteSort(pageable),
+                        qCommute.registerDate.asc(),
+                        qCommute.startDate.asc(),
+                        qCommute.employee.id.asc()
+                )
 
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -129,7 +134,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
                 .fetch()
                 ;
 
-        return new PageImpl(commuteStateDataList, pageable, getTotalPage(startDate, endDate, employeeId));
+        return new PageImpl<>(commuteStateDataList, pageable, getTotalPage(startDate, endDate, employeeId));
     }
 
     @Override
@@ -178,8 +183,7 @@ public class CommuteCustomRepositoryImpl implements CommuteCustomRepository {
 
                 .where(
                         qCommute.employee.id.eq(employeeId)
-                                        .and(
-                        getRegisterDateStringTemplate().eq(formatter.format(registerDate)))
+                                        .and(getRegisterDateStringTemplate().eq(formatter.format(registerDate)))
                 )
 
                 .fetchOne();

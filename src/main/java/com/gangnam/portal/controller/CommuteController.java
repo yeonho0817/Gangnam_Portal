@@ -34,9 +34,8 @@ public class CommuteController {
             @ApiResponse(responseCode = "4XX", description = "출근 등록 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData commuteStart(@ApiIgnore @Parameter(hidden = true) UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken,
-                                     @Parameter(description = "출근 시간 정보") @RequestBody @Valid CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
-        return commuteService.commuteStart(usernamePasswordAuthenticationToken, commuteStartEndDTO);
+    public ResponseData commuteStart(@ApiIgnore @Parameter(hidden = true) UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) {
+        return commuteService.commuteStart(usernamePasswordAuthenticationToken);
     }
 
     // 퇴근 등록        O
@@ -48,9 +47,8 @@ public class CommuteController {
             @ApiResponse(responseCode = "4XX", description = "퇴근 등록 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData commuteEnd(@ApiIgnore UsernamePasswordAuthenticationToken authenticationToken,
-                                   @Parameter(description = "퇴근 시간 정보") @RequestBody CommuteDTO.CommuteStartEndDTO commuteStartEndDTO) {
-        return commuteService.commuteEnd(authenticationToken, commuteStartEndDTO);
+    public ResponseData commuteEnd(@ApiIgnore UsernamePasswordAuthenticationToken authenticationToken) {
+        return commuteService.commuteEnd(authenticationToken);
     }
 
     // 출퇴근 수정 - 관리자 기능      O

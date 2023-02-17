@@ -17,11 +17,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-@RestControllerAdvice(basePackages = "com.gangnam.portal.controller")
+
+
 @Slf4j
 @RequiredArgsConstructor
+@RestControllerAdvice(basePackages = { "com.gangnam.portal.controller", "com.gangnam.portal.dto" })
 public class ExceptionController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -46,7 +49,7 @@ public class ExceptionController {
         ResponseEntity<ErrorResponse> errorResponseEntity = ErrorResponse.of(e.getErrorStatus(), e.getErrorStatus().getDescription());
 
         if (e.getErrorStatus() == ErrorStatus.NOT_FOUND_LOGIN_EMAIL) {
-            String encodeMessage = URLEncoder.encode(errorResponseEntity.getBody().getMessage(), "UTF-8");
+            String encodeMessage = URLEncoder.encode(errorResponseEntity.getBody().getMessage(), StandardCharsets.UTF_8);
 
             response.setHeader("Location", frontRedirect + "/beforeEnter?status=" + errorResponseEntity.getBody().getStatus() + "&code=" + errorResponseEntity.getBody().getError() + "&message=" + encodeMessage);
             response.setStatus(302);
@@ -74,15 +77,12 @@ public class ExceptionController {
                     errorStatus = ErrorStatus.BLANK_ESSENTIAL_VALUE;
                     break;
 
-                case "Pattern":
+                case "Pattern": case "KakaoEmail":
                     errorStatus = ErrorStatus.INVALID_PATTERN;
                     break;
-
             }
         }
-
         printLog(errorStatus.getHttpStatus().value(), errorStatus.getHttpStatus().name(), message);
-
 
         return ErrorResponse.of(errorStatus, message);
     }

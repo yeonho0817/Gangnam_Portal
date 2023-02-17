@@ -164,7 +164,7 @@ public class EmployeeService {
         if (findEmployeeEmail.size() == 1) {
             findEmployeeEmail.get(0).updateEmail(employeeUpdateInfo.getGoogleEmail() + companyEmail);
 
-            if (! employeeUpdateInfo.getKakaoEmail().isBlank()) {
+            if (StringUtils.hasText(employeeUpdateInfo.getKakaoEmail())) {
                 findEmployee.addEmployeeEmail(EmployeeEmail.builder()
                             .employee(findEmployee)
                             .email(employeeUpdateInfo.getKakaoEmail())
@@ -174,7 +174,7 @@ public class EmployeeService {
         } else {
             findEmployeeEmail.get(0).updateEmail(employeeUpdateInfo.getGoogleEmail() + companyEmail);
 
-            if (! employeeUpdateInfo.getKakaoEmail().isEmpty()) {
+            if (StringUtils.hasText(employeeUpdateInfo.getKakaoEmail())) {
                 findEmployeeEmail.get(1).updateEmail(employeeUpdateInfo.getKakaoEmail());
             } else {
                 findEmployee.getEmployeeEmailList().remove(findEmployeeEmail.get(1));
@@ -223,7 +223,7 @@ public class EmployeeService {
         checkDuplicateEmail(mode, employeeAdminInfo.getEmployeeId(), employeeAdminInfo.getGoogleEmail() + companyEmail, Provider.google);
 
         // 카카오 이메일 검사
-        if (! employeeAdminInfo.getKakaoEmail().isEmpty()) {
+        if (StringUtils.hasText(employeeAdminInfo.getKakaoEmail())) {
             checkDuplicateEmail(mode, employeeAdminInfo.getEmployeeId(), employeeAdminInfo.getKakaoEmail(), Provider.kakao);
         }
 
