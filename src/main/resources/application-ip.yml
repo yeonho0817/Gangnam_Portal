@@ -100,6 +100,7 @@ spring:
     weather:
       apiUri: "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
       secretKey: "aLsQzQMHjr7pGgjsqPrCAN09ZS%2FxRdjV2yB1%2FF%2FxkrBZsXUhUzUB%2FPRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA%3D%3D"
+      secretKeyDecode: "aLsQzQMHjr7pGgjsqPrCAN09ZS/xRdjV2yB1/F/xkrBZsXUhUzUB/PRKmbW3CJTdXNf3wP1igRSYsf1NhzAGkA=="
     subway:
       apiUri: "http://swopenAPI.seoul.go.kr/api/subway"
       #      secretKey: "747967775364757338377456677458"

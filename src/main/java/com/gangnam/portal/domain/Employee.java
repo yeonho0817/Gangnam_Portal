@@ -62,7 +62,7 @@ public class Employee {
     @Column(name = "phone", nullable = false, columnDefinition = "VARCHAR(15)")
     private String phone;
 
-    @Column(name = "profile_img", nullable = false, columnDefinition = "VARCHAR(500)")
+    @Column(name = "profile_img", columnDefinition = "VARCHAR(500)")
     private String profileImg;
 
     @Column(name = "state", nullable = false, columnDefinition = "TINYINT(1)")

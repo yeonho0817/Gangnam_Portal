@@ -50,6 +50,8 @@ public enum ErrorStatus {
     // Valid Error Message
     BLANK_ESSENTIAL_VALUE(400, HttpStatus.BAD_REQUEST, "필수 값이 없습니다."),
     INVALID_PATTERN(400, HttpStatus.BAD_REQUEST, "형식이 맞지 않습니다."),
+    INVALID_MIN(400, HttpStatus.BAD_REQUEST, "최소값 보다 커야합니다."),
+    INVALID_SIZE(400, HttpStatus.BAD_REQUEST, "길이가 맞지 않습니다.");
 
     ;
 

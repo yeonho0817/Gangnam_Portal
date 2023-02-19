@@ -36,7 +36,6 @@ public class EmployeeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseData saveEmployee(@Valid @RequestBody EmployeeDTO.EmployeeAdminInfo employeeSaveInfo) {
-        System.out.println(employeeSaveInfo.toString());
         return employeeService.saveEmployee(employeeSaveInfo);
     }
 

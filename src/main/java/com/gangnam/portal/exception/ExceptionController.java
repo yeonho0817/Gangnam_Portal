@@ -31,7 +31,7 @@ public class ExceptionController {
     @Value("${frontRedirect}")
     private String frontRedirect;
 
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e) {
 
         return bindingError(e.getBindingResult());
@@ -76,10 +76,14 @@ public class ExceptionController {
                 case "NotBlank": case "NotNull":
                     errorStatus = ErrorStatus.BLANK_ESSENTIAL_VALUE;
                     break;
-
-                case "Pattern": case "KakaoEmail":
+                case "Pattern": case "KakaoEmail": case "PastOrPresent":
                     errorStatus = ErrorStatus.INVALID_PATTERN;
                     break;
+                case "Min":
+                    errorStatus = ErrorStatus.INVALID_MIN;
+                    break;
+                case "Size":
+                    errorStatus = ErrorStatus.INVALID_SIZE;
             }
         }
         printLog(errorStatus.getHttpStatus().value(), errorStatus.getHttpStatus().name(), message);
