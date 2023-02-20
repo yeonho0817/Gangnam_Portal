@@ -28,7 +28,8 @@ services:
     ports:
       - 3307:3306
     volumes:
-      - mysql-db-volume:/var/lib/mysql
+      - ./db:/var/lib/mysql
+      - ./profileImg:/var/lib/profileImage
 
   redis:
     image: redis:alpine

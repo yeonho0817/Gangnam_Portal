@@ -2,10 +2,7 @@ package com.gangnam.portal.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gangnam.portal.annotation.KakaoEmail;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
@@ -33,6 +30,7 @@ public class EmployeeDTO {
     @RequiredArgsConstructor
     @AllArgsConstructor
     @Builder
+    @ToString
     public static class EmployeeAdminInfo {
         private Long employeeId;
         @NotNull(message = "사번이 빈칸입니다.")
@@ -43,7 +41,7 @@ public class EmployeeDTO {
         @NotBlank(message = "한글 이름이 빈칸입니다.")
         private String nameKr;
         @NotBlank(message = "영어 이름이 빈칸입니다.")
-        @Pattern(regexp = "^[A-Za-z]+$")
+        @Pattern(regexp = "^[A-Za-z]+$", message = "영어가 아닙니다.")
         private String nameEn;
         @NotNull(message = "생일이 빈칸입니다.")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
@@ -57,7 +55,7 @@ public class EmployeeDTO {
         @NotNull(message = "부서가 빈칸입니다.")
         private Long departmentId;
 
-//        private MultipartFile profileImg;
+//        private MultipartFile newProfileImg;
         @NotBlank(message = "성별이 빈칸입니다.")
         private String gender;
         @NotBlank(message = "전화번호가 빈칸입니다.")
@@ -76,7 +74,6 @@ public class EmployeeDTO {
         @Size(min = 2, message = "이메일 크기가 맞지 않습니다.(최소 2 이상)")
         @Pattern(regexp = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*$", message = "회사 이메일 형식에 맞지 않습니다.")
         private String googleEmail;
-        @Size(min = 2, message = "이메일 크기가 맞지 않습니다.(최소 2 이상)")
         @KakaoEmail(message = "카카오 이메일 형식에 맞지 않습니다.")
         private String kakaoEmail;
     }
@@ -97,9 +94,9 @@ public class EmployeeDTO {
         private Long rankId;
         private String rank;
         private Long affiliationId;
-        private String affiliation;
+        private String affiliationName;
         private Long departmentId;
-        private String department;
+        private String departmentName;
 
         private String profileImg;
         private String gender;

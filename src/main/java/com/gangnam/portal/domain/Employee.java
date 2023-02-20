@@ -141,7 +141,7 @@ public class Employee {
     }
 
     public void updateProfileImg(String profileImg) {
-        if (profileImg == null) return;
+//        if (profileImg == null) return;
         this.profileImg = profileImg;
     }
 

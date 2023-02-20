@@ -14,16 +14,18 @@ public interface EmployeeCustomRepository {
 
     List<EmployeeDTO.EmployeeNameList> readEmployeeNameList();
     
-    
     // 인력조회
     Page<EmployeeDTO.HRInfoData> readHumanResource(Pageable pageable, String selectValue, String searchText);
-    
     
     // 소속/부서 조회
     Page<EmployeeDTO.EmployeeSimpleInfo> readHumanResourceDepartment(Pageable pageable, String name, String affiliation, String department);
 
     List<EmployeeDTO.EmployeeSimpleInfo> findByEmployeeIdOrderByIdAsc(Long employeeId);
 
+    // 사진 조회
+
     Page<EmployeeDTO.HRInfoData> test(Pageable pageable, String selectValue, String searchText);
+
+
 
 }

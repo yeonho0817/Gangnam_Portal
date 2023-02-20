@@ -64,27 +64,33 @@ public class EtcService {
         // radom 숫자
         Random random = new Random();
 
+        Date today = new Date();
+
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-        String str = formatter.format(new Date());
+        String str = formatter.format(today);
 
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"), Locale.KOREA);
+//        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"), Locale.KOREA);
+//
+//        calendar.set(Calendar.YEAR, Integer.parseInt(str.substring(0, 4)));
+//        calendar.set(Calendar.MONTH, Integer.parseInt(str.substring(4, 6))-1);
+//        calendar.set(Calendar.DATE, Integer.parseInt(str.substring(6, 8)));
+//        calendar.set(Calendar.HOUR, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        calendar.set(Calendar.MILLISECOND, 0);
+//
+//        System.out.println(Integer.parseInt(str) + authenticationDTO.getId());
+//
+//        SimpleDateFormat test = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        System.out.println(calendar + "\n" + test.format(new Date()));
 
-        calendar.set(Calendar.YEAR, Integer.parseInt(str.substring(0, 4)));
-        calendar.set(Calendar.MONTH, Integer.parseInt(str.substring(4, 6))-1);
-        calendar.set(Calendar.DATE, Integer.parseInt(str.substring(6, 8)));
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+        System.out.println(Integer.parseInt(str) + authenticationDTO.getId());
 
-        System.out.println(authenticationDTO.getId() + calendar.getTime().getTime());
+        SimpleDateFormat formatter1 = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+        System.out.println(formatter1.format(today));
 
-        SimpleDateFormat test = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(calendar + "\n" + test.format(new Date()));
-
-
-        random.setSeed(authenticationDTO.getId() + calendar.getTime().getTime());
+        random.setSeed(Integer.parseInt(str) + authenticationDTO.getId());
 
         Long fortuneId = (long) random.nextInt(507);
 

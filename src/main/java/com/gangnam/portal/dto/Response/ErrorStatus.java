@@ -19,6 +19,7 @@ public enum ErrorStatus {
     FIND_DEPARTMENT_FAILED(404, HttpStatus.NOT_FOUND, "해당 소속/부서 정보가 없습니다."),
 
     SAVE_PROFILE_IMAGE_FAILED(409, HttpStatus.CONFLICT, "프로필 저장에 실패했습니다."),
+    NOT_FOUND_PROFILE_IMAGE(404, HttpStatus.NOT_FOUND, "프로필 이미지를 가져올 수 없습니다."),
 
     NOT_FOUND_LOGIN_EMAIL(401, HttpStatus.UNAUTHORIZED, "로그인한 이메일을 찾지 못했습니다."),
     NOT_FOUND_EMAIL(404, HttpStatus.NOT_FOUND, "해당 이메일을 찾지 못했습니다."),

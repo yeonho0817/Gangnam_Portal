@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -35,8 +36,10 @@ public class EmployeeController {
             @ApiResponse(responseCode = "4XX", description = "사원 정보 추가 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData saveEmployee(@Valid @RequestBody EmployeeDTO.EmployeeAdminInfo employeeSaveInfo) {
-        return employeeService.saveEmployee(employeeSaveInfo);
+    public ResponseData saveEmployee(@Valid @RequestPart EmployeeDTO.EmployeeAdminInfo employeeSaveInfo,
+                                     @RequestPart(required = false) MultipartFile newProfileImg
+    ) {
+        return employeeService.saveEmployee(employeeSaveInfo, newProfileImg);
     }
 
     // 사원 수정
@@ -49,8 +52,17 @@ public class EmployeeController {
             @ApiResponse(responseCode = "4XX", description = "사원 정보 수정 실패",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseData updateEmployeeInfo(@Valid @RequestBody EmployeeDTO.EmployeeAdminInfo employeeUpdateInfo) {
-        return employeeService.updateEmployeeInfo(employeeUpdateInfo);
+    public ResponseData updateEmployeeInfo(@Valid @RequestPart EmployeeDTO.EmployeeAdminInfo employeeUpdateInfo,
+                                           @RequestPart(required = false) MultipartFile newProfileImg
+    ) {
+        System.out.println(newProfileImg);
+        return employeeService.updateEmployeeInfo(employeeUpdateInfo, newProfileImg);
+    }
+
+    // 이미지 반환
+    @GetMapping("/profile-image/{employeeId}")
+    public byte[] getProfileImage(@PathVariable(name="employeeId") Long employeeId) {
+        return employeeService.getProfileImage(employeeId);
     }
 
     // 사원 정보 조회

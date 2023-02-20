@@ -1,7 +1,9 @@
 
 frontRedirect: "http://10.220.230.27"
 
-profilePath: "??"
+profilePath: "/var/lib/profileImage"
+
+profileUri: "http://10.220.230.27:8081/profile-image/"
 
 companyEmail: "@twolinecode.com"
 

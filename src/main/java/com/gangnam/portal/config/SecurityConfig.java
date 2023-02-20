@@ -74,7 +74,8 @@ public class SecurityConfig {
                 .antMatchers("/auth/kakao/login", "/auth/kakao/callback").permitAll()
                 .antMatchers("/auth/logout").permitAll()
 
-                .antMatchers("/img").permitAll()
+                // 프로필 이미지
+                .antMatchers("/profile-image/**").permitAll()
                 
                 //권한 부여
                 .antMatchers("/commute/admin").hasRole("ADMIN")
@@ -99,8 +100,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://portal.gn.com", "http://10.220.230.27", "http://10.220.230.27.nip.io"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Origin", "Cache-Control", "Content-Type", "Authorization", "RefreshToken"));
-        configuration.setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PATCH", "PUT", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("**", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Access-Control-Request-Headers", "Origin", "Cache-Control", "Content-Type", "Authorization", "RefreshToken"));
+        configuration.setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PATCH", "PUT", "OPTIONS", "HEAD"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

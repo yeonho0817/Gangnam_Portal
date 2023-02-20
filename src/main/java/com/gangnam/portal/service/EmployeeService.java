@@ -15,6 +15,7 @@ import com.gangnam.portal.repository.RanksRepository;
 import com.gangnam.portal.repository.custom.EmployeeCustomRepository;
 import com.gangnam.portal.repository.custom.TeamCustomRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,10 +49,13 @@ public class EmployeeService {
     @Value("${companyEmail}")
     private String companyEmail;
 
+    @Value("${noImagePath}")
+    private String noImagePath;
+
     // 사원 추가
     @Modifying
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseData saveEmployee(EmployeeDTO.EmployeeAdminInfo employeeSaveInfo) {
+    public ResponseData saveEmployee(EmployeeDTO.EmployeeAdminInfo employeeSaveInfo, MultipartFile multipartFile) {
         checkDuplicated("save", employeeSaveInfo);
 
         // affiliation + department
@@ -75,9 +82,7 @@ public class EmployeeService {
 //                .build());
 
         // 사진 저장
-//        saveProfileImage(employeeSaveInfo.getProfileImg(), employeeSaveInfo.getNameKr(), employeeSaveInfo.getGoogleEmail());
-
-
+        saveProfileImage(multipartFile, employeeSaveInfo.getNameKr(), employeeSaveInfo.getGoogleEmail());
 
         Employee newEmployee = Employee.builder()
                 .employeeNo(employeeSaveInfo.getEmployeeNo())
@@ -93,8 +98,7 @@ public class EmployeeService {
                 .state(!employeeSaveInfo.getState().equals("재직"))
                 .birthday(employeeSaveInfo.getBirthday())
                 .joinDate(employeeSaveInfo.getJoinDate())
-
-//                .profileImg(profilePath + "\\" + employeeSaveInfo.getNameKr() + "-" + employeeSaveInfo.getGoogleEmail() + companyEmail)
+                .profileImg(profilePath + employeeSaveInfo.getNameKr() + "-" + employeeSaveInfo.getGoogleEmail() + companyEmail + ".jpg")
 
                 .build();
 
@@ -123,12 +127,12 @@ public class EmployeeService {
 
     // 사원 수정
     @Transactional(rollbackFor = {Exception.class})
-    public ResponseData updateEmployeeInfo(EmployeeDTO.EmployeeAdminInfo employeeUpdateInfo) {
+    public ResponseData updateEmployeeInfo(EmployeeDTO.EmployeeAdminInfo employeeUpdateInfo, MultipartFile newProfileImg) {
         // 중복 검사
         checkDuplicated("update", employeeUpdateInfo);
 
         // affiliation + department
-        Department findDepartment = teamCustomRepository.findByDepartmentId(employeeUpdateInfo.getAffiliationId())
+        Department findDepartment = teamCustomRepository.findByDepartmentId(employeeUpdateInfo.getDepartmentId())
                 .orElseThrow(() -> new CustomException(ErrorStatus.FIND_DEPARTMENT_FAILED));
 
         // ranks
@@ -156,7 +160,14 @@ public class EmployeeService {
         findEmployee.updateState(!employeeUpdateInfo.getState().equals("재직"));
         findEmployee.updateBirthday(employeeUpdateInfo.getBirthday());
         findEmployee.updateJoinDate(employeeUpdateInfo.getJoinDate());
-//        findEmployee.updateProfileImg(profilePath + "\\" + employeeUpdateInfo.getNameKr() + "-" + employeeUpdateInfo.getGoogleEmail() + companyEmail);
+
+        // 사진 저장
+        if (! Objects.isNull(newProfileImg)) {
+            saveProfileImage(newProfileImg, employeeUpdateInfo.getNameKr(), employeeUpdateInfo.getGoogleEmail());
+            findEmployee.updateProfileImg(profilePath + employeeUpdateInfo.getNameKr() + "-" + employeeUpdateInfo.getGoogleEmail() + companyEmail + ".jpg");
+        } else {
+            findEmployee.updateProfileImg(null);
+        }
 
         // email
         List<EmployeeEmail> findEmployeeEmail = findEmployee.getEmployeeEmailList();
@@ -235,8 +246,9 @@ public class EmployeeService {
     }
 
     private void saveProfileImage(MultipartFile multipartFile, String nameKr, String googleEmail) {
+        System.out.println(profilePath + nameKr + "-" + googleEmail + companyEmail + ".jpg");
         try {
-            multipartFile.transferTo(new File(profilePath + "\\" + nameKr + "-" + googleEmail + companyEmail));
+            multipartFile.transferTo(new File(profilePath + nameKr + "-" + googleEmail + companyEmail + ".jpg"));
         } catch (Exception e) {
             throw new CustomException(ErrorStatus.SAVE_PROFILE_IMAGE_FAILED);
         }
@@ -261,6 +273,31 @@ public class EmployeeService {
         return new ResponseData<>(Status.FIND_MY_INFO_SUCCESS, Status.FIND_MY_INFO_SUCCESS.getDescription(), findEmployeeInfo);
     }
 
+    // profile image
+    public byte[] getProfileImage(Long employeeId) {
+        try {
+            Employee findEmployee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new CustomException(ErrorStatus.NOT_FOUND_EMPLOYEE));
+
+            String path = null;
+
+            if (! StringUtils.hasText(findEmployee.getProfileImg())) {
+                path = noImagePath;
+            } else {
+                path = findEmployee.getProfileImg();
+            }
+
+            InputStream imageStream = new FileInputStream(path);
+
+            byte[] imageByteArray = IOUtils.toByteArray(imageStream);
+            imageStream.close();
+
+            return imageByteArray;
+        } catch (IOException e) {
+            throw new CustomException(ErrorStatus.NOT_FOUND_PROFILE_IMAGE);
+        }
+    }
+
     // 내 정보 수정    O
     @Transactional(rollbackFor = {Exception.class})
     public ResponseData updateMyInfo(UsernamePasswordAuthenticationToken authenticationToken, EmployeeDTO.UpdateInfoDTO updateInfoDTO) {
@@ -277,7 +314,7 @@ public class EmployeeService {
         findEmployee.updateNameEn(updateInfoDTO.getNameEn());
         findEmployee.updatePhone(updateInfoDTO.getPhone());
         findEmployee.updateAddress(updateInfoDTO.getAddress());
-        findEmployee.updateProfileImg(profilePath + "\\" + findEmployee.getNameKr() + "-" + findEmployeeEmail.getEmail() + ".jpg");
+        findEmployee.updateProfileImg(profilePath + findEmployee.getNameKr() + "-" + findEmployeeEmail.getEmail() + ".jpg");
 
         return new ResponseData(Status.UPDATE_MY_INFO_SUCCESS, Status.UPDATE_MY_INFO_SUCCESS.getDescription());
     }

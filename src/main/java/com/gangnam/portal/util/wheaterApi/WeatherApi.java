@@ -175,8 +175,8 @@ public class WeatherApi {
         conn.disconnect();
         String result= sb.toString();
 
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(result);
+
+        JsonElement element = JsonParser.parseString(result);
 
         JsonArray jsonArray = (JsonArray) element.getAsJsonObject().get("response")
                 .getAsJsonObject().get("body")
@@ -199,7 +199,7 @@ public class WeatherApi {
                 System.out.println(jsonArray.get(i+5));
 
                 weatherInfo = EtcDTO.WeatherInfo.builder()
-                            .date(baseDate.toString().substring(0,4) + "-" + baseDate.toString().substring(4,6) + "-" + baseDate.toString().substring(6,8))
+                            .date(baseDate.substring(0,4) + "-" + baseDate.substring(4,6) + "-" + baseDate.substring(6,8))
                             .time(baseTime.substring(0, 2))
                             .isNight((Integer.parseInt(hourFormat.format(new Date())) >= 19 && Integer.parseInt(hourFormat.format(new Date())) <= 24) || (Integer.parseInt(hourFormat.format(new Date()))>=0 && Integer.parseInt(hourFormat.format(new Date())) < 6) )
                             .tmp(jsonArray.get(i).getAsJsonObject().get("fcstValue").getAsString())

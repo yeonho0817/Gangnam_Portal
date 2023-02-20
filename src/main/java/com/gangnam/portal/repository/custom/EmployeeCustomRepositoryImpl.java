@@ -8,6 +8,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,9 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
     private final QDepartment qDepartment = QDepartment.department;
     private final QRanks qRanks = QRanks.ranks;
     private final QAffiliation qAffiliation = QAffiliation.affiliation;
+
+    @Value("${profileUri}")
+    private String profileUri;
 
     @Override
     public Optional<EmployeeDTO.EmployeeInfoDTO> findEmployeeInfo(Long id) {
@@ -58,10 +62,10 @@ public class EmployeeCustomRepositoryImpl implements EmployeeCustomRepository {
                     .rankId(employee.getRanks().getId())
                     .rank(employee.getRanks().getName().name())
                     .affiliationId(employee.getAffiliation().getId())
-                    .affiliation(employee.getAffiliation().getName().name())
+                    .affiliationName(employee.getAffiliation().getName().name())
                     .departmentId(employee.getDepartment().getId())
-                    .department(employee.getDepartment().getName().getName())
-                    .profileImg(employee.getProfileImg())
+                    .departmentName(employee.getDepartment().getName().getName())
+                    .profileImg(profileUri + employee.getId())
                     .gender(employee.getGender() % 2 == 0 ? "여자" : "남자")
                     .phone(employee.getPhone())
                     .address(employee.getAddress())
